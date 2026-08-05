@@ -1,0 +1,43 @@
+# Data and generated experiment artifacts
+data/
+**/data/
+results/
+**/results/
+models/
+**/models/
+reproduction_runs/
+**/reproduction_runs/
+
+# Serialized datasets and trained models
+*.pkl
+*.joblib
+*.npy
+*.npz
+*.pt
+*.pth
+*.ckpt
+
+# Generated tables, figures, and logs
+*.csv
+*.xlsx
+*.png
+*.jpg
+*.jpeg
+*.pdf
+*.log
+
+# Python caches and local environments
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.ipynb_checkpoints/
+.venv/
+venv/
+
+# Editors and operating systems
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
