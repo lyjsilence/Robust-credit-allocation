@@ -1,4 +1,4 @@
-"""Run Table 2 under rare-catastrophe concept drift."""
+"""Run both Table 2 panels under the lower-tail-risk DGP."""
 
 from __future__ import annotations
 
@@ -7,6 +7,8 @@ import csv
 import os
 import random
 from pathlib import Path
+
+os.environ.setdefault("CUBLAS_WORKSPACE_CONFIG", ":4096:8")
 
 import numpy as np
 import pandas as pd
@@ -18,6 +20,7 @@ import optimization_problem_with_holdout as optimization
 from catastrophe_mixture_concept_drift import (
     Y_STABLE,
     build_susceptibility,
+    covariate_environment_values,
     drifted_outcomes,
     environment_probabilities,
     population_worst_risky_value,
@@ -35,11 +38,24 @@ RESULT_COLUMNS = [
     "nonrobust_risky_exposure",
 ]
 
+COVARIATE_RESULT_COLUMNS = [
+    "replication",
+    "lambda_1",
+    "mean_realized_kl",
+    "robust_q_min",
+    "nonrobust_q_min",
+    "robust_risky_exposure",
+    "nonrobust_risky_exposure",
+]
+
 
 def set_seed(seed: int) -> None:
     random.seed(seed)
     np.random.seed(seed)
     torch.manual_seed(seed)
+    torch.use_deterministic_algorithms(True)
+    torch.backends.cudnn.benchmark = False
+    torch.backends.cudnn.deterministic = True
     if torch.cuda.is_available():
         torch.cuda.manual_seed_all(seed)
 
@@ -179,30 +195,51 @@ def manipulation_metrics(
     }
 
 
-def aggregate_results(raw_path: Path, table_path: Path) -> None:
+def aggregate_results(
+    raw_path: Path,
+    table_path: Path,
+    severity_column: str,
+) -> None:
     results = pd.read_csv(raw_path)
     rows = []
-    for (lambda_2, eta_test), group in results.groupby(
-        ["lambda_2", "eta_test"], sort=False
-    ):
+    for severity, group in results.groupby(severity_column, sort=False):
         robust = group["robust_q_min"]
         nonrobust = group["nonrobust_q_min"]
         robust_mean = robust.mean()
         nonrobust_mean = nonrobust.mean()
-        rows.append(
-            {
-                "lambda_2": lambda_2,
-                "eta_test": eta_test,
-                "robust_mean": robust_mean,
-                "robust_se": robust.sem(),
-                "nonrobust_mean": nonrobust_mean,
-                "nonrobust_se": nonrobust.sem(),
-                "improvement_percent": (
-                    100.0 * (robust_mean - nonrobust_mean) / nonrobust_mean
-                ),
-            }
-        )
+        row = {
+            severity_column: severity,
+            "robust_mean": robust_mean,
+            "robust_se": robust.sem(),
+            "nonrobust_mean": nonrobust_mean,
+            "nonrobust_se": nonrobust.sem(),
+            "improvement_percent": (
+                100.0 * (robust_mean - nonrobust_mean) / nonrobust_mean
+            ),
+        }
+        for column in ("eta_test", "mean_realized_kl"):
+            if column in group:
+                row[column] = group[column].mean()
+        rows.append(row)
     pd.DataFrame(rows).to_csv(table_path, index=False)
+
+
+def combine_table2(
+    covariate_path: Path,
+    concept_path: Path,
+    output_path: Path,
+) -> None:
+    covariate = pd.read_csv(covariate_path).rename(
+        columns={"lambda_1": "lambda"}
+    )
+    covariate.insert(0, "shift_type", "covariate")
+    concept = pd.read_csv(concept_path).rename(
+        columns={"lambda_2": "lambda"}
+    )
+    concept.insert(0, "shift_type", "concept")
+    pd.concat([covariate, concept], ignore_index=True).to_csv(
+        output_path, index=False
+    )
 
 
 def summarize_checks(
@@ -254,7 +291,7 @@ def summarize_checks(
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
-        description="Run catastrophe-mixture concept drift for Table 2."
+        description="Run both Table 2 shifts under the lower-tail-risk DGP."
     )
     parser.add_argument("--start-rep", type=int, default=0)
     parser.add_argument("--n-replications", type=int, default=100)
@@ -290,8 +327,12 @@ def main() -> None:
 
     raw_path = output_dir / "replication_results.csv"
     table_path = output_dir / "table2_concept_drift.csv"
+    covariate_raw_path = output_dir / "covariate_replication_results.csv"
+    covariate_table_path = output_dir / "table2_covariate_shift.csv"
+    combined_table_path = output_dir / "table2.csv"
     check_path = output_dir / "manipulation_checks.csv"
     kl_path = output_dir / "kl_checks.csv"
+    covariate_kl_path = output_dir / "covariate_kl_checks.csv"
     summary_path = output_dir / "manipulation_summary.csv"
 
     print("lambda_2 -> eta_test")
@@ -320,10 +361,14 @@ def main() -> None:
             )
 
         set_seed(1)
-        print("\nTraining non-robust policies and evaluating drift")
+        print("\nTraining non-robust policies and evaluating shifts")
         with raw_path.open(
             "w", newline="", encoding="utf-8"
-        ) as result_file, check_path.open(
+        ) as result_file, covariate_raw_path.open(
+            "w", newline="", encoding="utf-8"
+        ) as covariate_file, covariate_kl_path.open(
+            "w", newline="", encoding="utf-8"
+        ) as covariate_kl_file, check_path.open(
             "w", newline="", encoding="utf-8"
         ) as check_file, kl_path.open(
             "w", newline="", encoding="utf-8"
@@ -332,6 +377,10 @@ def main() -> None:
                 result_file, fieldnames=RESULT_COLUMNS
             )
             result_writer.writeheader()
+            covariate_writer = csv.DictWriter(
+                covariate_file, fieldnames=COVARIATE_RESULT_COLUMNS
+            )
+            covariate_writer.writeheader()
             check_writer = None
             kl_writer = csv.DictWriter(
                 kl_file,
@@ -345,6 +394,16 @@ def main() -> None:
                 ],
             )
             kl_writer.writeheader()
+            covariate_kl_writer = csv.DictWriter(
+                covariate_kl_file,
+                fieldnames=[
+                    "replication",
+                    "lambda_1",
+                    "environment",
+                    "realized_kl",
+                ],
+            )
+            covariate_kl_writer.writeheader()
 
             for replication in replications:
                 print(
@@ -432,15 +491,64 @@ def main() -> None:
                         f"robust={robust_q_min:.6f}, "
                         f"non-robust={nonrobust_q_min:.6f}"
                     )
+
+                policy_actions = np.stack(
+                    [robust_actions[replication], nonrobust_actions]
+                )
+                for lambda_1 in args.lambda_grid:
+                    values, divergences = covariate_environment_values(
+                        test_data["Y_all"],
+                        policy_actions,
+                        lambda_1,
+                        args.n_drift_environments,
+                        replication,
+                    )
+                    for environment, value in enumerate(divergences):
+                        covariate_kl_writer.writerow(
+                            {
+                                "replication": replication,
+                                "lambda_1": lambda_1,
+                                "environment": environment,
+                                "realized_kl": value,
+                            }
+                        )
+
+                    robust_q_min, nonrobust_q_min = values.min(axis=1)
+                    covariate_writer.writerow(
+                        {
+                            "replication": replication,
+                            "lambda_1": lambda_1,
+                            "mean_realized_kl": divergences.mean(),
+                            "robust_q_min": robust_q_min,
+                            "nonrobust_q_min": nonrobust_q_min,
+                            "robust_risky_exposure": metrics[
+                                "robust_risky_exposure"
+                            ],
+                            "nonrobust_risky_exposure": metrics[
+                                "nonrobust_risky_exposure"
+                            ],
+                        }
+                    )
+                    print(
+                        f"  lambda_1={lambda_1:g}: "
+                        f"robust={robust_q_min:.6f}, "
+                        f"non-robust={nonrobust_q_min:.6f}"
+                    )
                 result_file.flush()
+                covariate_file.flush()
+                covariate_kl_file.flush()
                 check_file.flush()
                 kl_file.flush()
     finally:
         os.chdir(original_dir)
 
-    aggregate_results(raw_path, table_path)
+    aggregate_results(raw_path, table_path, "lambda_2")
+    aggregate_results(
+        covariate_raw_path, covariate_table_path, "lambda_1"
+    )
+    combine_table2(covariate_table_path, table_path, combined_table_path)
     summarize_checks(check_path, kl_path, summary_path)
-    print(f"\nSaved {table_path}")
+    print(f"\nSaved {combined_table_path}")
     print(f"Saved {summary_path}")
 
 

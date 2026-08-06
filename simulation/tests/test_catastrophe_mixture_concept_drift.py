@@ -8,6 +8,7 @@ from catastrophe_mixture_concept_drift import (
     Y_GOOD,
     Y_STABLE,
     build_susceptibility,
+    covariate_environment_values,
     drifted_outcomes,
     environment_probabilities,
     population_worst_risky_value,
@@ -58,6 +59,28 @@ class CatastropheMixtureConceptDriftTests(unittest.TestCase):
             if previous is not None:
                 self.assertTrue(np.all(probabilities > previous))
             previous = probabilities
+
+    def test_covariate_shift_reuses_the_baseline_dgp(self):
+        risky = self.data["risky_action"].reshape(-1)
+        stable = 1 - risky
+        actions = np.stack([risky, stable])
+        values, divergences = covariate_environment_values(
+            self.data["Y_all"],
+            actions,
+            severity=0.0,
+            n_environments=3,
+            replication=0,
+        )
+        expected = np.array(
+            [
+                self.data["Y_all"][np.arange(risky.size), risky].mean(),
+                self.data["Y_all"][np.arange(risky.size), stable].mean(),
+            ]
+        )
+        np.testing.assert_allclose(
+            values, np.repeat(expected[:, None], 3, axis=1)
+        )
+        np.testing.assert_array_equal(divergences, 0.0)
 
 
 if __name__ == "__main__":

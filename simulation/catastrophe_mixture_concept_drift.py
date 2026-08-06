@@ -4,7 +4,12 @@ from __future__ import annotations
 
 import numpy as np
 
-from generate_dgp import nonlinear_score, sample_actions, sample_uniform_ball
+from generate_dgp import (
+    exponential_tilt_weights,
+    nonlinear_score,
+    sample_actions,
+    sample_uniform_ball,
+)
 
 
 P0 = 0.10
@@ -173,6 +178,47 @@ def drifted_outcomes(
         + risky_indicator[None, :, :]
         * (risky_outcome[:, :, None] - Y_STABLE)
     )
+
+
+def covariate_environment_values(
+    outcomes: np.ndarray,
+    policy_actions: np.ndarray,
+    severity: float,
+    n_environments: int,
+    replication: int,
+    *,
+    base_test_seed: int = 1042,
+) -> tuple[np.ndarray, np.ndarray]:
+    """Evaluate fixed policies under exponential-tilting resampling."""
+    outcomes = np.asarray(outcomes)
+    policy_actions = np.atleast_2d(policy_actions)
+    rows = np.arange(outcomes.shape[0])
+    selected = np.stack(
+        [outcomes[rows, actions] for actions in policy_actions]
+    )
+
+    if float(severity) == 0.0:
+        values = selected.mean(axis=1, keepdims=True)
+        return np.repeat(values, n_environments, axis=1), np.zeros(
+            n_environments
+        )
+
+    values = np.empty((policy_actions.shape[0], n_environments))
+    divergences = np.empty(n_environments)
+    for environment in range(n_environments):
+        seed = base_test_seed + 10000 * (replication + 1) + environment
+        rng = np.random.default_rng(seed)
+        weights, divergences[environment] = exponential_tilt_weights(
+            rng, outcomes.shape[0], severity
+        )
+        indices = rng.choice(
+            outcomes.shape[0],
+            size=outcomes.shape[0],
+            replace=True,
+            p=weights,
+        )
+        values[:, environment] = selected[:, indices].mean(axis=1)
+    return values, divergences
 
 
 def population_worst_risky_value(eta: float = 0.20) -> float:
