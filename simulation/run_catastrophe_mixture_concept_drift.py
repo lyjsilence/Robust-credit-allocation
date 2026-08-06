@@ -17,7 +17,7 @@ import torch
 import basics_with_holdout as basics
 import opt_policy_learn_with_holdout as policy_learning
 import optimization_problem_with_holdout as optimization
-from catastrophe_mixture_concept_drift import (
+from generate_dgp import (
     Y_STABLE,
     build_susceptibility,
     covariate_environment_values,

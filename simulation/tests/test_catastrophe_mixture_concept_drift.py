@@ -2,7 +2,7 @@ import unittest
 
 import numpy as np
 
-from catastrophe_mixture_concept_drift import (
+from generate_dgp import (
     P0,
     Y_BAD,
     Y_GOOD,
