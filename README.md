@@ -39,6 +39,5 @@ python simulation/run_experiment.py \
 
 `generate_dgp.py` saves each nonzero condition in the directory read by
 `run_experiment.py`, for example `simulation/data/nonlinear_drift=1.0` or
-`simulation/data/nonlinear_shift=0.5`. The legacy names `none`, `covariate`,
-and `concept` remain accepted through `--shift_type` for old scripts. Repeat
-the last command with `-robust_met non-robust`.
+`simulation/data/nonlinear_shift=0.5`. Repeat the last command with
+`-robust_met non-robust`.

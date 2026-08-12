@@ -18,14 +18,6 @@ import numpy as np
 
 
 DGP_MODES = ("raw", "shift", "drift")
-MODE_ALIASES = {
-    "raw": "raw",
-    "none": "raw",
-    "shift": "shift",
-    "covariate": "shift",
-    "drift": "drift",
-    "concept": "drift",
-}
 SHIFT_SCALE = 0.20
 
 P0 = 0.10
@@ -539,15 +531,6 @@ def generate_drift_replication(
     }
 
 
-def normalize_mode(mode: str) -> str:
-    """Return the canonical raw/shift/drift mode name."""
-    try:
-        return MODE_ALIASES[mode]
-    except KeyError as error:
-        choices = ", ".join(DGP_MODES)
-        raise ValueError(f"mode must be one of: {choices}") from error
-
-
 def generate_replication(
     replication: int,
     *,
@@ -562,7 +545,6 @@ def generate_replication(
     dgp_kwargs: dict[str, Any],
 ) -> dict[str, Any]:
     """Dispatch one replication explicitly to raw, shift, or drift."""
-    mode = normalize_mode(mode)
     if mode == "raw":
         return generate_raw_replication(
             replication,
@@ -585,15 +567,17 @@ def generate_replication(
             base_seed_test=base_seed_test,
             dgp_kwargs=dgp_kwargs,
         )
-    return generate_drift_replication(
-        replication,
-        n_train=n_train,
-        n_test=n_test,
-        severity=severity,
-        num_environments=num_environments,
-        base_seed_train=base_seed_train,
-        base_seed_test=base_seed_test,
-    )
+    if mode == "drift":
+        return generate_drift_replication(
+            replication,
+            n_train=n_train,
+            n_test=n_test,
+            severity=severity,
+            num_environments=num_environments,
+            base_seed_train=base_seed_train,
+            base_seed_test=base_seed_test,
+        )
+    raise ValueError(f"mode must be one of: {', '.join(DGP_MODES)}")
 
 
 def plot_decision_regions(
@@ -641,16 +625,11 @@ def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         description="Generate nominal, covariate-shift, or concept-drift data."
     )
-    mode_group = parser.add_mutually_exclusive_group()
-    mode_group.add_argument(
+    parser.add_argument(
         "--mode",
         choices=DGP_MODES,
+        default="drift",
         help="DGP mode: raw (none), shift (covariates), or drift (concept).",
-    )
-    mode_group.add_argument(
-        "--shift_type",
-        choices=("none", "covariate", "concept"),
-        help=argparse.SUPPRESS,
     )
     parser.add_argument("--severity", type=float, default=0.5)
     parser.add_argument(
@@ -681,7 +660,6 @@ def build_parser() -> argparse.ArgumentParser:
 
 
 def output_stem(mode: str, severity: float) -> str:
-    mode = normalize_mode(mode)
     if mode == "raw":
         return "Shift_0.0"
     prefix = "Shift" if mode == "shift" else "Drift"
@@ -694,7 +672,6 @@ def output_directory(
     base_dir: Path, g_type: str, mode: str, severity: float
 ) -> Path:
     """Match the condition directories read by run_experiment.py."""
-    mode = normalize_mode(mode)
     if mode == "raw":
         condition = g_type
     else:
@@ -704,10 +681,9 @@ def output_directory(
 
 def main() -> None:
     args = build_parser().parse_args()
-    mode = normalize_mode(args.mode or args.shift_type or "drift")
 
     output_dir = output_directory(
-        args.out_dir, args.g_type, mode, args.severity
+        args.out_dir, args.g_type, args.mode, args.severity
     )
     output_dir.mkdir(parents=True, exist_ok=True)
     dgp_kwargs = {
@@ -721,8 +697,8 @@ def main() -> None:
         "m0": args.m0,
         "delta": args.delta,
     }
-    n_test = 10000 if mode == "raw" else args.n_test
-    stem = output_stem(mode, args.severity)
+    n_test = 10000 if args.mode == "raw" else args.n_test
+    stem = output_stem(args.mode, args.severity)
 
     for replication in range(args.num_rep):
         data = generate_replication(
@@ -730,7 +706,7 @@ def main() -> None:
             n_train=args.n_train,
             n_test=n_test,
             g_type=args.g_type,
-            mode=mode,
+            mode=args.mode,
             severity=args.severity,
             num_environments=args.num_environments,
             base_seed_train=args.base_seed_train,

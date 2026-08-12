@@ -18,7 +18,6 @@ from generate_dgp import (
     generate_replication,
     middle_margin_score,
     nonlinear_score,
-    normalize_mode,
     output_directory,
     output_stem,
     simulate_catastrophe_dataset,
@@ -144,19 +143,10 @@ class CovariateShiftTests(unittest.TestCase):
 
 
 class OutputPathTests(unittest.TestCase):
-    def test_new_and_legacy_command_names(self):
+    def test_mode_command(self):
         parser = build_parser()
         self.assertEqual(parser.parse_args(["--mode", "raw"]).mode, "raw")
-        legacy = parser.parse_args(["--shift_type", "concept"])
-        self.assertEqual(legacy.shift_type, "concept")
-
-    def test_modes_and_legacy_names_are_explicit(self):
-        self.assertEqual(normalize_mode("raw"), "raw")
-        self.assertEqual(normalize_mode("shift"), "shift")
-        self.assertEqual(normalize_mode("drift"), "drift")
-        self.assertEqual(normalize_mode("none"), "raw")
-        self.assertEqual(normalize_mode("covariate"), "shift")
-        self.assertEqual(normalize_mode("concept"), "drift")
+        self.assertEqual(parser.parse_args([]).mode, "drift")
 
     def test_output_directories_match_run_experiment(self):
         base = Path("data")

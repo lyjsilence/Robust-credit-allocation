@@ -15,12 +15,12 @@ generation function, while `generate_replication` is a short dispatcher:
 - `shift`: the same smooth outcomes with X-dependent covariate resampling;
 - `drift`: the lower-tail-risk outcome model with concept drift.
 
-The historical command names `none`, `covariate`, and `concept` are retained
-as hidden `--shift_type` aliases so existing scripts continue to work. Output
-directories and PKL schemas remain unchanged.
+There is only one selector: `--mode`, whose default is `drift`. No alias map or
+second command-line option is retained. Output directories and PKL schemas
+remain unchanged.
 
 ## Validation
 
-Run the simulation unit tests, exercise both the new and legacy command-line
-interfaces, and compare newly generated representative raw, shift, and drift
-objects with the existing PKL files recursively and exactly.
+Run the simulation unit tests, exercise the `--mode` command-line interface,
+and compare newly generated representative raw, shift, and drift objects with
+the existing PKL files recursively and exactly.
