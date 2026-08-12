@@ -10,6 +10,7 @@ from generate_dgp import (
     Y_GOOD,
     Y_STABLE,
     apply_covariate_shift,
+    build_parser,
     build_susceptibility,
     calibrated_tilt_weights,
     drifted_outcomes,
@@ -17,7 +18,9 @@ from generate_dgp import (
     generate_replication,
     middle_margin_score,
     nonlinear_score,
+    normalize_mode,
     output_directory,
+    output_stem,
     simulate_catastrophe_dataset,
     simulate_dataset,
     solve_catastrophe_probability,
@@ -73,13 +76,13 @@ class CatastropheMixtureConceptDriftTests(unittest.TestCase):
                 self.assertTrue(np.all(probabilities > previous))
             previous = probabilities
 
-    def test_concept_branch_uses_the_saved_data_contract(self):
+    def test_drift_mode_uses_the_saved_data_contract(self):
         data = generate_replication(
             0,
             n_train=400,
             n_test=200,
             g_type="nonlinear",
-            shift_type="concept",
+            mode="drift",
             severity=1.0,
             num_environments=3,
             base_seed_train=42,
@@ -141,20 +144,37 @@ class CovariateShiftTests(unittest.TestCase):
 
 
 class OutputPathTests(unittest.TestCase):
+    def test_new_and_legacy_command_names(self):
+        parser = build_parser()
+        self.assertEqual(parser.parse_args(["--mode", "raw"]).mode, "raw")
+        legacy = parser.parse_args(["--shift_type", "concept"])
+        self.assertEqual(legacy.shift_type, "concept")
+
+    def test_modes_and_legacy_names_are_explicit(self):
+        self.assertEqual(normalize_mode("raw"), "raw")
+        self.assertEqual(normalize_mode("shift"), "shift")
+        self.assertEqual(normalize_mode("drift"), "drift")
+        self.assertEqual(normalize_mode("none"), "raw")
+        self.assertEqual(normalize_mode("covariate"), "shift")
+        self.assertEqual(normalize_mode("concept"), "drift")
+
     def test_output_directories_match_run_experiment(self):
         base = Path("data")
         self.assertEqual(
-            output_directory(base, "nonlinear", "none", 0),
+            output_directory(base, "nonlinear", "raw", 0),
             base / "nonlinear",
         )
         self.assertEqual(
-            output_directory(base, "nonlinear", "covariate", 0.5),
+            output_directory(base, "nonlinear", "shift", 0.5),
             base / "nonlinear_shift=0.5",
         )
         self.assertEqual(
-            output_directory(base, "nonlinear", "concept", 1),
+            output_directory(base, "nonlinear", "drift", 1),
             base / "nonlinear_drift=1.0",
         )
+        self.assertEqual(output_stem("raw", 0), "Shift_0.0")
+        self.assertEqual(output_stem("shift", 0.5), "Shift_0.5")
+        self.assertEqual(output_stem("drift", 1), "Drift_1")
 
 
 if __name__ == "__main__":

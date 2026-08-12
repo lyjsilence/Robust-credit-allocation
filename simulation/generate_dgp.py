@@ -1,8 +1,10 @@
 """Generate the simulation data used in the paper.
 
-The script supports the nominal environment, covariate shift, and concept
-drift through one command-line interface. Defaults reproduce the data-generating
-process reported in the paper.
+The script exposes the three simulation modes directly:
+
+- ``raw``: no deployment shift;
+- ``shift``: covariate shift through an X-dependent exponential tilt;
+- ``drift``: concept drift through the lower-tail-risk outcome model.
 """
 
 from __future__ import annotations
@@ -15,7 +17,15 @@ import joblib
 import numpy as np
 
 
-SHIFT_TYPES = ("none", "covariate", "concept")
+DGP_MODES = ("raw", "shift", "drift")
+MODE_ALIASES = {
+    "raw": "raw",
+    "none": "raw",
+    "shift": "shift",
+    "covariate": "shift",
+    "drift": "drift",
+    "concept": "drift",
+}
 SHIFT_SCALE = 0.20
 
 P0 = 0.10
@@ -385,70 +395,17 @@ def drifted_outcomes(
     )
 
 
-def generate_replication(
+def generate_raw_replication(
     replication: int,
     *,
     n_train: int,
     n_test: int,
     g_type: str,
-    shift_type: str,
-    severity: float,
-    num_environments: int,
     base_seed_train: int,
     base_seed_test: int,
     dgp_kwargs: dict[str, Any],
 ) -> dict[str, Any]:
-    """Generate one training dataset and its corresponding test environment(s)."""
-
-    if shift_type == "concept":
-        train = simulate_catastrophe_dataset(
-            n_train, base_seed_train + replication
-        )
-        test_base = simulate_catastrophe_dataset(
-            n_test,
-            base_seed_test + replication,
-            retain_drift_state=True,
-        )
-        susceptibility = build_susceptibility(
-            test_base["X"], num_environments
-        )
-        probabilities, eta_test, divergences = environment_probabilities(
-            susceptibility, severity
-        )
-        outcomes = drifted_outcomes(
-            test_base["catastrophe_uniform"],
-            test_base["risky_action"],
-            probabilities,
-        )
-
-        rows = np.arange(n_test)
-        actions = test_base["T"].reshape(-1)
-        risky_actions = test_base["risky_action"].reshape(-1)
-        environments = []
-        for probability, outcome in zip(probabilities, outcomes):
-            environment = dict(test_base)
-            environment["Y_all"] = outcome
-            environment["Y"] = outcome[
-                rows, actions
-            ].reshape(-1, 1).astype(np.float32)
-            expected = np.full((n_test, 2), Y_STABLE)
-            expected[rows, risky_actions] = (
-                probability * Y_BAD + (1.0 - probability) * Y_GOOD
-            )
-            environment["mu"] = expected.astype(np.float32)
-            environments.append(environment)
-
-        return {
-            "train": train,
-            "test": {
-                "base": test_base,
-                "envs": environments,
-                "lambda2": float(severity),
-                "eta_test": eta_test,
-                "kl_list": divergences,
-            },
-        }
-
+    """Generate the unshifted smooth-outcome training and test datasets."""
     train = simulate_dataset(
         n_train,
         base_seed_train + replication,
@@ -461,9 +418,32 @@ def generate_replication(
         g_type,
         **dgp_kwargs,
     )
+    return {"train": train, "test": test_base}
 
-    if shift_type == "none":
-        return {"train": train, "test": test_base}
+
+def generate_shift_replication(
+    replication: int,
+    *,
+    n_train: int,
+    n_test: int,
+    g_type: str,
+    severity: float,
+    num_environments: int,
+    base_seed_train: int,
+    base_seed_test: int,
+    dgp_kwargs: dict[str, Any],
+) -> dict[str, Any]:
+    """Generate smooth outcomes under X-dependent covariate shift."""
+    data = generate_raw_replication(
+        replication,
+        n_train=n_train,
+        n_test=n_test,
+        g_type=g_type,
+        base_seed_train=base_seed_train,
+        base_seed_test=base_seed_test,
+        dgp_kwargs=dgp_kwargs,
+    )
+    train, test_base = data["train"], data["test"]
 
     x = test_base["X"]
     if g_type == "linear":
@@ -499,6 +479,121 @@ def generate_replication(
         "shift_eta": float(severity),
     }
     return {"train": train, "test": test}
+
+
+def generate_drift_replication(
+    replication: int,
+    *,
+    n_train: int,
+    n_test: int,
+    severity: float,
+    num_environments: int,
+    base_seed_train: int,
+    base_seed_test: int,
+) -> dict[str, Any]:
+    """Generate lower-tail outcomes under concept drift."""
+    train = simulate_catastrophe_dataset(
+        n_train, base_seed_train + replication
+    )
+    test_base = simulate_catastrophe_dataset(
+        n_test,
+        base_seed_test + replication,
+        retain_drift_state=True,
+    )
+    susceptibility = build_susceptibility(test_base["X"], num_environments)
+    probabilities, eta_test, divergences = environment_probabilities(
+        susceptibility, severity
+    )
+    outcomes = drifted_outcomes(
+        test_base["catastrophe_uniform"],
+        test_base["risky_action"],
+        probabilities,
+    )
+
+    rows = np.arange(n_test)
+    actions = test_base["T"].reshape(-1)
+    risky_actions = test_base["risky_action"].reshape(-1)
+    environments = []
+    for probability, outcome in zip(probabilities, outcomes):
+        environment = dict(test_base)
+        environment["Y_all"] = outcome
+        environment["Y"] = (
+            outcome[rows, actions].reshape(-1, 1).astype(np.float32)
+        )
+        expected = np.full((n_test, 2), Y_STABLE)
+        expected[rows, risky_actions] = (
+            probability * Y_BAD + (1.0 - probability) * Y_GOOD
+        )
+        environment["mu"] = expected.astype(np.float32)
+        environments.append(environment)
+
+    return {
+        "train": train,
+        "test": {
+            "base": test_base,
+            "envs": environments,
+            "lambda2": float(severity),
+            "eta_test": eta_test,
+            "kl_list": divergences,
+        },
+    }
+
+
+def normalize_mode(mode: str) -> str:
+    """Return the canonical raw/shift/drift mode name."""
+    try:
+        return MODE_ALIASES[mode]
+    except KeyError as error:
+        choices = ", ".join(DGP_MODES)
+        raise ValueError(f"mode must be one of: {choices}") from error
+
+
+def generate_replication(
+    replication: int,
+    *,
+    n_train: int,
+    n_test: int,
+    g_type: str,
+    mode: str,
+    severity: float,
+    num_environments: int,
+    base_seed_train: int,
+    base_seed_test: int,
+    dgp_kwargs: dict[str, Any],
+) -> dict[str, Any]:
+    """Dispatch one replication explicitly to raw, shift, or drift."""
+    mode = normalize_mode(mode)
+    if mode == "raw":
+        return generate_raw_replication(
+            replication,
+            n_train=n_train,
+            n_test=n_test,
+            g_type=g_type,
+            base_seed_train=base_seed_train,
+            base_seed_test=base_seed_test,
+            dgp_kwargs=dgp_kwargs,
+        )
+    if mode == "shift":
+        return generate_shift_replication(
+            replication,
+            n_train=n_train,
+            n_test=n_test,
+            g_type=g_type,
+            severity=severity,
+            num_environments=num_environments,
+            base_seed_train=base_seed_train,
+            base_seed_test=base_seed_test,
+            dgp_kwargs=dgp_kwargs,
+        )
+    return generate_drift_replication(
+        replication,
+        n_train=n_train,
+        n_test=n_test,
+        severity=severity,
+        num_environments=num_environments,
+        base_seed_train=base_seed_train,
+        base_seed_test=base_seed_test,
+    )
 
 
 def plot_decision_regions(
@@ -546,8 +641,16 @@ def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         description="Generate nominal, covariate-shift, or concept-drift data."
     )
-    parser.add_argument(
-        "--shift_type", choices=SHIFT_TYPES, default="concept"
+    mode_group = parser.add_mutually_exclusive_group()
+    mode_group.add_argument(
+        "--mode",
+        choices=DGP_MODES,
+        help="DGP mode: raw (none), shift (covariates), or drift (concept).",
+    )
+    mode_group.add_argument(
+        "--shift_type",
+        choices=("none", "covariate", "concept"),
+        help=argparse.SUPPRESS,
     )
     parser.add_argument("--severity", type=float, default=0.5)
     parser.add_argument(
@@ -577,32 +680,34 @@ def build_parser() -> argparse.ArgumentParser:
     return parser
 
 
-def output_stem(shift_type: str, severity: float) -> str:
-    if shift_type == "none":
+def output_stem(mode: str, severity: float) -> str:
+    mode = normalize_mode(mode)
+    if mode == "raw":
         return "Shift_0.0"
-    prefix = "Shift" if shift_type == "covariate" else "Drift"
+    prefix = "Shift" if mode == "shift" else "Drift"
     severity = float(severity)
     label = str(int(severity)) if severity.is_integer() else str(severity)
     return f"{prefix}_{label}"
 
 
 def output_directory(
-    base_dir: Path, g_type: str, shift_type: str, severity: float
+    base_dir: Path, g_type: str, mode: str, severity: float
 ) -> Path:
     """Match the condition directories read by run_experiment.py."""
-    if shift_type == "none":
+    mode = normalize_mode(mode)
+    if mode == "raw":
         condition = g_type
     else:
-        mode = "shift" if shift_type == "covariate" else "drift"
         condition = f"{g_type}_{mode}={float(severity):.1f}"
     return base_dir / condition
 
 
 def main() -> None:
     args = build_parser().parse_args()
+    mode = normalize_mode(args.mode or args.shift_type or "drift")
 
     output_dir = output_directory(
-        args.out_dir, args.g_type, args.shift_type, args.severity
+        args.out_dir, args.g_type, mode, args.severity
     )
     output_dir.mkdir(parents=True, exist_ok=True)
     dgp_kwargs = {
@@ -616,8 +721,8 @@ def main() -> None:
         "m0": args.m0,
         "delta": args.delta,
     }
-    n_test = 10000 if args.shift_type == "none" else args.n_test
-    stem = output_stem(args.shift_type, args.severity)
+    n_test = 10000 if mode == "raw" else args.n_test
+    stem = output_stem(mode, args.severity)
 
     for replication in range(args.num_rep):
         data = generate_replication(
@@ -625,7 +730,7 @@ def main() -> None:
             n_train=args.n_train,
             n_test=n_test,
             g_type=args.g_type,
-            shift_type=args.shift_type,
+            mode=mode,
             severity=args.severity,
             num_environments=args.num_environments,
             base_seed_train=args.base_seed_train,
