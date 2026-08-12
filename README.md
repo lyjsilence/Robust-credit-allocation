@@ -14,17 +14,29 @@ under distribution shift.
 Datasets, trained models, generated results, and reproduction artifacts are
 intentionally excluded from this repository.
 
-## Revised Table 2 experiment
+## Simulation workflow
 
-From the repository root, reproduce the revised 100-replication Table 2
-experiment with:
+Generate and save the simulation data before running policy learning. For
+example, generate the revised concept-drift data at \(\lambda_2=1\):
 
 ```bash
-python simulation/run_catastrophe_mixture_concept_drift.py \
-  --n-replications 100 \
-  --output-dir simulation/results/catastrophe_mixture_table2_100rep
+python simulation/generate_dgp.py \
+  --shift_type concept \
+  --severity 1 \
+  --num_rep 100 \
+  --out_dir simulation/data
 ```
 
-The runner keeps the training radius at `0.2`, evaluates 100 deployment
-environments per shift level, and writes the covariate-shift and concept-drift
-panels of Table 2.
+Then run the existing experiment entry point:
+
+```bash
+python simulation/run_experiment.py \
+  -mode drift \
+  --dist_shift 1 \
+  -robust_met robust
+```
+
+`generate_dgp.py` saves each nonzero condition in the directory read by
+`run_experiment.py`, for example `simulation/data/nonlinear_drift=1.0` or
+`simulation/data/nonlinear_shift=0.5`. Repeat the last command with
+`-robust_met non-robust`.

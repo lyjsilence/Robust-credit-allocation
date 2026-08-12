@@ -49,7 +49,7 @@ def optimization(obj_fun, X, pol_dict, policy, opt_pth, device, k_idx, log_alpha
     args = pol_dict["args"]
 
     policy_optimizer = optim.Adam(policy.parameters(), lr=args.lr, weight_decay=args.weight_decay)
-    pre_value = torch.inf
+    best_value = -torch.inf
     step, patience = 0, 10
 
     if args.verbose:
@@ -72,27 +72,35 @@ def optimization(obj_fun, X, pol_dict, policy, opt_pth, device, k_idx, log_alpha
             X_val, T_val, Y_val, prop_score_val \
                 = torch.tensor(X_val).to(device), torch.tensor(T_val).to(device), \
                   torch.tensor(Y_val).to(device), torch.tensor(prop_score_val).to(device),
-            Q_DRO_val, _ = evaluation(policy, X_val, T_val, Y_val, prop_score_val, log_alpha, args)
-
-            difference = pre_value - Q_DRO_val
-            if difference < 0.001:
-                step += 1
-                if step >= patience:
-                    if args.verbose:
-                        print(f'Early stopping at step {epoch} due to small difference.')
-                    break
+            if pol_dict["robust_met"] == "robust":
+                validation_value, _ = evaluation(
+                    policy, X_val, T_val, Y_val, prop_score_val, log_alpha, args
+                )
             else:
-                pre_value = Q_DRO_val
+                validation_value = eval_IPW(
+                    policy, X_val, T_val, Y_val, prop_score_val, args
+                )
+
+            if validation_value > best_value + 0.001:
+                best_value = validation_value
                 step = 0
+                torch.save(policy.state_dict(), opt_pth)
+            else:
+                step += 1
+                min_epochs = 100 if pol_dict["robust_met"] == "non-robust" else 0
+                if step >= patience and epoch + 1 >= min_epochs:
+                    if args.verbose:
+                        print(f'Early stopping at step {epoch} due to small improvement.')
+                    break
 
         # output the running status
         if args.verbose:
-            if (epoch + 1) % 5 == 0:
-                print(f"Iteration: {k_idx}, Epoch [{epoch + 1}/{args.optimization_epochs}], "
-                      f"Objective: {obj.item():.4f}, Q_DRO_val: {Q_DRO_val.item():.4f}")
+                if (epoch + 1) % 5 == 0:
+                    print(f"Iteration: {k_idx}, Epoch [{epoch + 1}/{args.optimization_epochs}], "
+                      f"Objective: {obj.item():.4f}, validation value: {validation_value.item():.4f}")
 
-    torch.save(policy.state_dict(), opt_pth)
-    return obj.item(), Q_DRO_val.item()
+    policy.load_state_dict(torch.load(opt_pth))
+    return obj.item(), best_value.item()
 
 
 def optimization_alpha(obj_fun, pol_dict, alpha_list, device, k_idx, policy, eval=False):
@@ -101,7 +109,8 @@ def optimization_alpha(obj_fun, pol_dict, alpha_list, device, k_idx, policy, eva
     log_alpha.requires_grad_(True)
 
     alpha_optimizer = optim.Adam([log_alpha], lr=args.lr, weight_decay=args.weight_decay)
-    pre_value = torch.inf
+    best_value = -torch.inf
+    best_alpha = log_alpha.detach().clone()
     step, patience = 0, 10
 
     if args.verbose:
@@ -124,16 +133,16 @@ def optimization_alpha(obj_fun, pol_dict, alpha_list, device, k_idx, policy, eva
                   torch.tensor(Y_val).to(device), torch.tensor(prop_score_val).to(device),
             Q_DRO_val, _ = evaluation(policy, X_val, T_val, Y_val, prop_score_val, log_alpha, args)
 
-            difference = pre_value - Q_DRO_val
-            if difference < 0.001:
+            if Q_DRO_val > best_value + 0.001:
+                best_value = Q_DRO_val
+                best_alpha = log_alpha.detach().clone()
+                step = 0
+            else:
                 step += 1
                 if step >= patience:
                     if args.verbose:
-                        print(f'Early stopping at step {epoch} due to small difference.')
+                        print(f'Early stopping at step {epoch} due to small improvement.')
                     break
-            else:
-                pre_value = Q_DRO_val
-                step = 0
 
         # output the running status
         if args.verbose:
@@ -141,7 +150,10 @@ def optimization_alpha(obj_fun, pol_dict, alpha_list, device, k_idx, policy, eva
                 print(f"Iteration: {k_idx}, Epoch [{epoch + 1}/{args.optimization_epochs}], "
                       f"Objective: {obj.item():.4f}, Q_DRO_val: {Q_DRO_val.item():.4f}")
 
+    with torch.no_grad():
+        log_alpha.copy_(best_alpha)
+
     if eval == True:
-        return log_alpha, Q_DRO_val.item()
+        return log_alpha, best_value.item()
     else:
         return log_alpha

@@ -16,6 +16,7 @@ import numpy as np
 
 
 SHIFT_TYPES = ("none", "covariate", "concept")
+SHIFT_SCALE = 0.20
 
 P0 = 0.10
 Y_BAD = 0.00
@@ -165,126 +166,61 @@ def kl_to_uniform(weights: np.ndarray) -> float:
     return float(np.sum(clipped * (np.log(clipped) + np.log(n))))
 
 
-def exponential_tilt_weights(
-    rng: np.random.Generator,
-    n: int,
-    severity: float,
-    center_z: bool = False,
-) -> tuple[np.ndarray, float]:
-    """Generate exponential-tilting weights and their realized KL divergence."""
-    severity = float(severity)
-    if severity == 0.0:
-        return np.full(n, 1.0 / n, dtype=np.float64), 0.0
+def middle_margin_score(score: np.ndarray, gamma: float) -> np.ndarray:
+    """Emphasize observations with an intermediate decision margin."""
+    margin = np.abs(np.asarray(score, dtype=np.float64))
+    return margin * np.exp(-float(gamma) * margin)
 
-    z = rng.normal(size=n).astype(np.float64)
-    if center_z:
-        z = z - z.mean()
-    logits = severity * z
+
+def tilt_weights(score: np.ndarray, beta: float) -> np.ndarray:
+    """Return exponential-tilting weights for a fixed shift score."""
+    logits = float(beta) * np.asarray(score, dtype=np.float64)
     logits -= logits.max()
     weights = np.exp(logits)
     weights /= weights.sum()
+    return weights
+
+
+def calibrated_tilt_weights(
+    score: np.ndarray, severity: float
+) -> tuple[np.ndarray, float]:
+    """Calibrate structured tilt weights to the requested KL level."""
+    target_kl = 0.5 * (SHIFT_SCALE * float(severity)) ** 2
+    if target_kl == 0.0:
+        n = np.asarray(score).size
+        return np.full(n, 1.0 / n, dtype=np.float64), 0.0
+
+    lower, upper = 0.0, 1.0
+    while kl_to_uniform(tilt_weights(score, upper)) < target_kl:
+        upper *= 2.0
+
+    for _ in range(60):
+        midpoint = 0.5 * (lower + upper)
+        weights = tilt_weights(score, midpoint)
+        if kl_to_uniform(weights) < target_kl:
+            lower = midpoint
+        else:
+            upper = midpoint
+
+    weights = tilt_weights(score, 0.5 * (lower + upper))
     return weights, kl_to_uniform(weights)
 
 
 def apply_covariate_shift(
     base_data: dict[str, np.ndarray],
-    severity: float,
+    weights: np.ndarray,
     seed: int,
-    center_z: bool = False,
-) -> tuple[dict[str, np.ndarray], np.ndarray, float]:
-    """Resample a test dataset using exponential-tilting weights."""
+) -> dict[str, np.ndarray]:
+    """Resample a test dataset using structured exponential-tilting weights."""
     n = base_data["X"].shape[0]
     rng = np.random.default_rng(seed)
-    weights, realized_kl = exponential_tilt_weights(
-        rng, n=n, severity=severity, center_z=center_z
-    )
-    if float(severity) == 0.0:
-        return base_data, weights, realized_kl
-
     indices = rng.choice(n, size=n, replace=True, p=weights)
-    shifted = {
+    return {
         key: value[indices].copy()
         if isinstance(value, np.ndarray) and value.shape[0] == n
         else value
         for key, value in base_data.items()
     }
-    return shifted, weights, realized_kl
-
-
-def rotate_vector(w1: float, w2: float, angle: float) -> tuple[float, float]:
-    """Rotate a two-dimensional vector."""
-    cosine, sine = np.cos(angle), np.sin(angle)
-    return (
-        float(cosine * w1 - sine * w2),
-        float(sine * w1 + cosine * w2),
-    )
-
-
-def apply_concept_drift(
-    base_data: dict[str, np.ndarray],
-    severity: float,
-    seed: int,
-    *,
-    gamma: float,
-    m0: float,
-    delta: float,
-    g_type: str,
-    w1: float,
-    w2: float,
-    b: float,
-    R: float,
-    max_severity: float = 5.0,
-    max_rotation: float = 1.0,
-    max_intercept_shift: float = 0.5,
-    max_radius_shift: float = 0.8,
-    max_x2_shift: float = 0.3,
-    min_radius: float = 0.7,
-) -> dict[str, np.ndarray]:
-    """Perturb the conditional outcome model while holding covariates fixed."""
-    if float(severity) == 0.0:
-        return base_data
-
-    rng = np.random.default_rng(seed)
-    x = base_data["X"].astype(np.float64)
-    action = base_data["T"].reshape(-1).astype(np.int64)
-    propensity = base_data["prop_score_all"].astype(np.float64)
-    noise = base_data["eps_all"].astype(np.float64)
-    x1, x2 = x[:, 0], x[:, 1]
-
-    scaled_severity = float(np.clip(float(severity) / max_severity, 0.0, 1.0))
-    rotation_sign = rng.choice([-1.0, 1.0])
-    intercept_sign = rng.choice([-1.0, 1.0])
-    radius_sign = rng.choice([-1.0, 1.0])
-    x2_sign = rng.choice([-1.0, 1.0])
-
-    if g_type == "linear":
-        angle = rotation_sign * max_rotation * scaled_severity
-        drift_w1, drift_w2 = rotate_vector(w1, w2, angle)
-        drift_b = float(b + intercept_sign * max_intercept_shift * scaled_severity)
-        score = linear_score(
-            x1, x2, w1=drift_w1, w2=drift_w2, intercept=drift_b
-        )
-    elif g_type == "nonlinear":
-        drift_radius = float(
-            max(min_radius, float(R) + radius_sign * max_radius_shift * scaled_severity)
-        )
-        x2_shift = float(x2_sign * max_x2_shift * scaled_severity)
-        drift_b = float(b + intercept_sign * max_intercept_shift * scaled_severity)
-        score = x1 - nonlinear_boundary(x2 - x2_shift, radius=drift_radius) - drift_b
-    else:
-        raise ValueError("g_type must be 'linear' or 'nonlinear'")
-
-    mu = latent_means(score, baseline=m0, effect=delta, sharpness=gamma)
-    potential_outcomes = sigmoid(mu + noise)
-    observed_outcome = potential_outcomes[np.arange(x.shape[0]), action]
-    observed_propensity = propensity[np.arange(x.shape[0]), action]
-
-    drifted = dict(base_data)
-    drifted["Y_all"] = potential_outcomes.astype(np.float32)
-    drifted["Y"] = observed_outcome.reshape(-1, 1).astype(np.float32)
-    drifted["prop_score"] = observed_propensity.reshape(-1, 1).astype(np.float32)
-    drifted["mu"] = mu.astype(np.float32)
-    return drifted
 
 
 # Lower-tail-risk DGP used by the revised Table 2.
@@ -417,7 +353,7 @@ def environment_probabilities(
     susceptibility: np.ndarray,
     lambda_2: float,
     *,
-    shift_scale: float = 0.20,
+    shift_scale: float = SHIFT_SCALE,
 ) -> tuple[np.ndarray, float, np.ndarray]:
     """Return calibrated probabilities and realized KL by environment."""
     eta_test = 0.5 * (shift_scale * float(lambda_2)) ** 2
@@ -449,53 +385,6 @@ def drifted_outcomes(
     )
 
 
-def covariate_environment_values(
-    outcomes: np.ndarray,
-    policy_actions: np.ndarray,
-    severity: float,
-    n_environments: int,
-    replication: int,
-    *,
-    base_test_seed: int = 1042,
-) -> tuple[np.ndarray, np.ndarray]:
-    """Evaluate fixed policies under exponential-tilting resampling."""
-    outcomes = np.asarray(outcomes)
-    policy_actions = np.atleast_2d(policy_actions)
-    rows = np.arange(outcomes.shape[0])
-    selected = np.stack(
-        [outcomes[rows, actions] for actions in policy_actions]
-    )
-
-    if float(severity) == 0.0:
-        values = selected.mean(axis=1, keepdims=True)
-        return np.repeat(values, n_environments, axis=1), np.zeros(
-            n_environments
-        )
-
-    values = np.empty((policy_actions.shape[0], n_environments))
-    divergences = np.empty(n_environments)
-    for environment in range(n_environments):
-        seed = base_test_seed + 10000 * (replication + 1) + environment
-        rng = np.random.default_rng(seed)
-        weights, divergences[environment] = exponential_tilt_weights(
-            rng, outcomes.shape[0], severity
-        )
-        indices = rng.choice(
-            outcomes.shape[0],
-            size=outcomes.shape[0],
-            replace=True,
-            p=weights,
-        )
-        values[:, environment] = selected[:, indices].mean(axis=1)
-    return values, divergences
-
-
-def population_worst_risky_value(eta: float = 0.20) -> float:
-    """Return the two-point risky action's KL worst-case value."""
-    probability = solve_catastrophe_probability(np.ones(1), eta)[0]
-    return float(probability * Y_BAD + (1.0 - probability) * Y_GOOD)
-
-
 def generate_replication(
     replication: int,
     *,
@@ -505,76 +394,110 @@ def generate_replication(
     shift_type: str,
     severity: float,
     num_environments: int,
-    center_z: bool,
     base_seed_train: int,
     base_seed_test: int,
     dgp_kwargs: dict[str, Any],
 ) -> dict[str, Any]:
     """Generate one training dataset and its corresponding test environment(s)."""
-    if shift_type not in SHIFT_TYPES:
-        raise ValueError(f"shift_type must be one of {SHIFT_TYPES}")
 
-    retain_drift_state = shift_type == "concept"
+    if shift_type == "concept":
+        train = simulate_catastrophe_dataset(
+            n_train, base_seed_train + replication
+        )
+        test_base = simulate_catastrophe_dataset(
+            n_test,
+            base_seed_test + replication,
+            retain_drift_state=True,
+        )
+        susceptibility = build_susceptibility(
+            test_base["X"], num_environments
+        )
+        probabilities, eta_test, divergences = environment_probabilities(
+            susceptibility, severity
+        )
+        outcomes = drifted_outcomes(
+            test_base["catastrophe_uniform"],
+            test_base["risky_action"],
+            probabilities,
+        )
+
+        rows = np.arange(n_test)
+        actions = test_base["T"].reshape(-1)
+        risky_actions = test_base["risky_action"].reshape(-1)
+        environments = []
+        for probability, outcome in zip(probabilities, outcomes):
+            environment = dict(test_base)
+            environment["Y_all"] = outcome
+            environment["Y"] = outcome[
+                rows, actions
+            ].reshape(-1, 1).astype(np.float32)
+            expected = np.full((n_test, 2), Y_STABLE)
+            expected[rows, risky_actions] = (
+                probability * Y_BAD + (1.0 - probability) * Y_GOOD
+            )
+            environment["mu"] = expected.astype(np.float32)
+            environments.append(environment)
+
+        return {
+            "train": train,
+            "test": {
+                "base": test_base,
+                "envs": environments,
+                "lambda2": float(severity),
+                "eta_test": eta_test,
+                "kl_list": divergences,
+            },
+        }
+
     train = simulate_dataset(
         n_train,
         base_seed_train + replication,
         g_type,
-        retain_drift_state=retain_drift_state,
         **dgp_kwargs,
     )
     test_base = simulate_dataset(
         n_test,
         base_seed_test + replication,
         g_type,
-        retain_drift_state=retain_drift_state,
         **dgp_kwargs,
     )
 
     if shift_type == "none":
         return {"train": train, "test": test_base}
 
+    x = test_base["X"]
+    if g_type == "linear":
+        raw_score = linear_score(
+            x[:, 0],
+            x[:, 1],
+            w1=dgp_kwargs.get("w1", 1.0),
+            w2=dgp_kwargs.get("w2", -0.8),
+            intercept=dgp_kwargs.get("b", 0.0),
+        )
+    else:
+        raw_score = nonlinear_score(
+            x[:, 0], x[:, 1], radius=dgp_kwargs.get("R", 1.0)
+        )
+    shift_score = middle_margin_score(
+        raw_score, gamma=dgp_kwargs.get("gamma", 6.0)
+    )
+    q, realized_kl = calibrated_tilt_weights(shift_score, severity)
     environment_seeds = (
         base_seed_test + 10000 * (replication + 1) + j
         for j in range(num_environments)
     )
-    if shift_type == "covariate":
-        environments, weights, divergences = [], [], []
-        for seed in environment_seeds:
-            environment, q, realized_kl = apply_covariate_shift(
-                test_base, severity=severity, seed=seed, center_z=center_z
-            )
-            environments.append(environment)
-            weights.append(q)
-            divergences.append(realized_kl)
-        test = {
-            "base": test_base,
-            "envs": environments,
-            "q_list": weights,
-            "kl_list": divergences,
-            "shift_eta": float(severity),
-        }
-    else:
-        environments = [
-            apply_concept_drift(
-                test_base,
-                severity=severity,
-                seed=seed,
-                gamma=float(dgp_kwargs["gamma"]),
-                m0=float(dgp_kwargs["m0"]),
-                delta=float(dgp_kwargs["delta"]),
-                g_type=g_type,
-                w1=float(dgp_kwargs["w1"]),
-                w2=float(dgp_kwargs["w2"]),
-                b=float(dgp_kwargs["b"]),
-                R=float(dgp_kwargs["R"]),
-            )
-            for seed in environment_seeds
-        ]
-        test = {
-            "base": test_base,
-            "envs": environments,
-            "lambda2": float(severity),
-        }
+    environments, weights, divergences = [], [], []
+    for seed in environment_seeds:
+        environments.append(apply_covariate_shift(test_base, q, seed))
+        weights.append(q)
+        divergences.append(realized_kl)
+    test = {
+        "base": test_base,
+        "envs": environments,
+        "q_list": weights,
+        "kl_list": divergences,
+        "shift_eta": float(severity),
+    }
     return {"train": train, "test": test}
 
 
@@ -624,9 +547,9 @@ def build_parser() -> argparse.ArgumentParser:
         description="Generate nominal, covariate-shift, or concept-drift data."
     )
     parser.add_argument(
-        "--shift_type", choices=SHIFT_TYPES, default="none"
+        "--shift_type", choices=SHIFT_TYPES, default="concept"
     )
-    parser.add_argument("--severity", type=float, default=0.0)
+    parser.add_argument("--severity", type=float, default=0.5)
     parser.add_argument(
         "--g_type", choices=("linear", "nonlinear"), default="nonlinear"
     )
@@ -634,7 +557,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--n_train", type=int, default=10000)
     parser.add_argument("--n_test", type=int, default=2500)
     parser.add_argument("--num_environments", type=int, default=100)
-    parser.add_argument("--out_dir", type=Path, default=Path("./data/Simulation"))
+    parser.add_argument("--out_dir", type=Path, default=Path("./data"))
     parser.add_argument("--base_seed_train", type=int, default=42)
     parser.add_argument("--base_seed_test", type=int, default=1042)
     parser.add_argument("--p_hi", type=float, default=0.75)
@@ -647,36 +570,40 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--w2", type=float, default=-0.8)
     parser.add_argument("--b", type=float, default=0.0)
     parser.add_argument("--R", type=float, default=1.0)
-    parser.add_argument("--center_z", action="store_true")
     parser.add_argument("--plot", dest="plot", action="store_true")
     parser.add_argument("--no_plot", dest="plot", action="store_false")
-    parser.set_defaults(plot=True)
+    parser.set_defaults(plot=False)
     parser.add_argument("--plot_n", type=int, default=6000)
     return parser
-
-
-def validate_args(args: argparse.Namespace) -> None:
-    if args.severity < 0:
-        raise ValueError("severity must be nonnegative")
-    if args.shift_type == "none" and args.severity != 0.0:
-        raise ValueError("severity must be 0 when shift_type is 'none'")
-    for name in ("num_rep", "n_train", "n_test", "num_environments"):
-        if getattr(args, name) <= 0:
-            raise ValueError(f"{name} must be positive")
 
 
 def output_stem(shift_type: str, severity: float) -> str:
     if shift_type == "none":
         return "Shift_0.0"
     prefix = "Shift" if shift_type == "covariate" else "Drift"
-    return f"{prefix}_{float(severity)}"
+    severity = float(severity)
+    label = str(int(severity)) if severity.is_integer() else str(severity)
+    return f"{prefix}_{label}"
+
+
+def output_directory(
+    base_dir: Path, g_type: str, shift_type: str, severity: float
+) -> Path:
+    """Match the condition directories read by run_experiment.py."""
+    if shift_type == "none":
+        condition = g_type
+    else:
+        mode = "shift" if shift_type == "covariate" else "drift"
+        condition = f"{g_type}_{mode}={float(severity):.1f}"
+    return base_dir / condition
 
 
 def main() -> None:
     args = build_parser().parse_args()
-    validate_args(args)
 
-    output_dir = args.out_dir / args.g_type
+    output_dir = output_directory(
+        args.out_dir, args.g_type, args.shift_type, args.severity
+    )
     output_dir.mkdir(parents=True, exist_ok=True)
     dgp_kwargs = {
         "sigmas": (args.sigma0, args.sigma1),
@@ -701,7 +628,6 @@ def main() -> None:
             shift_type=args.shift_type,
             severity=args.severity,
             num_environments=args.num_environments,
-            center_z=args.center_z,
             base_seed_train=args.base_seed_train,
             base_seed_test=args.base_seed_test,
             dgp_kwargs=dgp_kwargs,

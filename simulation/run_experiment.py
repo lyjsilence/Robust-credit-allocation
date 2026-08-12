@@ -6,6 +6,8 @@ import random
 import os
 from pathlib import Path
 
+os.environ.setdefault("CUBLAS_WORKSPACE_CONFIG", ":4096:8")
+
 import joblib
 import torch
 
@@ -15,16 +17,12 @@ os.environ["KMP_DUPLICATE_LIB_OK"]="TRUE"
 def set_seed(seed):
     random.seed(seed)
     np.random.seed(seed)
+    torch.manual_seed(seed)
+    torch.use_deterministic_algorithms(True)
+    torch.backends.cudnn.deterministic = True
+    torch.backends.cudnn.benchmark = False
     if torch.cuda.is_available():
         torch.cuda.manual_seed_all(seed)
-
-    torch.manual_seed(seed)
-    torch.cuda.manual_seed(seed)
-    torch.cuda.manual_seed_all(seed)
-
-    if seed == 0:
-        torch.backends.cudnn.deterministic = True
-        torch.backends.cudnn.benchmark = False
 
 
 def severity_label(value):
@@ -42,9 +40,9 @@ def resolve_data_dir(args):
     if args.data_dir is not None:
         return Path(args.data_dir).expanduser().resolve()
 
-    simulation_dir = Path(__file__).resolve().parent / "data" / "Simulation"
+    simulation_dir = Path(__file__).resolve().parent / "data"
     if args.dist_shift == 0:
-        condition = f"{args.type}_raw"
+        condition = f"{args.type}"
     elif args.type == "linear":
         raise ValueError(
             "Nonzero shift/drift experiments for the linear DGP are not "
@@ -90,8 +88,8 @@ parser.add_argument("-alpha_lb", type=float, default=0.1)
 parser.add_argument(
     "--dist_shift",
     type=float,
-    default=2.5,
-    choices=[0, 0.5, 1, 1.5, 2, 2.5, 3, 4, 5, 6, 7, 8, 9, 10],
+    default=0.5,
+    choices=[0, 0.5, 1, 1.5, 2, 2.5, 3],
 )
 parser.add_argument("--test_size", type=int, default=2500, choices=[500, 2000, 2500])
 

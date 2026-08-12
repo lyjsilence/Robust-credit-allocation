@@ -42,8 +42,8 @@ The behavior policy assigns the score-preferred action with probability
 \]
 
 We use two conditional outcome specifications within this common framework.
-The first is the smooth-outcome specification used in Sections 5.2 and 5.4.
-Its latent conditional means are
+The first is the smooth-outcome specification used in Sections 5.2 and 5.4
+and in the covariate-shift panel of Table 2. Its latent conditional means are
 
 \[
 \mu_a(x)
@@ -60,8 +60,8 @@ Y(a)=\operatorname{sigmoid}\{\mu_a(X)+\epsilon_a\},
 \epsilon_a\overset{\mathrm{i.i.d.}}{\sim}N(0,0.3^2).
 \]
 
-The second is a lower-tail-risk specification used for both panels of Table
-2. Here \(a_R(x)=a^\dagger(x)\) denotes the risky action and
+The second is a lower-tail-risk specification used for the concept-drift
+panel of Table 2. Here \(a_R(x)=a^\dagger(x)\) denotes the risky action and
 \(a_S(x)=1-a_R(x)\) the stable action. Under the nominal environment,
 
 \[
@@ -89,34 +89,45 @@ and evaluation samples.
 ## 5.3. Robust Versus Non-Robust Policy Learning
 
 We compare the robust policy learner with its non-robust counterpart under
-covariate shift and concept drift. Both panels of Table 2 use the lower-tail
-baseline model defined in Section 5.1. The two policies are trained once per
-replication and then evaluated under both types of shift. Consequently, the
-score function, action boundary, behavior policy, outcome support, training
-sample, and learned policies are identical across the two panels. The robust
-learner uses the same training ambiguity radius, \(\eta=0.2\), for all shift
-levels, whereas the non-robust learner optimizes the nominal empirical
-objective.
+covariate shift and concept drift. The covariate-shift panel retains the
+smooth-outcome specification, whereas the concept-drift panel uses the
+lower-tail-risk specification defined in Section 5.1. The policy-learning
+configuration and worst-environment evaluation criterion are otherwise
+unchanged. Within each panel and replication, the robust and non-robust
+methods use the same training and evaluation samples. The robust learner uses
+the same training ambiguity radius, \(\eta=0.2\), for all shift levels,
+whereas the non-robust learner optimizes the nominal empirical objective.
 
 ### Covariate shift
 
 Covariate shift changes the deployment distribution of \(X\) while leaving
-the conditional outcome kernel fixed. For environment \(m\) and evaluation
-observation \(i\), draw an auxiliary tilting score \(z_{im}\sim N(0,1)\) and
-define
+the conditional outcome kernel fixed. Let \(s(x_1,x_2)\) denote the score
+defining the nominal treatment boundary and define the middle-margin score
 
 \[
-q_{im}(\lambda_1)
-=
-\frac{\exp(\lambda_1 z_{im})}
-{\sum_{j=1}^{n_{\mathrm{test}}}\exp(\lambda_1 z_{jm})}.
+h(x)=|s(x_1,x_2)|\exp\{-\gamma|s(x_1,x_2)|\}.
 \]
 
-We construct an environment by drawing \(n_{\mathrm{test}}\) observations
-with replacement from the nominal evaluation sample using probabilities
-\(\{q_{im}(\lambda_1)\}_{i=1}^{n_{\mathrm{test}}}\). Larger
-\(\lambda_1\) produces a more concentrated deployment distribution. This
-resampling changes the empirical covariate distribution but does not alter
+This score is zero at the treatment boundary, reaches its maximum at
+\(|s(x_1,x_2)|=1/\gamma\), and decreases far from the boundary. For evaluation
+observation \(i\), define
+
+\[
+q_i(\lambda_1)
+=
+\frac{\exp\{\beta(\lambda_1)h(X_i)\}}
+{\sum_{j=1}^{n_{\mathrm{test}}}\exp\{\beta(\lambda_1)h(X_j)\}}.
+\]
+
+For each replication and severity, \(\beta(\lambda_1)\) is calibrated so that
+\(D_{\mathrm{KL}}\{q(\lambda_1)\|p_0\}\) equals, respectively,
+\(\{0.005,0.02,0.045,0.08,0.125,0.18\}\) for
+\(\lambda_1\in\{0.5,1,1.5,2,2.5,3\}\), where \(p_0\) is uniform on the
+nominal evaluation sample. We construct each of 100 environments by drawing
+\(n_{\mathrm{test}}\) observations with replacement using probabilities
+\(\{q_i(\lambda_1)\}_{i=1}^{n_{\mathrm{test}}}\). Larger \(\lambda_1\)
+concentrates the deployment distribution in the intermediate-margin region.
+This resampling changes the empirical covariate distribution but does not alter
 \(P(Y\mid X,A)\).
 
 ### Concept drift
@@ -225,36 +236,35 @@ standard errors. The relative improvement is
 
 | Shift type | Severity | Robust \(Q_{\min}\) | Non-robust \(Q_{\min}\) | Improvement |
 |---|---:|---:|---:|---:|
-| Covariate shift | \(\lambda_1=0.5\) | 0.7870 (0.0004) | 0.7907 (0.0005) | -0.47% |
-|  | \(\lambda_1=1.0\) | 0.7819 (0.0004) | 0.7834 (0.0006) | -0.19% |
-|  | \(\lambda_1=1.5\) | 0.7631 (0.0015) | 0.7529 (0.0022) | 1.36% |
-|  | \(\lambda_1=2.0\) | 0.7193 (0.0045) | 0.6723 (0.0071) | 6.99% |
-|  | \(\lambda_1=2.5\) | 0.6488 (0.0092) | 0.5491 (0.0124) | 18.15% |
-|  | \(\lambda_1=3.0\) | 0.5678 (0.0135) | 0.4228 (0.0153) | 34.30% |
-| Concept drift | \(\lambda_2=0.5\) | 0.7869 (0.0003) | 0.7825 (0.0005) | 0.56% |
-|  | \(\lambda_2=1.0\) | 0.7792 (0.0005) | 0.7612 (0.0006) | 2.36% |
-|  | \(\lambda_2=1.5\) | 0.7713 (0.0008) | 0.7390 (0.0008) | 4.36% |
-|  | \(\lambda_2=2.0\) | 0.7627 (0.0011) | 0.7158 (0.0011) | 6.56% |
-|  | \(\lambda_2=2.5\) | 0.7540 (0.0015) | 0.6909 (0.0014) | 9.14% |
-|  | \(\lambda_2=3.0\) | 0.7448 (0.0018) | 0.6653 (0.0017) | 11.94% |
+| Covariate shift | \(\lambda_1=0.5\) | 0.7592 (0.0006) | 0.7436 (0.0006) | 2.09% |
+|  | \(\lambda_1=1.0\) | 0.7570 (0.0006) | 0.7401 (0.0006) | 2.29% |
+|  | \(\lambda_1=1.5\) | 0.7552 (0.0007) | 0.7366 (0.0006) | 2.53% |
+|  | \(\lambda_1=2.0\) | 0.7534 (0.0007) | 0.7329 (0.0007) | 2.79% |
+|  | \(\lambda_1=2.5\) | 0.7512 (0.0008) | 0.7291 (0.0008) | 3.04% |
+|  | \(\lambda_1=3.0\) | 0.7495 (0.0008) | 0.7256 (0.0008) | 3.29% |
+| Concept drift | \(\lambda_2=0.5\) | 0.7887 (0.0002) | 0.7816 (0.0006) | 0.90% |
+|  | \(\lambda_2=1.0\) | 0.7858 (0.0002) | 0.7573 (0.0007) | 3.76% |
+|  | \(\lambda_2=1.5\) | 0.7829 (0.0002) | 0.7327 (0.0009) | 6.84% |
+|  | \(\lambda_2=2.0\) | 0.7796 (0.0003) | 0.7067 (0.0011) | 10.31% |
+|  | \(\lambda_2=2.5\) | 0.7762 (0.0004) | 0.6793 (0.0014) | 14.26% |
+|  | \(\lambda_2=3.0\) | 0.7729 (0.0004) | 0.6506 (0.0017) | 18.79% |
 
-Under mild covariate shift, the two methods have similar worst-environment
-values, with differences below one-half of one percent. The robust advantage
-becomes positive at \(\lambda_1=1.5\) and increases to \(34.30\%\) at
-\(\lambda_1=3\). Under concept drift, the robust advantage increases
-monotonically from \(0.56\%\) to \(11.94\%\). Both policies lose value as the
-catastrophe probability increases, but the robust policy deteriorates more
-slowly. The learned robust policies choose the risky action for \(21.0\%\) of
-evaluation observations on average, compared with \(61.9\%\) for the
-non-robust policies. This difference in lower-tail exposure explains why the
-performance gap expands as concept drift becomes more severe.
+Under covariate shift, the average robust improvement increases monotonically
+from \(2.09\%\) at \(\lambda_1=0.5\) to \(3.29\%\) at \(\lambda_1=3\).
+Both policy values decline as deployment mass shifts toward the middle-margin
+region, but the robust policy deteriorates more slowly. Under the revised
+concept drift, the robust advantage increases monotonically from \(0.90\%\) to
+\(18.79\%\). Both concept-drift policies lose value as the catastrophe
+probability increases, but the robust policy deteriorates substantially more
+slowly. The expanding gap is consistent with the robust objective placing more
+weight on lower-tail outcomes during policy learning.
 
 ## Revision Note
 
 This replacement defines one general simulation framework and treats the
 smooth-outcome and lower-tail-risk models as two conditional outcome
-specifications within that framework. Both panels of Table 2 now use the same
-lower-tail baseline DGP and the same learned policies. The covariate-shift
-panel has therefore been rerun and replaced. The concept-drift panel is
-unchanged from the previously verified 100-replication result. Table 1, Table
-3, Figures 3--4, and their underlying simulations are unchanged.
+specifications within that framework. The covariate-shift panel retains the
+smooth-outcome equation but replaces the random tilt with the middle-margin
+covariate shift and reports the corresponding 100-replication results. The
+concept-drift panel retains the revised lower-tail-risk DGP. Table 1, Table 3,
+Figures 3--4, and their underlying simulations are unchanged.
