@@ -35,15 +35,23 @@ def severity_label(value):
     return str(value)
 
 
+def condition_name(args):
+    """Return the directory name shared by data and saved models."""
+    if args.mode == "raw":
+        return args.type
+    return f"nonlinear_{args.mode}={args.dist_shift:.1f}"
+
+
 def resolve_data_dir(args):
     """Return the directory containing the requested DGP replications."""
 
     simulation_dir = Path(__file__).resolve().parent / "data"
-    if args.mode == 'raw':
-        condition = f"{args.type}"
-    else:
-        condition = f"nonlinear_{args.mode}={args.dist_shift:.1f}"
-    return simulation_dir / condition
+    return simulation_dir / condition_name(args)
+
+
+def model_directory(args):
+    """Return the model directory for the requested DGP condition."""
+    return Path("models/Simulation") / condition_name(args) / args.robust_met
 
 
 def data_file_path(data_dir, mode, dist_shift, replication):
@@ -161,8 +169,8 @@ if __name__ == '__main__':
     if not os.path.exists(f"./results/Simulation/{args.type}/{args.robust_met}"):
         os.makedirs(f"./results/Simulation/{args.type}/{args.robust_met}")
     # save the models
-    if not os.path.exists(f"./models/Simulation/{args.type}/{args.robust_met}"):
-        os.makedirs(f"./models/Simulation/{args.type}/{args.robust_met}")
+    args.model_dir = model_directory(args)
+    args.model_dir.mkdir(parents=True, exist_ok=True)
 
     if args.baseline != 'None':
         args.opt_procedure = 'non-data-driven'

@@ -54,10 +54,10 @@ def pi_alpha_alter(pol_dict, num_classes, num_layers, exp_id, device):
     robust_met, opt_procedure, dist_shift \
         = pol_dict["robust_met"], pol_dict["opt_procedure"], pol_dict["dist_shift"]
     if args.baseline == 'None':
-        opt_pth = os.path.join(f"./models/Simulation/{args.type}/{robust_met}",
+        opt_pth = os.path.join(args.model_dir,
                                f"opt_pol_{args.mode}_dist_{dist_shift}_{opt_procedure}-exp_id_{exp_id}_{num_layers}.pth")
     else:
-        opt_pth = os.path.join(f"./models/Simulation/{args.type}/{robust_met}",
+        opt_pth = os.path.join(args.model_dir,
                                f"opt_pol_{args.mode}_dist_{dist_shift}_{opt_procedure}_{args.baseline}-exp_id_{exp_id}_{num_layers}.pth")
 
     model = models.Prob_model(pol_dict["args"], pol_dict["dim_X"], device, Nclasses=num_classes)
