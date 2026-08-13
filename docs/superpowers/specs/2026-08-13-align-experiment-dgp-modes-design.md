@@ -4,12 +4,14 @@
 
 Use the same `raw`, `shift`, and `drift` mode names in `run_experiment.py` as
 in `generate_dgp.py`, without changing policy learning, evaluation, random
-seeds, model files, or result files.
+seeds, numerical results, or result filenames.
 
 ## Changes
 
 - Expose one command-line option: `--mode raw|shift|drift`, defaulting to
-  `drift`.
+  `raw`, consistently with `generate_dgp.py`.
+- Require `dist_shift=0` for `raw` and a positive `dist_shift` for `shift` and
+  `drift`, so mode rather than a numeric special case controls the workflow.
 - Keep the existing data directories:
   - `raw` reads `data/<type>/Shift_0.0-exp-<rep>.pkl`;
   - `shift` reads

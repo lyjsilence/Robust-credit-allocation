@@ -37,23 +37,18 @@ def severity_label(value):
 
 def resolve_data_dir(args):
     """Return the directory containing the requested DGP replications."""
-    if args.data_dir is not None:
-        return Path(args.data_dir).expanduser().resolve()
 
     simulation_dir = Path(__file__).resolve().parent / "data"
-    if args.dist_shift == 0:
+    if args.mode == 'raw':
         condition = f"{args.type}"
-    elif args.type == "linear":
-        raise ValueError(
-            "Nonzero shift/drift experiments for the linear DGP are not "
-            "included in the paper."
-        )
     else:
         condition = f"nonlinear_{args.mode}={args.dist_shift:.1f}"
     return simulation_dir / condition
 
 
 def data_file_path(data_dir, mode, dist_shift, replication):
+    if mode == "raw":
+        return data_dir / f"Shift_0.0-exp-{replication}.pkl"
     prefix = "Shift" if mode == "shift" else "Drift"
     return data_dir / (
         f"{prefix}_{severity_label(dist_shift)}-exp-{replication}.pkl"
@@ -88,7 +83,7 @@ parser.add_argument("-alpha_lb", type=float, default=0.1)
 parser.add_argument(
     "--dist_shift",
     type=float,
-    default=0.5,
+    default=0,
     choices=[0, 0.5, 1, 1.5, 2, 2.5, 3],
 )
 parser.add_argument("--test_size", type=int, default=2500, choices=[500, 2000, 2500])
@@ -100,7 +95,12 @@ parser.add_argument("-estimator_choices", type=str, default="normalized_estimato
 parser.add_argument("-baseline", type=str, default='None', choices=['None', 'SNLN', 'KLLN'])
 parser.add_argument("-verbose", type=bool, default=False, help='Print the training process or not')
 parser.add_argument("-plot_boundary", type=bool, default=False, help='Plot the decision boundary in evaluation')
-parser.add_argument('-mode', type=str, default='drift', choices=['shift', 'drift'])
+parser.add_argument(
+    "--mode",
+    type=str,
+    default="raw",
+    choices=["raw", "shift", "drift"],
+)
 parser.add_argument(
     "--start_rep",
     type=int,
@@ -116,7 +116,7 @@ parser.add_argument(
 parser.add_argument(
     "--data_dir",
     type=str,
-    default=None,
+    default='data/',
     help="Directory containing the requested simulation PKL files.",
 )
 parser.add_argument(
@@ -133,6 +133,10 @@ if __name__ == '__main__':
         parser.error("--start_rep must be nonnegative.")
     if args.num_reps < 1:
         parser.error("--num_reps must be at least 1.")
+    if args.mode == "raw" and args.dist_shift != 0:
+        parser.error("raw mode requires --dist_shift 0.")
+    if args.mode != "raw" and args.dist_shift == 0:
+        parser.error("shift and drift modes require a positive --dist_shift.")
 
     data_dir = resolve_data_dir(args)
     replications = range(args.start_rep, args.start_rep + args.num_reps)
@@ -177,7 +181,7 @@ if __name__ == '__main__':
         eval_dict = {}
         shift_label = severity_label(args.dist_shift)
 
-        if args.dist_shift == 0.0:
+        if args.mode == "raw":
             for delta in [0.01, 0.05, 0.1, 0.2, 0.3, 0.4]:
                 dict_evaluation = dict_train_forOPL
 

@@ -32,7 +32,7 @@ Then run the existing experiment entry point:
 
 ```bash
 python simulation/run_experiment.py \
-  -mode drift \
+  --mode drift \
   --dist_shift 1 \
   -robust_met robust
 ```
