@@ -269,7 +269,7 @@ def initialize_setting(device, train_dict, test_dict, args):
         val_dict[key] = train_dict[key][:train_val_ratio, :]
         train_dict[key] = train_dict[key][train_val_ratio:, :]
 
-    if args.dist_shift == 0:
+    if args.mode == "raw":
         for key in test_dict.keys():
             test_dict[key] = test_dict[key][:args.test_size, :]
         shift_env, shift_q = None, None

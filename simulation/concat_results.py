@@ -13,7 +13,7 @@ def severity_label(value):
     """Match the labels written by run_experiment.py."""
     value = float(value)
     if value == 0:
-        return "0.0"
+        return "0"
     if value.is_integer():
         return str(int(value))
     return str(value)
@@ -21,11 +21,11 @@ def severity_label(value):
 
 def result_path(base_dir, mode, shift, baseline, replication):
     """Return the result file for one replication."""
-    label = severity_label(shift)
-    if float(shift) == 0:
+    if mode == "raw":
         baseline_tag = "" if baseline == "None" else f"-{baseline}"
-        name = f"Shift_{label}{baseline_tag}-exp_id-{replication}-DRO.pkl"
+        name = f"Shift_0.0{baseline_tag}-exp_id-{replication}-DRO.pkl"
     else:
+        label = severity_label(shift)
         prefix = "Shift" if mode == "shift" else "Drift"
         name = f"{prefix}_{label}-exp_id-{replication}-min.pkl"
     return base_dir / name
@@ -67,7 +67,7 @@ def write_summary(values, output_path):
 
 def summary_filename(mode, shift, baseline):
     """Return a filename that distinguishes nominal, shift, and drift."""
-    if float(shift) == 0:
+    if mode == "raw":
         condition = "Nominal"
     else:
         prefix = "Shift" if mode == "shift" else "Drift"
@@ -85,7 +85,9 @@ def build_parser():
         default="results/Simulation",
         help="Directory containing the linear/nonlinear result folders.",
     )
-    parser.add_argument("--mode", default="drift", choices=["drift", "shift"])
+    parser.add_argument(
+        "--mode", default="raw", choices=["raw", "shift", "drift"]
+    )
     parser.add_argument(
         "--robust_met", default="robust", choices=["robust", "non-robust"]
     )
@@ -98,7 +100,7 @@ def build_parser():
     parser.add_argument(
         "--dist_shift",
         type=float,
-        default=0.5,
+        default=0,
         choices=[0, 0.5, 1, 1.5, 2, 2.5, 3],
     )
     parser.add_argument("--num_runs", type=int, default=100)
@@ -108,6 +110,8 @@ def build_parser():
 
 def main():
     args = build_parser().parse_args()
+    if args.mode == "raw" and args.dist_shift != 0:
+        raise ValueError("raw mode requires --dist_shift 0.")
     experiment_dir = Path(args.base_dir) / args.type / args.robust_met
     values = aggregate_results(
         experiment_dir,

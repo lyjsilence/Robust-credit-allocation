@@ -29,7 +29,7 @@ def severity_label(value):
     """Match the numeric labels used by the generated simulation files."""
     value = float(value)
     if value == 0:
-        return "0.0"
+        return "0"
     if value.is_integer():
         return str(int(value))
     return str(value)
@@ -143,8 +143,6 @@ if __name__ == '__main__':
         parser.error("--num_reps must be at least 1.")
     if args.mode == "raw" and args.dist_shift != 0:
         parser.error("raw mode requires --dist_shift 0.")
-    if args.mode != "raw" and args.dist_shift == 0:
-        parser.error("shift and drift modes require a positive --dist_shift.")
 
     data_dir = resolve_data_dir(args)
     replications = range(args.start_rep, args.start_rep + args.num_reps)
@@ -187,7 +185,9 @@ if __name__ == '__main__':
 
         '''policy evaluation'''
         eval_dict = {}
-        shift_label = severity_label(args.dist_shift)
+        shift_label = (
+            "0.0" if args.mode == "raw" else severity_label(args.dist_shift)
+        )
 
         if args.mode == "raw":
             for delta in [0.01, 0.05, 0.1, 0.2, 0.3, 0.4]:

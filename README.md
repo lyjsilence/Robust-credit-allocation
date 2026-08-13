@@ -41,3 +41,15 @@ python simulation/run_experiment.py \
 `run_experiment.py`, for example `simulation/data/nonlinear_drift=1.0` or
 `simulation/data/nonlinear_shift=0.5`. Repeat the last command with
 `-robust_met non-robust`.
+
+The three zero-severity conditions remain distinct:
+
+```bash
+python simulation/run_experiment.py --mode raw --dist_shift 0
+python simulation/run_experiment.py --mode shift --dist_shift 0
+python simulation/run_experiment.py --mode drift --dist_shift 0
+```
+
+They read `data/nonlinear`, `data/nonlinear_shift=0.0`, and
+`data/nonlinear_drift=0.0`, respectively. Saved models mirror the same
+condition directories under `models/Simulation/`.
