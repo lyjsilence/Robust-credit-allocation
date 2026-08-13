@@ -31,9 +31,9 @@ def plot_boundary(pol_dict, device):
 
     for i in range(100):
         if args.baseline == 'None':
-            evaluated_policy = f'./models/Simulation/{args.type}/robust\\opt_pol_dist_0.0_data-driven-exp_id_0_2.pth'
+            evaluated_policy = f'./models/{args.type}/robust\\opt_pol_dist_0.0_data-driven-exp_id_0_2.pth'
         else:
-            evaluated_policy = f'./models/Simulation/{args.type}/robust\\opt_pol_dist_0.0_non-data-driven_SNLN-exp_id_0_2.pth'
+            evaluated_policy = f'./models/{args.type}/robust\\opt_pol_dist_0.0_non-data-driven_SNLN-exp_id_0_2.pth'
 
         if args.baseline == 'None':
             policy = op.NN_Sieves(pol_dict, pol_dict["dim_X"], device, Nlayers=2, Nclasses=pol_dict["num_treat"])
@@ -61,7 +61,7 @@ def plot_boundary(pol_dict, device):
         plt.ylabel(r"$x_2$")
         plt.tight_layout()
         plt.show()
-        #plt.savefig(f'./models/Simulation_evolution/nonlinear/robust\\iter_{k_idx}.png')
+        #plt.savefig(f'./models/evolution/nonlinear/robust\\iter_{k_idx}.png')
 
 
 def plot_evolution(pol_dict, device):
@@ -74,7 +74,7 @@ def plot_evolution(pol_dict, device):
         iter_all = 88
 
     for iter in range(iter_all):
-        evaluated_policy = f'./models/Simulation_evolution/nonlinear/robust\\opt_pol_dist_0.0_data-driven-exp_id_0_{opt_k}-iter_{iter}.pth'
+        evaluated_policy = f'./models/evolution/nonlinear/robust\\opt_pol_dist_0.0_data-driven-exp_id_0_{opt_k}-iter_{iter}.pth'
 
 
         '''Initialize alpha'''
@@ -105,7 +105,7 @@ def plot_evolution(pol_dict, device):
         plt.ylabel(r"$x_2$")
         plt.tight_layout()
         # plt.show()
-        plt.savefig(f'./models/Simulation_evolution/nonlinear/robust\\iter_{iter}.png')
+        plt.savefig(f'./models/evolution/nonlinear/robust\\iter_{iter}.png')
         plt.close()
 
 
@@ -147,11 +147,11 @@ if __name__ == '__main__':
 
     '''The policy list that can be run.'''
 
-    if not os.path.exists(f"./results/Simulation/{args.type}/{args.robust_met}"):
-        os.makedirs(f"./results/Simulation/{args.type}/{args.robust_met}")
+    if not os.path.exists(f"./results/{args.type}/{args.robust_met}"):
+        os.makedirs(f"./results/{args.type}/{args.robust_met}")
 
-    if not os.path.exists(f"./models/Simulation/{args.type}/{args.robust_met}"):
-        os.makedirs(f"./models/Simulation/{args.type}/{args.robust_met}")
+    if not os.path.exists(f"./models/{args.type}/{args.robust_met}"):
+        os.makedirs(f"./models/{args.type}/{args.robust_met}")
 
     if args.baseline != 'None':
         args.opt_procedure = 'non-data-driven'

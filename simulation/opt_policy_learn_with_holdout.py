@@ -71,7 +71,7 @@ def pi_alpha_alter(pol_dict, num_classes, num_layers, exp_id, device):
 
         # show_evolution = True
         # if show_evolution == True:
-        #     opt_pth = os.path.join(f"./models/Simulation_evolution/{args.type}/{robust_met}",
+        #     opt_pth = os.path.join(f"./models/evolution/{args.type}/{robust_met}",
         #                        f"opt_pol_dist_{dist_shift}_{opt_procedure}-exp_id_{exp_id}_{num_layers}-iter_{k_idx}.pth")
 
         op.set_requires_grad(policy, flag=True)

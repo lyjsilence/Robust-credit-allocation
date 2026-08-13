@@ -51,5 +51,5 @@ python simulation/run_experiment.py --mode drift --dist_shift 0
 ```
 
 They read `data/nonlinear`, `data/nonlinear_shift=0.0`, and
-`data/nonlinear_drift=0.0`, respectively. Saved models mirror the same
-condition directories under `models/Simulation/`.
+`data/nonlinear_drift=0.0`, respectively. Results and models mirror the same
+condition directories directly under `results/` and `models/`.

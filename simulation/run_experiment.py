@@ -51,7 +51,12 @@ def resolve_data_dir(args):
 
 def model_directory(args):
     """Return the model directory for the requested DGP condition."""
-    return Path("models/Simulation") / condition_name(args) / args.robust_met
+    return Path("models") / condition_name(args) / args.robust_met
+
+
+def result_directory(args):
+    """Return the result directory for the requested DGP condition."""
+    return Path("results") / condition_name(args) / args.robust_met
 
 
 def data_file_path(data_dir, mode, dist_shift, replication):
@@ -163,10 +168,8 @@ if __name__ == '__main__':
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
     '''The policy list that can be run.'''
-    # save the results
-    if not os.path.exists(f"./results/Simulation/{args.type}/{args.robust_met}"):
-        os.makedirs(f"./results/Simulation/{args.type}/{args.robust_met}")
-    # save the models
+    args.result_dir = result_directory(args)
+    args.result_dir.mkdir(parents=True, exist_ok=True)
     args.model_dir = model_directory(args)
     args.model_dir.mkdir(parents=True, exist_ok=True)
 
@@ -205,11 +208,17 @@ if __name__ == '__main__':
                 for k in q_keys:
                     eval_dict[args.robust_met + '_' + k + '_delta_' + str(delta)] = pol_dict_test[k]
                 if args.baseline == 'None':
-                    joblib.dump(eval_dict,
-                                f"results/Simulation/{args.type}/{args.robust_met}/Shift_{shift_label}-exp_id-{i}-DRO.pkl")
+                    joblib.dump(
+                        eval_dict,
+                        args.result_dir
+                        / f"Shift_{shift_label}-exp_id-{i}-DRO.pkl",
+                    )
                 else:
-                    joblib.dump(eval_dict,
-                                f"results/Simulation/{args.type}/{args.robust_met}/Shift_{shift_label}-{args.baseline}-exp_id-{i}-DRO.pkl")
+                    joblib.dump(
+                        eval_dict,
+                        args.result_dir
+                        / f"Shift_{shift_label}-{args.baseline}-exp_id-{i}-DRO.pkl",
+                    )
         else:
             dict_evaluation = dict_train_forOPL
             pol_dict_test = opt_policy_learn.policy_evaluation_min(
@@ -221,8 +230,14 @@ if __name__ == '__main__':
             eval_dict[args.robust_met + '_Q_min'] = pol_dict_test['Q_min']
             print(eval_dict)
             if args.mode == 'shift':
-                joblib.dump(eval_dict,
-                            f"results/Simulation/{args.type}/{args.robust_met}/Shift_{shift_label}-exp_id-{i}-min.pkl")
+                joblib.dump(
+                    eval_dict,
+                    args.result_dir
+                    / f"Shift_{shift_label}-exp_id-{i}-min.pkl",
+                )
             elif args.mode == 'drift':
-                joblib.dump(eval_dict,
-                            f"results/Simulation/{args.type}/{args.robust_met}/Drift_{shift_label}-exp_id-{i}-min.pkl")
+                joblib.dump(
+                    eval_dict,
+                    args.result_dir
+                    / f"Drift_{shift_label}-exp_id-{i}-min.pkl",
+                )

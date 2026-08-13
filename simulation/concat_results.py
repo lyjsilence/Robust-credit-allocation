@@ -76,13 +76,20 @@ def summary_filename(mode, shift, baseline):
     return f"summary_{condition}{baseline_tag}.csv"
 
 
+def condition_name(mode, dgp_type, shift):
+    """Return the condition directory shared by results and models."""
+    if mode == "raw":
+        return dgp_type
+    return f"nonlinear_{mode}={float(shift):.1f}"
+
+
 def build_parser():
     parser = argparse.ArgumentParser(
         description="Summarize simulation results across replications."
     )
     parser.add_argument(
         "--base_dir",
-        default="results/Simulation",
+        default="results",
         help="Directory containing the linear/nonlinear result folders.",
     )
     parser.add_argument(
@@ -112,7 +119,11 @@ def main():
     args = build_parser().parse_args()
     if args.mode == "raw" and args.dist_shift != 0:
         raise ValueError("raw mode requires --dist_shift 0.")
-    experiment_dir = Path(args.base_dir) / args.type / args.robust_met
+    experiment_dir = (
+        Path(args.base_dir)
+        / condition_name(args.mode, args.type, args.dist_shift)
+        / args.robust_met
+    )
     values = aggregate_results(
         experiment_dir,
         args.mode,
