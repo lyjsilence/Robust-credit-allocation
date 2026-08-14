@@ -3,3 +3,4 @@ models/
 results/
 __pycache__/
 *.log
+!attempts.csv
