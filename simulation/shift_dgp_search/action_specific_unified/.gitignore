@@ -11,3 +11,7 @@ __pycache__/
 !selected_depths.csv
 !figure_linear.png
 !figure_nonlinear.png
+!figure_linear_boundary.png
+!figure_nonlinear_boundary.png
+!figure_linear_regions.png
+!figure_nonlinear_regions.png

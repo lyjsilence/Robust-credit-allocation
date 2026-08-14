@@ -26,3 +26,7 @@ conda run -n yijun_env python simulation\shift_dgp_search\action_specific_unifie
 The pilot search was frozen before the 100-replication run. `search_log.csv`
 records the rejected symmetric action-specific specifications and the reason for
 selecting the modular outcome specification.
+
+The figure script uses the 2,500 generated test observations from replication 0.
+It saves paper-style scatterplots (`figure_linear.png`, `figure_nonlinear.png`)
+and two optional versions with `_boundary` and `_regions` suffixes.

@@ -64,8 +64,16 @@ depth frequencies were K=1: 42, K=2: 35, K=3: 16, K=4: 5, and K=5: 2.
 
 ## Decision boundaries
 
-- `figure_linear.png`: Ours and SNLS both recover the linear boundary.
-- `figure_nonlinear.png`: Ours recovers the S-shaped boundary; SNLS remains linear.
+- `figure_linear.png`, `figure_nonlinear.png`: paper-style observed decision points.
+- `figure_linear_boundary.png`, `figure_nonlinear_boundary.png`: the same points
+  with the true boundary overlaid.
+- `figure_linear_regions.png`, `figure_nonlinear_regions.png`: the same points
+  over faint model-specific decision regions.
+
+All panels use the same 2,500 replication-0 test observations and the paper's
+purple/yellow action colors. Ours and SNLS both recover the linear boundary;
+under the S-shaped boundary, Ours follows the nonlinear structure while SNLS
+remains approximately linear.
 
 ## Reproducibility checks
 
