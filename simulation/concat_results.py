@@ -1,143 +1,164 @@
-"""Summarize simulation results across replications."""
+"""Summarize all existing simulation result files in one CSV."""
 
 import argparse
 import csv
+import re
 from collections import defaultdict
+from dataclasses import dataclass
 from pathlib import Path
 
 import joblib
 import numpy as np
 
 
-def severity_label(value):
-    """Match the labels written by run_experiment.py."""
-    value = float(value)
-    if value == 0:
-        return "0"
-    if value.is_integer():
-        return str(int(value))
-    return str(value)
+SCRIPT_DIR = Path(__file__).resolve().parent
+DEFAULT_RESULTS_DIR = SCRIPT_DIR / "results"
+
+CONDITION_PATTERN = re.compile(
+    r"^(?P<dgp_type>linear|nonlinear)"
+    r"(?:_(?P<mode>shift|drift)=(?P<severity>[0-9.]+))?$"
+)
+FILENAME_PATTERN = re.compile(
+    r"^(?:Shift|Drift)_[^-]+"
+    r"(?:-(?P<baseline>SNLN|KLLN))?"
+    r"-exp_id-\d+-(?:DRO|min)\.pkl$"
+)
+
+MODE_ORDER = {"raw": 0, "shift": 1, "drift": 2}
+METHOD_ORDER = {"robust": 0, "non-robust": 1}
+BASELINE_ORDER = {"None": 0, "SNLN": 1, "KLLN": 2}
 
 
-def result_path(base_dir, mode, shift, baseline, replication):
-    """Return the result file for one replication."""
-    if mode == "raw":
-        baseline_tag = "" if baseline == "None" else f"-{baseline}"
-        name = f"Shift_0.0{baseline_tag}-exp_id-{replication}-DRO.pkl"
-    else:
-        label = severity_label(shift)
-        prefix = "Shift" if mode == "shift" else "Drift"
-        name = f"{prefix}_{label}-exp_id-{replication}-min.pkl"
-    return base_dir / name
+@dataclass(frozen=True)
+class SummaryGroup:
+    """Fields that identify one row of the summary table."""
+
+    dgp_type: str
+    mode: str
+    severity: float
+    method: str
+    baseline: str
+    metric: str
 
 
-def aggregate_results(base_dir, mode, shift, baseline, num_runs):
-    """Load one experimental condition and return scalar results by key."""
-    paths = [
-        result_path(base_dir, mode, shift, baseline, replication)
-        for replication in range(num_runs)
-    ]
-    missing = [i for i, path in enumerate(paths) if not path.is_file()]
-    if missing:
-        raise FileNotFoundError(
-            f"Missing {len(missing)} of {num_runs} result files; "
-            f"replication IDs: {missing}"
-        )
+def parse_result_path(path, results_dir):
+    """Read experimental metadata from a result directory and filename."""
+    condition = path.parent.parent.name
+    method = path.parent.name
 
-    values = defaultdict(list)
-    for path in paths:
-        for key, value in joblib.load(path).items():
-            values[key].append(float(np.asarray(value)))
-    return values
+    condition_match = CONDITION_PATTERN.fullmatch(condition)
+    filename_match = FILENAME_PATTERN.fullmatch(path.name)
+    if condition_match is None or filename_match is None:
+        raise ValueError(f"Unrecognized result path: {path.relative_to(results_dir)}")
+    if method not in METHOD_ORDER:
+        raise ValueError(f"Unrecognized method directory: {method}")
+
+    mode = condition_match.group("mode") or "raw"
+    severity = float(condition_match.group("severity") or 0)
+    baseline = filename_match.group("baseline") or "None"
+
+    return {
+        "dgp_type": condition_match.group("dgp_type"),
+        "mode": mode,
+        "severity": severity,
+        "method": method,
+        "baseline": baseline,
+    }
 
 
-def write_summary(values, output_path):
-    """Write means and sample standard deviations to CSV."""
+def collect_results(results_dir):
+    """Load every result file and group its scalar metrics."""
+    result_files = sorted(results_dir.rglob("*.pkl"))
+    if not result_files:
+        raise FileNotFoundError(f"No result files found in {results_dir}")
+
+    grouped_values = defaultdict(list)
+    for path in result_files:
+        metadata = parse_result_path(path, results_dir)
+        for metric, value in joblib.load(path).items():
+            group = SummaryGroup(metric=metric, **metadata)
+            grouped_values[group].append(float(np.asarray(value).item()))
+
+    return result_files, grouped_values
+
+
+def group_sort_key(group):
+    """Return a stable order for the summary rows."""
+    return (
+        group.dgp_type,
+        MODE_ORDER[group.mode],
+        group.severity,
+        METHOD_ORDER[group.method],
+        BASELINE_ORDER[group.baseline],
+        group.metric,
+    )
+
+
+def write_summary(grouped_values, output_path):
+    """Write counts, means, and sample standard deviations."""
     output_path.parent.mkdir(parents=True, exist_ok=True)
     with output_path.open("w", newline="", encoding="utf-8") as file:
         writer = csv.writer(file)
-        writer.writerow(["key", "n", "mean", "std"])
-        for key, observations in sorted(values.items()):
-            array = np.asarray(observations, dtype=float)
-            std = np.std(array, ddof=1) if array.size > 1 else 0.0
+        writer.writerow(
+            [
+                "dgp_type",
+                "mode",
+                "severity",
+                "method",
+                "baseline",
+                "metric",
+                "n",
+                "mean",
+                "std",
+            ]
+        )
+
+        for group in sorted(grouped_values, key=group_sort_key):
+            values = np.asarray(grouped_values[group], dtype=float)
+            std = np.std(values, ddof=1) if values.size > 1 else 0.0
             writer.writerow(
-                [key, array.size, f"{np.mean(array):.8g}", f"{std:.8g}"]
+                [
+                    group.dgp_type,
+                    group.mode,
+                    f"{group.severity:g}",
+                    group.method,
+                    group.baseline,
+                    group.metric,
+                    values.size,
+                    f"{np.mean(values):.8g}",
+                    f"{std:.8g}",
+                ]
             )
-
-
-def summary_filename(mode, shift, baseline):
-    """Return a filename that distinguishes nominal, shift, and drift."""
-    if mode == "raw":
-        condition = "Nominal"
-    else:
-        prefix = "Shift" if mode == "shift" else "Drift"
-        condition = f"{prefix}_{severity_label(shift)}"
-    baseline_tag = "" if baseline == "None" else f"-{baseline}"
-    return f"summary_{condition}{baseline_tag}.csv"
-
-
-def condition_name(mode, dgp_type, shift):
-    """Return the condition directory shared by results and models."""
-    if mode == "raw":
-        return dgp_type
-    return f"nonlinear_{mode}={float(shift):.1f}"
 
 
 def build_parser():
     parser = argparse.ArgumentParser(
-        description="Summarize simulation results across replications."
+        description="Summarize all existing simulation results in one CSV."
     )
     parser.add_argument(
-        "--base_dir",
-        default="results",
-        help="Directory containing the linear/nonlinear result folders.",
+        "--results_dir",
+        type=Path,
+        default=DEFAULT_RESULTS_DIR,
+        help="Result root (default: simulation/results).",
     )
     parser.add_argument(
-        "--mode", default="raw", choices=["raw", "shift", "drift"]
+        "--output",
+        type=Path,
+        help="Output CSV (default: <results_dir>/summary_results.csv).",
     )
-    parser.add_argument(
-        "--robust_met", default="robust", choices=["robust", "non-robust"]
-    )
-    parser.add_argument(
-        "--type", default="nonlinear", choices=["linear", "nonlinear"]
-    )
-    parser.add_argument(
-        "--baseline", default="None", choices=["None", "SNLN", "KLLN"]
-    )
-    parser.add_argument(
-        "--dist_shift",
-        type=float,
-        default=0,
-        choices=[0, 0.5, 1, 1.5, 2, 2.5, 3],
-    )
-    parser.add_argument("--num_runs", type=int, default=100)
-    parser.add_argument("--out_root", type=Path)
     return parser
 
 
 def main():
     args = build_parser().parse_args()
-    if args.mode == "raw" and args.dist_shift != 0:
-        raise ValueError("raw mode requires --dist_shift 0.")
-    experiment_dir = (
-        Path(args.base_dir)
-        / condition_name(args.mode, args.type, args.dist_shift)
-        / args.robust_met
-    )
-    values = aggregate_results(
-        experiment_dir,
-        args.mode,
-        args.dist_shift,
-        args.baseline,
-        args.num_runs,
-    )
+    results_dir = args.results_dir.resolve()
+    output_path = args.output or results_dir / "summary_results.csv"
 
-    output_dir = args.out_root or experiment_dir
-    output_path = output_dir / summary_filename(
-        args.mode, args.dist_shift, args.baseline
-    )
-    write_summary(values, output_path)
-    print(f"Saved {output_path}")
+    result_files, grouped_values = collect_results(results_dir)
+    write_summary(grouped_values, output_path)
+
+    print(f"Read {len(result_files)} result files.")
+    print(f"Saved {len(grouped_values)} summary rows to {output_path}")
 
 
 if __name__ == "__main__":
