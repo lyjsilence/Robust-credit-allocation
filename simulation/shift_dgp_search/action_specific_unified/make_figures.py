@@ -114,7 +114,15 @@ def draw_figure(root, boundary, x, point_decisions, grid, variant):
             )
         scatter_decisions(ax, x, decisions)
         if variant == "boundary":
-            ax.contour(x1, x2, true_score, levels=(0,), colors="black", linewidths=1.1)
+            ax.contour(
+                x1,
+                x2,
+                true_score,
+                levels=(0,),
+                colors="black",
+                linewidths=1.1,
+                linestyles=":",
+            )
         format_panel(ax, index, name)
 
     fig.subplots_adjust(left=0.065, right=0.99, top=0.97, bottom=0.23, wspace=0.27)
