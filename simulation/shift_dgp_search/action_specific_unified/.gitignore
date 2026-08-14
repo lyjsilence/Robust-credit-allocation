@@ -1,0 +1,13 @@
+data/
+models/
+results/
+logs/
+__pycache__/
+*.log
+!search_log.csv
+!table1.csv
+!table2.csv
+!table3.csv
+!selected_depths.csv
+!figure_linear.png
+!figure_nonlinear.png

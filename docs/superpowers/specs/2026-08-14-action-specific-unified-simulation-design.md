@@ -1,4 +1,4 @@
-# Action-Specific Unified Simulation Sandbox
+# Unified Modular-Outcome Simulation Sandbox
 
 ## Scope
 
@@ -7,25 +7,30 @@ Create an isolated sandbox for all simulation exhibits. The formal `simulation/d
 replications for Tables 1--3, and produce the decision-boundary figures. Only the
 SNLS linear baseline is included; KNLS is excluded.
 
-## Master DGP
+## Master DGP Family
 
 Draw five covariates uniformly from the unit ball. Let `s(X1, X2)` be either a
-linear score or the paper's S-shaped nonlinear score. For action `a`, define
+linear score or the paper's S-shaped nonlinear score. The same score, covariate
+distribution, action map, logging rule, and KL calibration are shared throughout.
+The outcome component is switched according to the mechanism under study.
+
+Tables 1 and 3 and the figures use the smooth component
 
 ```text
-logit p_a(X) = alpha + rho v(X) - (2a - 1) delta tanh(gamma s(X1, X2)),
-Y(a) = y_good if U_a > p_a(X), and y_bad otherwise.
+mu_a(X) = (2a - 1) delta tanh(gamma s(X1, X2)),
+Y(a) = sigmoid(mu_a(X) + epsilon_a).
 ```
 
-The common tail-risk term `v(X)` changes outcome levels without changing the
-nominal optimal boundary: action 1 is optimal exactly when `s(X1, X2) > 0`.
-The logging policy selects the nominally optimal action with probability 0.75.
+Table 2 enables the lower-tail component. The score selects a risky action whose
+outcome is 0.90 unless an X-dependent Bernoulli catastrophe produces zero; the
+other action has the stable outcome 0.79. The logging policy selects the score-
+preferred action with probability 0.75.
 
-- Raw: keep both `P(X)` and `P(Y | X, A)` fixed.
-- Covariate shift: exponentially tilt `P(X)` toward high tail-risk observations;
+- Raw: use the smooth component and keep both `P(X)` and `P(Y | X, A)` fixed.
+- Covariate shift: exponentially tilt `P(X)` toward high lower-tail-risk observations;
   keep `P(Y | X, A)` fixed.
-- Concept drift: keep `P(X)` fixed and increase action-specific catastrophe
-  logits using heterogeneous susceptibilities.
+- Concept drift: keep `P(X)` fixed and increase the risky action's catastrophe
+  logit using heterogeneous susceptibilities.
 
 Both shifts use KL targets 0.005, 0.02, 0.045, 0.08, 0.125, and 0.18.
 
@@ -52,4 +57,6 @@ seed convention.
 
 Generated datasets, model checkpoints, raw result files, and logs are ignored by
 Git. Summary tables, figures, code, the frozen configuration, and the search log
-remain tracked.
+remain tracked. The initial symmetric action-specific design is retained only in
+the search log: pilots showed that it gave robust and non-robust learners the same
+action ranking and therefore could not identify the intended shift mechanism.
