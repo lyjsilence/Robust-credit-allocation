@@ -1,736 +1,379 @@
-"""Generate the simulation data used in the paper.
-
-The script exposes the three simulation modes directly:
-
-- ``raw``: no deployment shift;
-- ``shift``: covariate shift through an X-dependent exponential tilt;
-- ``drift``: concept drift through the lower-tail-risk outcome model.
-"""
-
-from __future__ import annotations
+"""Generate the unified raw, covariate-shift, and concept-drift simulations."""
 
 import argparse
+from dataclasses import asdict, dataclass
 from pathlib import Path
-from typing import Any
 
 import joblib
 import numpy as np
 
 
-DGP_MODES = ("raw", "shift", "drift")
+SEVERITIES = (0.5, 1.0, 1.5, 2.0, 2.5, 3.0)
 SHIFT_SCALE = 0.20
 
-P0 = 0.10
-Y_BAD = 0.00
-Y_GOOD = 0.90
-Y_STABLE = 0.79
-P_LOG_RISKY = 0.75
+
+@dataclass(frozen=True)
+class DGPConfig:
+    smooth_effect: float = 1.5
+    smooth_sharpness: float = 6.0
+    smooth_noise: float = 0.3
+    bad_outcome: float = 0.0
+    good_outcome: float = 0.90
+    stable_outcome: float = 0.79
+    risky_propensity: float = 0.75
+    risk_low: float = 0.02
+    risk_high: float = 0.78
+    risk_threshold: float = 0.70
+    risk_sharpness: float = 30.0
 
 
-def sample_uniform_ball(
-    n: int, d: int, rng: np.random.Generator
-) -> np.ndarray:
-    """Sample uniformly from the closed unit Euclidean ball in R^d."""
-    z = rng.normal(size=(n, d))
-    norms = np.linalg.norm(z, axis=1, keepdims=True)
-    directions = z / np.maximum(norms, 1e-12)
-    radii = rng.uniform(size=(n, 1)) ** (1.0 / d)
-    return directions * radii
+CONFIG = DGPConfig()
 
 
-def sample_actions(
-    probabilities: np.ndarray, rng: np.random.Generator
-) -> np.ndarray:
-    """Sample one categorical action from each row of a probability matrix."""
-    n, num_actions = probabilities.shape
-    actions = np.empty(n, dtype=np.int64)
-    for i in range(n):
-        actions[i] = rng.choice(num_actions, p=probabilities[i])
-    return actions
+def sigmoid(value):
+    value = np.asarray(value, dtype=np.float64)
+    output = np.empty_like(value)
+    positive = value >= 0
+    output[positive] = 1.0 / (1.0 + np.exp(-value[positive]))
+    exp_value = np.exp(value[~positive])
+    output[~positive] = exp_value / (1.0 + exp_value)
+    return output
 
 
-def sigmoid(x: np.ndarray) -> np.ndarray:
-    """Compute a numerically stable sigmoid."""
-    x = np.asarray(x, dtype=np.float64)
-    result = np.empty_like(x, dtype=np.float64)
-    positive = x >= 0
-    result[positive] = 1.0 / (1.0 + np.exp(-x[positive]))
-    exp_x = np.exp(x[~positive])
-    result[~positive] = exp_x / (1.0 + exp_x)
-    return result
+def sample_uniform_ball(n, d, rng):
+    direction = rng.normal(size=(n, d))
+    direction /= np.maximum(np.linalg.norm(direction, axis=1, keepdims=True), 1e-12)
+    return direction * rng.uniform(size=(n, 1)) ** (1.0 / d)
 
 
-def linear_score(
-    x1: np.ndarray,
-    x2: np.ndarray,
-    w1: float,
-    w2: float,
-    intercept: float,
-) -> np.ndarray:
-    """Return the score whose zero contour is the linear decision boundary."""
-    return intercept + w1 * x1 + w2 * x2
+def sample_actions(probabilities, rng):
+    return np.asarray(
+        [rng.choice(probabilities.shape[1], p=row) for row in probabilities],
+        dtype=np.int64,
+    )
 
 
-def nonlinear_boundary(x2: np.ndarray, radius: float = 1.0) -> np.ndarray:
-    """Return the S-shaped boundary constructed from two semicircles."""
-    half_radius = 0.5 * radius
-    x2 = np.asarray(x2)
+def nonlinear_boundary(x2):
     boundary = np.empty_like(x2, dtype=np.float64)
-
-    upper = x2 >= 0.0
-    upper_term = half_radius**2 - (x2[upper] - half_radius) ** 2
-    boundary[upper] = np.sqrt(np.maximum(upper_term, 0.0))
-
-    lower = ~upper
-    lower_term = half_radius**2 - (x2[lower] + half_radius) ** 2
-    boundary[lower] = -np.sqrt(np.maximum(lower_term, 0.0))
+    upper = x2 >= 0
+    boundary[upper] = np.sqrt(np.maximum(0.25 - (x2[upper] - 0.5) ** 2, 0.0))
+    boundary[~upper] = -np.sqrt(np.maximum(0.25 - (x2[~upper] + 0.5) ** 2, 0.0))
     return boundary
 
 
-def nonlinear_score(
-    x1: np.ndarray, x2: np.ndarray, radius: float = 1.0
-) -> np.ndarray:
-    """Return the score whose zero contour is the nonlinear decision boundary."""
-    return x1 - nonlinear_boundary(x2, radius=radius)
+def decision_score(x, boundary):
+    if boundary == "linear":
+        return x[:, 0] - 0.8 * x[:, 1]
+    if boundary == "nonlinear":
+        return x[:, 0] - nonlinear_boundary(x[:, 1])
+    raise ValueError("boundary must be 'linear' or 'nonlinear'")
 
 
-def latent_means(
-    score: np.ndarray, baseline: float, effect: float, sharpness: float
-) -> np.ndarray:
-    """Construct latent conditional means for the two actions."""
-    score = np.asarray(score, dtype=np.float64).reshape(-1)
-    contrast = effect * np.tanh(sharpness * score)
-    return np.stack([baseline - contrast, baseline + contrast], axis=1)
+def propensity_from_action(action, preferred_probability):
+    propensity = np.full((action.size, 2), 1.0 - preferred_probability)
+    propensity[np.arange(action.size), action] = preferred_probability
+    return propensity
 
 
-def simulate_dataset(
-    n: int,
-    seed: int,
-    g_type: str,
-    *,
-    sigmas: tuple[float, float] = (0.3, 0.3),
-    p_hi: float = 0.75,
-    w1: float = 1.0,
-    w2: float = -0.8,
-    b: float = 0.0,
-    R: float = 1.0,
-    gamma: float = 6.0,
-    m0: float = 0.0,
-    delta: float = 1.5,
-    retain_drift_state: bool = False,
-) -> dict[str, np.ndarray]:
-    """Generate one logged dataset under the nominal environment."""
-    rng = np.random.default_rng(seed)
-    num_actions = 2
-
-    x = sample_uniform_ball(n, 5, rng).astype(np.float64)
-    x1, x2 = x[:, 0], x[:, 1]
-    if g_type == "linear":
-        score = linear_score(x1, x2, w1=w1, w2=w2, intercept=b)
-    elif g_type == "nonlinear":
-        score = nonlinear_score(x1, x2, radius=R)
-    else:
-        raise ValueError("g_type must be 'linear' or 'nonlinear'")
-
-    mu = latent_means(score, baseline=m0, effect=delta, sharpness=gamma)
-    sigma_array = np.asarray(sigmas, dtype=np.float64).reshape(1, num_actions)
-    noise = rng.normal(size=(n, num_actions)).astype(np.float64) * sigma_array
-    potential_outcomes = sigmoid(mu + noise)
-
-    optimal_action = np.argmax(mu, axis=1)
-    propensity = np.empty((n, num_actions), dtype=np.float64)
-    propensity[optimal_action == 0] = np.array([p_hi, 1.0 - p_hi])
-    propensity[optimal_action == 1] = np.array([1.0 - p_hi, p_hi])
-
-    action = sample_actions(propensity, rng)
-    observed_outcome = potential_outcomes[np.arange(n), action]
-    observed_propensity = propensity[np.arange(n), action]
-
-    dataset = {
+def pack_dataset(x, action, outcomes, propensity, mean, **extra):
+    rows = np.arange(x.shape[0])
+    data = {
         "X": x.astype(np.float32),
-        "T": action.reshape(-1, 1).astype(np.int64),
-        "Y": observed_outcome.reshape(-1, 1).astype(np.float32),
-        "prop_score": observed_propensity.reshape(-1, 1).astype(np.float32),
-        "Y_all": potential_outcomes.astype(np.float32),
+        "T": action.reshape(-1, 1),
+        "Y": outcomes[rows, action].reshape(-1, 1).astype(np.float32),
+        "prop_score": propensity[rows, action].reshape(-1, 1).astype(np.float32),
+        "Y_all": outcomes.astype(np.float32),
         "prop_score_all": propensity.astype(np.float32),
-        "mu": mu.astype(np.float32),
+        "mu": mean.astype(np.float32),
     }
-    if retain_drift_state:
-        dataset["eps_all"] = noise.astype(np.float32)
-        dataset["score"] = score.reshape(-1, 1).astype(np.float32)
-    return dataset
+    data.update(extra)
+    return data
 
 
-def kl_to_uniform(weights: np.ndarray) -> float:
-    """Compute KL(weights || uniform)."""
-    n = weights.size
-    clipped = np.clip(weights, 1e-300, 1.0)
-    return float(np.sum(clipped * (np.log(clipped) + np.log(n))))
+def simulate_smooth_dataset(n, seed, boundary, config=CONFIG):
+    """Nominal outcome component used by Tables 1 and 3 and the figures."""
+    rng = np.random.default_rng(seed)
+    x = sample_uniform_ball(n, 5, rng)
+    score = decision_score(x, boundary)
+    contrast = config.smooth_effect * np.tanh(config.smooth_sharpness * score)
+    latent_mean = np.column_stack([-contrast, contrast])
+    outcomes = sigmoid(latent_mean + rng.normal(size=(n, 2)) * config.smooth_noise)
+    optimal = np.argmax(latent_mean, axis=1)
+    propensity = propensity_from_action(optimal, config.risky_propensity)
+    action = sample_actions(propensity, rng)
+    return pack_dataset(
+        x, action, outcomes, propensity, latent_mean,
+        score=score.reshape(-1, 1).astype(np.float32),
+    )
 
 
-def middle_margin_score(score: np.ndarray, gamma: float) -> np.ndarray:
-    """Emphasize observations with an intermediate decision margin."""
-    margin = np.abs(np.asarray(score, dtype=np.float64))
-    return margin * np.exp(-float(gamma) * margin)
+def risk_score(x, config=CONFIG):
+    wave = np.sin(2.0 * np.pi * x[:, 2]) * np.sin(2.0 * np.pi * x[:, 3])
+    return sigmoid(config.risk_sharpness * (wave - config.risk_threshold))
 
 
-def tilt_weights(score: np.ndarray, beta: float) -> np.ndarray:
-    """Return exponential-tilting weights for a fixed shift score."""
-    logits = float(beta) * np.asarray(score, dtype=np.float64)
+def simulate_tail_dataset(n, seed, config=CONFIG):
+    """Lower-tail component used by both Table 2 perturbation modes."""
+    rng = np.random.default_rng(seed)
+    x = sample_uniform_ball(n, 5, rng)
+    score = decision_score(x, "nonlinear")
+    risky_action = (score >= 0).astype(np.int64)
+    probability = config.risk_low + (config.risk_high - config.risk_low) * risk_score(x)
+    uniforms = rng.uniform(size=n)
+    risky_outcome = np.where(
+        uniforms < probability, config.bad_outcome, config.good_outcome
+    )
+    outcomes = np.full((n, 2), config.stable_outcome)
+    outcomes[np.arange(n), risky_action] = risky_outcome
+    mean = np.full((n, 2), config.stable_outcome)
+    mean[np.arange(n), risky_action] = (1.0 - probability) * config.good_outcome
+    propensity = propensity_from_action(risky_action, config.risky_propensity)
+    action = sample_actions(propensity, rng)
+    return pack_dataset(
+        x, action, outcomes, propensity, mean,
+        score=score.reshape(-1, 1).astype(np.float32),
+        risky_action=risky_action.reshape(-1, 1),
+        catastrophe_probability=probability.reshape(-1, 1).astype(np.float32),
+        catastrophe_uniform=uniforms.reshape(-1, 1).astype(np.float32),
+    )
+
+
+def kl_to_uniform(weights):
+    weights = np.clip(weights, 1e-300, 1.0)
+    return float(np.sum(weights * (np.log(weights) + np.log(weights.size))))
+
+
+def tilt_weights(score, beta):
+    logits = beta * np.asarray(score, dtype=np.float64).reshape(-1)
     logits -= logits.max()
     weights = np.exp(logits)
-    weights /= weights.sum()
-    return weights
+    return weights / weights.sum()
 
 
-def calibrated_tilt_weights(
-    score: np.ndarray, severity: float
-) -> tuple[np.ndarray, float]:
-    """Calibrate structured tilt weights to the requested KL level."""
-    target_kl = 0.5 * (SHIFT_SCALE * float(severity)) ** 2
-    if target_kl == 0.0:
-        n = np.asarray(score).size
-        return np.full(n, 1.0 / n, dtype=np.float64), 0.0
-
+def calibrated_weights(score, severity):
+    target = 0.5 * (SHIFT_SCALE * float(severity)) ** 2
     lower, upper = 0.0, 1.0
-    while kl_to_uniform(tilt_weights(score, upper)) < target_kl:
+    while kl_to_uniform(tilt_weights(score, upper)) < target:
         upper *= 2.0
-
     for _ in range(60):
         midpoint = 0.5 * (lower + upper)
-        weights = tilt_weights(score, midpoint)
-        if kl_to_uniform(weights) < target_kl:
+        if kl_to_uniform(tilt_weights(score, midpoint)) < target:
             lower = midpoint
         else:
             upper = midpoint
-
     weights = tilt_weights(score, 0.5 * (lower + upper))
     return weights, kl_to_uniform(weights)
 
 
-def apply_covariate_shift(
-    base_data: dict[str, np.ndarray],
-    weights: np.ndarray,
-    seed: int,
-) -> dict[str, np.ndarray]:
-    """Resample a test dataset using structured exponential-tilting weights."""
-    n = base_data["X"].shape[0]
-    rng = np.random.default_rng(seed)
-    indices = rng.choice(n, size=n, replace=True, p=weights)
-    return {
-        key: value[indices].copy()
-        if isinstance(value, np.ndarray) and value.shape[0] == n
-        else value
-        for key, value in base_data.items()
-    }
+def shift_specification(test, severity, num_environments, replication):
+    score = risk_score(test["X"])
+    weights, realized_kl = calibrated_weights(score, severity)
+    severity_index = -1 if float(severity) == 0 else SEVERITIES.index(float(severity))
+    indices = []
+    for environment in range(num_environments):
+        seed = 50000 + 10000 * replication + 1000 * severity_index + environment
+        indices.append(
+            np.random.default_rng(seed).choice(
+                test["X"].shape[0], size=test["X"].shape[0], replace=True, p=weights
+            )
+        )
+    return {"indices": np.asarray(indices, dtype=np.int32), "kl": realized_kl}
 
 
-# Lower-tail-risk DGP used by the revised Table 2.
-def simulate_catastrophe_dataset(
-    n: int,
-    seed: int,
-    *,
-    retain_drift_state: bool = False,
-) -> dict[str, np.ndarray]:
-    """Generate logged data with a high-mean, lower-tail-risky action."""
-    rng = np.random.default_rng(seed)
-    x = sample_uniform_ball(n, 5, rng)
-    score = nonlinear_score(x[:, 0], x[:, 1])
-    risky_action = (score >= 0.0).astype(np.int64)
-
-    catastrophe_uniform = rng.uniform(size=n)
-    risky_outcome = np.where(
-        catastrophe_uniform < P0, Y_BAD, Y_GOOD
-    )
-    outcomes = np.full((n, 2), Y_STABLE, dtype=np.float64)
-    outcomes[np.arange(n), risky_action] = risky_outcome
-
-    expected_outcomes = np.full((n, 2), Y_STABLE, dtype=np.float64)
-    expected_risky = P0 * Y_BAD + (1.0 - P0) * Y_GOOD
-    expected_outcomes[np.arange(n), risky_action] = expected_risky
-
-    propensity = np.full((n, 2), 1.0 - P_LOG_RISKY, dtype=np.float64)
-    propensity[np.arange(n), risky_action] = P_LOG_RISKY
-    action = sample_actions(propensity, rng)
-    observed_outcome = outcomes[np.arange(n), action]
-    observed_propensity = propensity[np.arange(n), action]
-
-    data = {
-        "X": x.astype(np.float32),
-        "T": action.reshape(-1, 1),
-        "Y": observed_outcome.reshape(-1, 1).astype(np.float32),
-        "prop_score": observed_propensity.reshape(-1, 1).astype(np.float32),
-        "Y_all": outcomes.astype(np.float32),
-        "prop_score_all": propensity.astype(np.float32),
-        "mu": expected_outcomes.astype(np.float32),
-    }
-    if retain_drift_state:
-        data["score"] = score.reshape(-1, 1).astype(np.float32)
-        data["risky_action"] = risky_action.reshape(-1, 1)
-        data["catastrophe_uniform"] = catastrophe_uniform.reshape(-1, 1)
-    return data
-
-
-def drift_basis(x: np.ndarray) -> np.ndarray:
-    """Return the standardized basis used for heterogeneous susceptibility."""
+def drift_basis(x):
     x1, x2 = x[:, 0], x[:, 1]
-    continuous = np.column_stack(
-        [
-            x1,
-            x2,
-            x1 * x2,
-            x1**2 - x2**2,
-            np.sin(np.pi * x1),
-            np.cos(np.pi * x2),
-        ]
+    basis = np.column_stack(
+        [x1, x2, x1 * x2, x1**2 - x2**2, np.sin(np.pi * x1), np.cos(np.pi * x2)]
     )
-    continuous = (continuous - continuous.mean(0)) / continuous.std(0)
-    return np.column_stack([np.ones(x.shape[0]), continuous])
+    basis = (basis - basis.mean(0)) / basis.std(0)
+    return np.column_stack([np.ones(x.shape[0]), basis])
 
 
-def build_susceptibility(
-    x: np.ndarray,
-    n_environments: int,
-    *,
-    seed: int = 2026,
-    heterogeneity_scale: float = 0.35,
-) -> np.ndarray:
-    """Build positive susceptibility for each deployment environment."""
+def build_susceptibility(x, num_environments, seed=2026):
     basis = drift_basis(np.asarray(x, dtype=np.float64))
     rng = np.random.default_rng(seed)
-    theta = rng.normal(size=(n_environments, basis.shape[1]))
+    theta = rng.normal(size=(num_environments, basis.shape[1]))
     theta /= np.linalg.norm(theta, axis=1, keepdims=True)
-    raw = basis @ theta.T
-    return np.exp(
-        heterogeneity_scale * np.clip(raw, -2.0, 2.0)
-    ).T
+    return np.exp(0.35 * np.clip(basis @ theta.T, -2.0, 2.0)).T
 
 
-def bernoulli_kl(probability: np.ndarray, baseline: float = P0) -> np.ndarray:
-    """Compute KL(Bernoulli(probability) || Bernoulli(baseline))."""
-    probability = np.clip(
-        np.asarray(probability, dtype=np.float64), 1e-12, 1.0 - 1e-12
-    )
-    return (
-        probability * np.log(probability / baseline)
-        + (1.0 - probability)
-        * np.log((1.0 - probability) / (1.0 - baseline))
-    )
+def bernoulli_kl(probability, baseline):
+    probability = np.clip(probability, 1e-12, 1.0 - 1e-12)
+    baseline = np.clip(baseline, 1e-12, 1.0 - 1e-12)
+    return probability * np.log(probability / baseline) + (
+        1.0 - probability
+    ) * np.log((1.0 - probability) / (1.0 - baseline))
 
 
-def solve_catastrophe_probability(
-    susceptibility: np.ndarray,
-    eta_test: float,
-    *,
-    baseline: float = P0,
-) -> np.ndarray:
-    """Solve the conditional catastrophe probabilities for one environment."""
-    susceptibility = np.asarray(susceptibility, dtype=np.float64)
-    if eta_test == 0.0:
-        return np.full_like(susceptibility, baseline)
-
+def solve_drift_probability(susceptibility, target, baseline):
     baseline_logit = np.log(baseline / (1.0 - baseline))
 
-    def probabilities(tau: float) -> np.ndarray:
-        logits = baseline_logit + tau * susceptibility
-        return 1.0 / (1.0 + np.exp(-logits))
+    def probability(tau):
+        return sigmoid(baseline_logit + tau * susceptibility)
 
     lower, upper = 0.0, 1.0
-    while bernoulli_kl(probabilities(upper), baseline).mean() < eta_test:
+    while bernoulli_kl(probability(upper), baseline).mean() < target:
         upper *= 2.0
-
     for _ in range(80):
         midpoint = 0.5 * (lower + upper)
-        realized_kl = bernoulli_kl(
-            probabilities(midpoint), baseline
-        ).mean()
-        if realized_kl < eta_test:
+        if bernoulli_kl(probability(midpoint), baseline).mean() < target:
             lower = midpoint
         else:
             upper = midpoint
-    return probabilities(0.5 * (lower + upper))
+    return probability(0.5 * (lower + upper))
 
 
-def environment_probabilities(
-    susceptibility: np.ndarray,
-    lambda_2: float,
-    *,
-    shift_scale: float = SHIFT_SCALE,
-) -> tuple[np.ndarray, float, np.ndarray]:
-    """Return calibrated probabilities and realized KL by environment."""
-    eta_test = 0.5 * (shift_scale * float(lambda_2)) ** 2
-    probabilities = np.stack(
-        [
-            solve_catastrophe_probability(row, eta_test)
-            for row in susceptibility
-        ]
+def drift_specification(test, severity, num_environments):
+    baseline = test["catastrophe_probability"].reshape(-1).astype(np.float64)
+    susceptibility = build_susceptibility(test["X"], num_environments)
+    target = 0.5 * (SHIFT_SCALE * float(severity)) ** 2
+    probability = np.stack(
+        [solve_drift_probability(row, target, baseline) for row in susceptibility]
     )
-    realized_kl = bernoulli_kl(probabilities).mean(axis=1)
-    return probabilities, eta_test, realized_kl
+    realized = bernoulli_kl(probability, baseline).mean(axis=1)
+    return {"probabilities": probability.astype(np.float32), "kl": realized}
 
 
-def drifted_outcomes(
-    catastrophe_uniform: np.ndarray,
-    risky_action: np.ndarray,
-    probabilities: np.ndarray,
-) -> np.ndarray:
-    """Generate potential outcomes using common catastrophe uniforms."""
-    catastrophe_uniform = np.asarray(catastrophe_uniform).reshape(-1)
-    risky_action = np.asarray(risky_action).reshape(-1)
-    catastrophe = catastrophe_uniform[None, :] < probabilities
-    risky_outcome = np.where(catastrophe, Y_BAD, Y_GOOD)
-    risky_indicator = np.eye(2)[risky_action]
-    return (
-        Y_STABLE
-        + risky_indicator[None, :, :]
-        * (risky_outcome[:, :, None] - Y_STABLE)
-    )
-
-
-def generate_raw_replication(
-    replication: int,
-    *,
-    n_train: int,
-    n_test: int,
-    g_type: str,
-    base_seed_train: int,
-    base_seed_test: int,
-    dgp_kwargs: dict[str, Any],
-) -> dict[str, Any]:
-    """Generate the unshifted smooth-outcome training and test datasets."""
-    train = simulate_dataset(
-        n_train,
-        base_seed_train + replication,
-        g_type,
-        **dgp_kwargs,
-    )
-    test_base = simulate_dataset(
-        n_test,
-        base_seed_test + replication,
-        g_type,
-        **dgp_kwargs,
-    )
-    return {"train": train, "test": test_base}
-
-
-def generate_shift_replication(
-    replication: int,
-    *,
-    n_train: int,
-    n_test: int,
-    g_type: str,
-    severity: float,
-    num_environments: int,
-    base_seed_train: int,
-    base_seed_test: int,
-    dgp_kwargs: dict[str, Any],
-) -> dict[str, Any]:
-    """Generate smooth outcomes under X-dependent covariate shift."""
-    data = generate_raw_replication(
-        replication,
-        n_train=n_train,
-        n_test=n_test,
-        g_type=g_type,
-        base_seed_train=base_seed_train,
-        base_seed_test=base_seed_test,
-        dgp_kwargs=dgp_kwargs,
-    )
-    train, test_base = data["train"], data["test"]
-
-    x = test_base["X"]
-    if g_type == "linear":
-        raw_score = linear_score(
-            x[:, 0],
-            x[:, 1],
-            w1=dgp_kwargs.get("w1", 1.0),
-            w2=dgp_kwargs.get("w2", -0.8),
-            intercept=dgp_kwargs.get("b", 0.0),
-        )
-    else:
-        raw_score = nonlinear_score(
-            x[:, 0], x[:, 1], radius=dgp_kwargs.get("R", 1.0)
-        )
-    shift_score = middle_margin_score(
-        raw_score, gamma=dgp_kwargs.get("gamma", 6.0)
-    )
-    q, realized_kl = calibrated_tilt_weights(shift_score, severity)
-    environment_seeds = (
-        base_seed_test + 10000 * (replication + 1) + j
-        for j in range(num_environments)
-    )
-    environments, weights, divergences = [], [], []
-    for seed in environment_seeds:
-        environments.append(apply_covariate_shift(test_base, q, seed))
-        weights.append(q)
-        divergences.append(realized_kl)
-    test = {
-        "base": test_base,
-        "envs": environments,
-        "q_list": weights,
-        "kl_list": divergences,
-        "shift_eta": float(severity),
+def generate_replication(replication, n_train=10000, n_test=2500, num_environments=100):
+    data = {"config": asdict(CONFIG), "replication": replication}
+    for boundary in ("linear", "nonlinear"):
+        data[boundary] = {
+            "train": simulate_smooth_dataset(n_train, 42 + replication, boundary),
+            "test": simulate_smooth_dataset(n_test, 1042 + replication, boundary),
+        }
+    data["tail"] = {
+        "train": simulate_tail_dataset(n_train, 20042 + replication),
+        "test": simulate_tail_dataset(n_test, 21042 + replication),
     }
-    return {"train": train, "test": test}
-
-
-def generate_drift_replication(
-    replication: int,
-    *,
-    n_train: int,
-    n_test: int,
-    severity: float,
-    num_environments: int,
-    base_seed_train: int,
-    base_seed_test: int,
-) -> dict[str, Any]:
-    """Generate lower-tail outcomes under concept drift."""
-    train = simulate_catastrophe_dataset(
-        n_train, base_seed_train + replication
-    )
-    test_base = simulate_catastrophe_dataset(
-        n_test,
-        base_seed_test + replication,
-        retain_drift_state=True,
-    )
-    susceptibility = build_susceptibility(test_base["X"], num_environments)
-    probabilities, eta_test, divergences = environment_probabilities(
-        susceptibility, severity
-    )
-    outcomes = drifted_outcomes(
-        test_base["catastrophe_uniform"],
-        test_base["risky_action"],
-        probabilities,
-    )
-
-    rows = np.arange(n_test)
-    actions = test_base["T"].reshape(-1)
-    risky_actions = test_base["risky_action"].reshape(-1)
-    environments = []
-    for probability, outcome in zip(probabilities, outcomes):
-        environment = dict(test_base)
-        environment["Y_all"] = outcome
-        environment["Y"] = (
-            outcome[rows, actions].reshape(-1, 1).astype(np.float32)
-        )
-        expected = np.full((n_test, 2), Y_STABLE)
-        expected[rows, risky_actions] = (
-            probability * Y_BAD + (1.0 - probability) * Y_GOOD
-        )
-        environment["mu"] = expected.astype(np.float32)
-        environments.append(environment)
-
-    return {
-        "train": train,
-        "test": {
-            "base": test_base,
-            "envs": environments,
-            "lambda2": float(severity),
-            "eta_test": eta_test,
-            "kl_list": divergences,
-        },
+    test = data["tail"]["test"]
+    data["covariate"] = {
+        f"{severity:g}": shift_specification(test, severity, num_environments, replication)
+        for severity in SEVERITIES
     }
+    data["concept"] = {
+        f"{severity:g}": drift_specification(test, severity, num_environments)
+        for severity in SEVERITIES
+    }
+    return data
 
 
-def generate_replication(
-    replication: int,
-    *,
-    n_train: int,
-    n_test: int,
-    g_type: str,
-    mode: str,
-    severity: float,
-    num_environments: int,
-    base_seed_train: int,
-    base_seed_test: int,
-    dgp_kwargs: dict[str, Any],
-) -> dict[str, Any]:
-    """Dispatch one replication explicitly to raw, shift, or drift."""
+def concept_outcomes(test, probabilities, config=CONFIG):
+    n = test["X"].shape[0]
+    risky_action = test["risky_action"].reshape(-1)
+    uniforms = test["catastrophe_uniform"].reshape(-1)
+    risky = np.where(
+        uniforms[None, :] < probabilities, config.bad_outcome, config.good_outcome
+    )
+    outcomes = np.full((probabilities.shape[0], n, 2), config.stable_outcome)
+    outcomes[:, np.arange(n), risky_action] = risky
+    return outcomes.astype(np.float32)
+
+
+def generate_condition(
+    replication,
+    mode,
+    boundary,
+    severity,
+    n_train,
+    n_test,
+    num_environments,
+):
+    """Generate one condition in the format consumed by run_experiment.py."""
     if mode == "raw":
-        return generate_raw_replication(
-            replication,
-            n_train=n_train,
-            n_test=n_test,
-            g_type=g_type,
-            base_seed_train=base_seed_train,
-            base_seed_test=base_seed_test,
-            dgp_kwargs=dgp_kwargs,
-        )
-    if mode == "shift":
-        return generate_shift_replication(
-            replication,
-            n_train=n_train,
-            n_test=n_test,
-            g_type=g_type,
-            severity=severity,
-            num_environments=num_environments,
-            base_seed_train=base_seed_train,
-            base_seed_test=base_seed_test,
-            dgp_kwargs=dgp_kwargs,
-        )
-    if mode == "drift":
-        return generate_drift_replication(
-            replication,
-            n_train=n_train,
-            n_test=n_test,
-            severity=severity,
-            num_environments=num_environments,
-            base_seed_train=base_seed_train,
-            base_seed_test=base_seed_test,
-        )
-    raise ValueError(f"mode must be one of: {', '.join(DGP_MODES)}")
-
-
-def plot_decision_regions(
-    g_type: str,
-    output_path: Path,
-    *,
-    seed: int,
-    n_plot: int,
-    w1: float,
-    w2: float,
-    b: float,
-    R: float,
-    gamma: float,
-    m0: float,
-    delta: float,
-) -> None:
-    """Plot the Bayes-optimal decision regions in the first two covariates."""
-    import matplotlib.pyplot as plt
-
-    import basics_with_holdout as utils
-
-    rng = np.random.default_rng(seed)
-    x = sample_uniform_ball(n_plot, 5, rng)
-    if g_type == "linear":
-        score = linear_score(x[:, 0], x[:, 1], w1=w1, w2=w2, intercept=b)
+        train = simulate_smooth_dataset(n_train, 42 + replication, boundary)
+        test = simulate_smooth_dataset(n_test, 1042 + replication, boundary)
+        specification = None
     else:
-        score = nonlinear_score(x[:, 0], x[:, 1], radius=R)
-    decision = np.argmax(
-        latent_means(score, baseline=m0, effect=delta, sharpness=gamma), axis=1
-    )
+        train = simulate_tail_dataset(n_train, 20042 + replication)
+        test = simulate_tail_dataset(n_test, 21042 + replication)
+        if mode == "shift":
+            specification = shift_specification(
+                test, severity, num_environments, replication
+            )
+        else:
+            specification = drift_specification(test, severity, num_environments)
 
-    utils.set_large_fonts()
-    plt.figure(figsize=(6.5, 6))
-    plt.scatter(x[:, 0], x[:, 1], c=decision, s=6, alpha=0.85)
-    plt.xlim([-1.05, 1.05])
-    plt.ylim([-1.05, 1.05])
-    plt.xlabel(r"$x_1$")
-    plt.ylabel(r"$x_2$")
-    plt.tight_layout()
-    plt.savefig(output_path, dpi=200)
-    plt.close()
-
-
-def build_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(
-        description="Generate nominal, covariate-shift, or concept-drift data."
-    )
-    parser.add_argument(
-        "--mode",
-        choices=DGP_MODES,
-        default="drift",
-        help="DGP mode: raw (none), shift (covariates), or drift (concept).",
-    )
-    parser.add_argument("--severity", type=float, default=0.5)
-    parser.add_argument(
-        "--g_type", choices=("linear", "nonlinear"), default="nonlinear"
-    )
-    parser.add_argument("--num_rep", type=int, default=100)
-    parser.add_argument("--n_train", type=int, default=10000)
-    parser.add_argument("--n_test", type=int, default=2500)
-    parser.add_argument("--num_environments", type=int, default=100)
-    parser.add_argument("--out_dir", type=Path, default=Path("./data"))
-    parser.add_argument("--base_seed_train", type=int, default=42)
-    parser.add_argument("--base_seed_test", type=int, default=1042)
-    parser.add_argument("--p_hi", type=float, default=0.75)
-    parser.add_argument("--sigma0", type=float, default=0.3)
-    parser.add_argument("--sigma1", type=float, default=0.3)
-    parser.add_argument("--m0", type=float, default=0.0)
-    parser.add_argument("--delta", type=float, default=1.5)
-    parser.add_argument("--gamma", type=float, default=6.0)
-    parser.add_argument("--w1", type=float, default=1.0)
-    parser.add_argument("--w2", type=float, default=-0.8)
-    parser.add_argument("--b", type=float, default=0.0)
-    parser.add_argument("--R", type=float, default=1.0)
-    parser.add_argument("--plot", dest="plot", action="store_true")
-    parser.add_argument("--no_plot", dest="plot", action="store_false")
-    parser.set_defaults(plot=False)
-    parser.add_argument("--plot_n", type=int, default=6000)
-    return parser
+    data = {
+        "config": asdict(CONFIG),
+        "replication": replication,
+        "mode": mode,
+        "type": boundary,
+        "severity": float(severity),
+        "train": train,
+        "test": test,
+    }
+    if specification is not None:
+        data["specification"] = specification
+    return data
 
 
-def output_stem(mode: str, severity: float) -> str:
+def severity_label(value):
+    value = float(value)
+    return str(int(value)) if value.is_integer() else str(value)
+
+
+def condition_name(mode, boundary, severity):
+    if mode == "raw":
+        return boundary
+    return f"nonlinear_{mode}={float(severity):.1f}"
+
+
+def output_stem(mode, severity):
     if mode == "raw":
         return "Shift_0.0"
     prefix = "Shift" if mode == "shift" else "Drift"
-    severity = float(severity)
-    label = str(int(severity)) if severity.is_integer() else str(severity)
-    return f"{prefix}_{label}"
+    return f"{prefix}_{severity_label(severity)}"
 
 
-def output_directory(
-    base_dir: Path, g_type: str, mode: str, severity: float
-) -> Path:
-    """Match the condition directories read by run_experiment.py."""
-    if mode == "raw":
-        condition = g_type
-    else:
-        condition = f"{g_type}_{mode}={float(severity):.1f}"
-    return base_dir / condition
+def build_parser():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--mode", choices=("raw", "shift", "drift"), default="raw")
+    parser.add_argument(
+        "--type", "--g_type", dest="boundary", choices=("linear", "nonlinear"),
+        default="nonlinear",
+    )
+    parser.add_argument("--dist_shift", "--severity", dest="severity", type=float, default=0.0)
+    parser.add_argument("--start_rep", type=int, default=0)
+    parser.add_argument("--num_rep", "--num_reps", dest="num_reps", type=int, default=100)
+    parser.add_argument("--n_train", type=int, default=10000)
+    parser.add_argument("--n_test", type=int, default=2500)
+    parser.add_argument("--num_environments", type=int, default=100)
+    parser.add_argument("--out_dir", type=Path, default=Path(__file__).resolve().parent / "data")
+    return parser
 
 
-def main() -> None:
-    args = build_parser().parse_args()
+def main():
+    parser = build_parser()
+    args = parser.parse_args()
+    if args.start_rep < 0 or args.num_reps < 1:
+        parser.error("replication indices must be nonnegative and --num_rep positive")
+    if args.mode == "raw" and args.severity != 0:
+        parser.error("raw mode requires --dist_shift 0")
+    if args.mode != "raw" and args.boundary != "nonlinear":
+        parser.error("shift and drift use the nonlinear lower-tail DGP")
+    allowed_severities = (0.0,) + SEVERITIES
+    if args.mode != "raw" and args.severity not in allowed_severities:
+        parser.error(f"shift/drift severity must be one of {allowed_severities}")
 
-    output_dir = output_directory(
-        args.out_dir, args.g_type, args.mode, args.severity
+    output_dir = args.out_dir.resolve() / condition_name(
+        args.mode, args.boundary, args.severity
     )
     output_dir.mkdir(parents=True, exist_ok=True)
-    dgp_kwargs = {
-        "sigmas": (args.sigma0, args.sigma1),
-        "p_hi": args.p_hi,
-        "w1": args.w1,
-        "w2": args.w2,
-        "b": args.b,
-        "R": args.R,
-        "gamma": args.gamma,
-        "m0": args.m0,
-        "delta": args.delta,
-    }
-    n_test = 10000 if args.mode == "raw" else args.n_test
     stem = output_stem(args.mode, args.severity)
 
-    for replication in range(args.num_rep):
-        data = generate_replication(
+    for replication in range(args.start_rep, args.start_rep + args.num_reps):
+        data = generate_condition(
             replication,
-            n_train=args.n_train,
-            n_test=n_test,
-            g_type=args.g_type,
-            mode=args.mode,
-            severity=args.severity,
-            num_environments=args.num_environments,
-            base_seed_train=args.base_seed_train,
-            base_seed_test=args.base_seed_test,
-            dgp_kwargs=dgp_kwargs,
+            args.mode,
+            args.boundary,
+            args.severity,
+            args.n_train,
+            args.n_test,
+            args.num_environments,
         )
-        output_path = output_dir / f"{stem}-exp-{replication}.pkl"
-        joblib.dump(data, output_path)
-        print(f"Saved {output_path}")
-
-    if args.plot:
-        plot_decision_regions(
-            args.g_type,
-            output_dir / f"decision_regions_{args.g_type}.png",
-            seed=123,
-            n_plot=args.plot_n,
-            w1=args.w1,
-            w2=args.w2,
-            b=args.b,
-            R=args.R,
-            gamma=args.gamma,
-            m0=args.m0,
-            delta=args.delta,
-        )
+        path = output_dir / f"{stem}-exp-{replication}.pkl"
+        joblib.dump(data, path, compress=3)
+        print(f"Saved {path}")
 
 
 if __name__ == "__main__":

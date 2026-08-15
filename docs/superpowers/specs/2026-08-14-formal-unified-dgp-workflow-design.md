@@ -8,7 +8,7 @@ formal `simulation/run_experiment.py` workflow.
 
 ## Generator
 
-Create `simulation/generate_unified_dgp.py` as one self-contained file. It will
+Use `simulation/generate_dgp.py` as one self-contained file. It will
 accept `raw`, `shift`, and `drift` modes; linear/nonlinear boundary type;
 severity; replication range; sample sizes; and number of environments. Outputs
 will use the existing condition directories and filenames under
