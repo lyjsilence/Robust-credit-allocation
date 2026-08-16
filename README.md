@@ -19,8 +19,7 @@ simulation/
   concat_results.py   Aggregate replication-level results
 ```
 
-The scripts create the following local directories, all of which are ignored
-by Git:
+The scripts create the following local directories:
 
 ```text
 simulation/data/       Generated datasets
@@ -33,37 +32,24 @@ simulation/results/    Replication-level results and summary_results.csv
 Each reported experiment uses 100 replications. `--start_rep` can be used to
 split replications across several processes or machines.
 
-### Tables 1 and 3: nominal DGPs
+### Generate nominal DGPs
 
 Generate the linear and nonlinear nominal datasets:
 
 ```bash
-python simulation/generate_dgp.py --mode raw --type linear --dist_shift 0 --num_rep 100
-python simulation/generate_dgp.py --mode raw --type nonlinear --dist_shift 0 --num_rep 100
+python generate_dgp.py --mode raw --type linear --dist_shift 0 --num_rep 100
+python generate_dgp.py --mode raw --type nonlinear --dist_shift 0 --num_rep 100
 ```
 
-These commands save data in `simulation/data/linear/` and
-`simulation/data/nonlinear/`.
-
-### Table 2: covariate shift and concept drift
+### Generate covariate shift and concept drift
 
 For each mode, repeat the command at
 `LEVEL = 0, 0.5, 1, 1.5, 2, 2.5, 3`:
 
 ```bash
-python simulation/generate_dgp.py --mode shift --type nonlinear --dist_shift LEVEL --num_rep 100
-python simulation/generate_dgp.py --mode drift --type nonlinear --dist_shift LEVEL --num_rep 100
+python generate_dgp.py --mode shift --type nonlinear --dist_shift LEVEL --num_rep 100
+python generate_dgp.py --mode drift --type nonlinear --dist_shift LEVEL --num_rep 100
 ```
-
-For example, the covariate-shift command at level 1.5 is:
-
-```bash
-python simulation/generate_dgp.py --mode shift --type nonlinear --dist_shift 1.5 --num_rep 100
-```
-
-The zero-severity shift and drift conditions are intentionally distinct from
-the nominal nonlinear condition. Their directories are respectively
-`nonlinear_shift=0.0`, `nonlinear_drift=0.0`, and `nonlinear`.
 
 ## 2. Run the experiments
 
@@ -71,47 +57,35 @@ The default training ambiguity radius is 0.20. Every command below runs
 replications 0--99 and writes models and results into matching condition
 directories.
 
-### Table 1: linear and nonlinear policies
+### (1) linear and nonlinear policies
 
-Run the proposed method and the SNLS baseline for each nominal DGP:
+Run the proposed method for each nominal DGP:
 
 ```bash
-python simulation/run_experiment.py --mode raw --type linear --dist_shift 0 --num_reps 100 -robust_met robust -baseline None
-python simulation/run_experiment.py --mode raw --type linear --dist_shift 0 --num_reps 100 -robust_met robust -baseline SNLN
-
-python simulation/run_experiment.py --mode raw --type nonlinear --dist_shift 0 --num_reps 100 -robust_met robust -baseline None
-python simulation/run_experiment.py --mode raw --type nonlinear --dist_shift 0 --num_reps 100 -robust_met robust -baseline SNLN
+python simulation/run_experiment.py --mode raw --type linear --dist_shift 0 --num_reps 100 -robust_met robust
+python simulation/run_experiment.py --mode raw --type nonlinear --dist_shift 0 --num_reps 100 -robust_met robust 
 ```
 
-The KNLS baseline is implemented as `-baseline KLLN` but is not required for
-the reported SNLS-only comparison.
 
-### Table 2: robustness under distribution shift
+### (2) robustness under distribution shift
 
 For every `MODE` in `shift, drift` and every `LEVEL` in
 `0, 0.5, 1, 1.5, 2, 2.5, 3`, run both policies:
 
 ```bash
-python simulation/run_experiment.py --mode MODE --type nonlinear --dist_shift LEVEL --num_reps 100 -robust_met robust -baseline None
-python simulation/run_experiment.py --mode MODE --type nonlinear --dist_shift LEVEL --num_reps 100 -robust_met non-robust -baseline None
+python simulation/run_experiment.py --mode MODE --type nonlinear --dist_shift LEVEL --num_reps 100 -robust_met robust 
+python simulation/run_experiment.py --mode MODE --type nonlinear --dist_shift LEVEL --num_reps 100 -robust_met non-robust 
 ```
 
-For example:
+### (3) policy complexity
 
-```bash
-python simulation/run_experiment.py --mode drift --type nonlinear --dist_shift 1.5 --num_reps 100 -robust_met robust -baseline None
-python simulation/run_experiment.py --mode drift --type nonlinear --dist_shift 1.5 --num_reps 100 -robust_met non-robust -baseline None
-```
-
-### Table 3: policy complexity
-
-No additional experiment command is needed. The nonlinear proposed-method run
+The nonlinear proposed-method run
 for Table 1 automatically fits and saves fixed complexities
 `K = 1, ..., 6`, together with the data-driven selection. Therefore, Table 3
 uses the results produced by:
 
 ```bash
-python simulation/run_experiment.py --mode raw --type nonlinear --dist_shift 0 --num_reps 100 -robust_met robust -baseline None
+python simulation/run_experiment.py --mode raw --type nonlinear --dist_shift 0 --num_reps 100 -robust_met robust
 ```
 
 ## 3. Aggregate results
@@ -119,7 +93,7 @@ python simulation/run_experiment.py --mode raw --type nonlinear --dist_shift 0 -
 After the required experiments finish, aggregate every existing result file:
 
 ```bash
-python simulation/concat_results.py --results_dir simulation/results
+python sconcat_results.py --results_dir results
 ```
 
 The script writes:
@@ -128,10 +102,3 @@ The script writes:
 simulation/results/summary_results.csv
 ```
 
-Each row reports the DGP type, perturbation mode and severity, robust method,
-baseline, metric name, number of completed replications, mean, sample standard
-deviation, and standard error. The same summary contains the entries needed for
-Tables 1, 2, and 3, including all fixed-`K` and data-driven nonlinear results.
-
-To combine only a subset of replications, place the corresponding `.pkl` files
-under the standard results directory and run the same aggregation command.
