@@ -23,7 +23,6 @@ FILENAME_PATTERN = re.compile(
     r"(?:-(?P<baseline>SNLN|KLLN))?"
     r"-exp_id-\d+-(?:DRO|min)\.pkl$"
 )
-
 MODE_ORDER = {"raw": 0, "shift": 1, "drift": 2}
 METHOD_ORDER = {"robust": 0, "non-robust": 1}
 BASELINE_ORDER = {"None": 0, "SNLN": 1, "KLLN": 2}
@@ -95,7 +94,7 @@ def group_sort_key(group):
 
 
 def write_summary(grouped_values, output_path):
-    """Write counts, means, and sample standard deviations."""
+    """Write counts, means, sample standard deviations, and standard errors."""
     output_path.parent.mkdir(parents=True, exist_ok=True)
     with output_path.open("w", newline="", encoding="utf-8") as file:
         writer = csv.writer(file)
@@ -110,12 +109,14 @@ def write_summary(grouped_values, output_path):
                 "n",
                 "mean",
                 "std",
+                "se",
             ]
         )
 
         for group in sorted(grouped_values, key=group_sort_key):
             values = np.asarray(grouped_values[group], dtype=float)
             std = np.std(values, ddof=1) if values.size > 1 else 0.0
+            se = std / np.sqrt(values.size)
             writer.writerow(
                 [
                     group.dgp_type,
@@ -127,6 +128,7 @@ def write_summary(grouped_values, output_path):
                     values.size,
                     f"{np.mean(values):.8g}",
                     f"{std:.8g}",
+                    f"{se:.8g}",
                 ]
             )
 

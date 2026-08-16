@@ -8,7 +8,7 @@ import joblib
 import numpy as np
 
 
-SEVERITIES = (0.5, 1.0, 1.5, 2.0, 2.5, 3.0)
+SEVERITIES = (0.0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0)
 SHIFT_SCALE = 0.20
 
 

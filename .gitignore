@@ -1,4 +1,4 @@
-# Data and generated experiment artifacts
+# Generated simulation artifacts
 data/
 **/data/
 results/
@@ -8,7 +8,12 @@ models/
 reproduction_runs/
 **/reproduction_runs/
 
-# Serialized datasets and trained models
+# Local archives and development sandboxes
+simulation/raw code/
+simulation/shift_dgp_search/
+simulation/*sandbox*/
+
+# Serialized datasets and fitted models
 *.pkl
 *.joblib
 *.npy
