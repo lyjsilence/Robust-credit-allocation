@@ -1,11 +1,10 @@
 # Robust Credit Allocation
 
-Simulation code for the paper *Robust Credit Allocation under Distribution
-Shift*. The repository contains the data-generating processes, policy-learning
-implementation, evaluation routines, and result aggregation script used for
-Tables 1--3.
+Simulation code for the paper *Policy Learning under Distribution Shift with
+Infinite-Dimensional Policy Classes: An Application
+to Consumer Credit Allocation*. The repository contains the data-generating processes, policy-learning
+implementation, evaluation routines, and result aggregation script.
 
-Generated datasets, trained models, and numerical results are not included.
 
 ## Setup
 
