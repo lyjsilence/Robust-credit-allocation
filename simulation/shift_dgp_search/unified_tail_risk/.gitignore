@@ -1,7 +1,0 @@
-data/
-models/
-results/
-__pycache__/
-*.log
-*.csv
-!summary.csv

@@ -13,11 +13,15 @@ import joblib
 import numpy as np
 import torch
 
-import alternative_optimization_with_holdout as evaluation_tools
-import basics_with_holdout as basics
-import opt_policy_learn_with_holdout as policy_tools
-import optimization_problem_with_holdout as optimization
-from generate_dgp import concept_outcomes
+from data import prepare_policy_data
+from evaluation import (
+    chosen_actions,
+    dro_value,
+    worst_concept_value,
+    worst_covariate_value,
+)
+from learning import Candidate, fit_candidate
+from models import build_policy, set_trainable
 
 
 HERE = Path(__file__).resolve().parent
@@ -67,12 +71,11 @@ def result_directory(args):
     return args.output_root / "results" / condition_name(args) / args.robust_met
 
 
-def make_fit_args(cli, model_dir, robust_method, baseline):
+def make_fit_args(cli, model_dir, baseline):
     args = copy.copy(cli)
     args.mode = "raw"
     args.type = "nonlinear"
     args.dist_shift = 0.0
-    args.robust_met = robust_method
     args.baseline = baseline
     args.opt_procedure = "data-driven" if baseline == "None" else "non-data-driven"
     args.model_dir = model_dir
@@ -81,56 +84,41 @@ def make_fit_args(cli, model_dir, robust_method, baseline):
 
 
 def fit_candidates(cli, train, test, replication, name, depths, baseline="None"):
-    model_dir = model_directory(cli)
-    args = make_fit_args(cli, model_dir, cli.robust_met, baseline)
+    args = make_fit_args(cli, model_directory(cli), baseline)
     set_seed(100000 * replication + sum(map(ord, name)))
-    policy_data = basics.initialize_setting(
-        torch.device(cli.device), copy.deepcopy(train), copy.deepcopy(test), args
+    policy_data = prepare_policy_data(
+        copy.deepcopy(train), copy.deepcopy(test), args
     )
 
     candidates = {}
     for depth in depths:
-        policy_data[f"alpha_list_{depth}"] = (
-            None
-            if cli.robust_met == "non-robust"
-            else [policy_data["init_alpha"]]
+        path, value, alphas = fit_candidate(
+            policy_data, depth, replication, torch.device(cli.device)
         )
-        path, value, alphas = policy_tools.pi_alpha_alter(
-            policy_data, cli.num_treat, depth, replication, torch.device(cli.device)
+        candidates[depth] = Candidate(
+            path=path,
+            validation_value=value,
+            criterion=value - np.sqrt(depth / policy_data["X_val"].shape[0]),
+            alpha=alphas[-1] if alphas else None,
         )
-        candidates[depth] = {
-            "path": path,
-            "value": value,
-            "criterion": value - np.sqrt(depth / policy_data["X_val"].shape[0]),
-            "alpha": alphas[-1] if alphas else None,
-        }
-    selected = max(candidates, key=lambda depth: candidates[depth]["criterion"])
+    selected = max(candidates, key=lambda depth: candidates[depth].criterion)
     return policy_data, candidates, selected
 
 
 def load_policy(policy_data, candidate, depth, baseline, device):
-    policy_class = (
-        optimization.NN_Sieves if baseline == "None" else optimization.NN_baseline
-    )
-    policy = policy_class(
-        policy_data,
-        policy_data["dim_X"],
-        device,
-        Nlayers=depth,
-        Nclasses=policy_data["num_treat"],
-    )
-    policy.load_state_dict(torch.load(candidate["path"], map_location=device))
+    policy = build_policy(policy_data, depth, baseline, device)
+    policy.load_state_dict(torch.load(candidate.path, map_location=device))
     policy.eval()
-    optimization.set_requires_grad(policy, False)
+    set_trainable(policy, False)
     return policy
 
 
 def robust_value(policy_data, candidate, depth, baseline, radius, device):
     policy = load_policy(policy_data, candidate, depth, baseline, device)
-    alpha = candidate["alpha"]
+    alpha = candidate.alpha
     if alpha is None:
         alpha = policy_data["init_alpha"]
-    value, _ = evaluation_tools.evaluation(
+    value, _ = dro_value(
         policy,
         torch.tensor(policy_data["X_test"], device=device),
         torch.tensor(policy_data["T_test"], device=device),
@@ -138,28 +126,15 @@ def robust_value(policy_data, candidate, depth, baseline, radius, device):
         torch.tensor(policy_data["prop_score_test"], device=device),
         torch.tensor([alpha], device=device),
         policy_data["args"],
-        amb_radius=radius,
+        radius,
     )
     return float(value.item())
 
 
-def chosen_actions(policy_data, candidate, depth, device):
+def policy_actions(policy_data, candidate, depth, device):
     policy = load_policy(policy_data, candidate, depth, "None", device)
-    with torch.no_grad():
-        logits = policy(torch.tensor(policy_data["X_test"], device=device))
-    return logits.argmax(1).cpu().numpy()
-
-
-def worst_covariate_value(test, indices, actions):
-    values = test["Y_all"][indices, actions[indices]]
-    return float(values.mean(axis=1).min())
-
-
-def worst_concept_value(test, probabilities, actions):
-    outcomes = concept_outcomes(test, probabilities)
-    rows = np.arange(test["X"].shape[0])
-    values = outcomes[:, rows, actions]
-    return float(values.mean(axis=1).min())
+    x = torch.tensor(policy_data["X_test"], device=device)
+    return chosen_actions(policy, x)
 
 
 def run_raw(args, replication, data):
@@ -176,20 +151,37 @@ def run_raw(args, replication, data):
         args, data["train"], data["test"], replication, name, depths, baseline
     )
     values = {}
-    for radius in RADII:
-        value = robust_value(
-            policy_data,
-            candidates[selected],
-            selected,
-            baseline,
-            radius,
-            torch.device(args.device),
-        )
-        values[f"{args.robust_met}_Q_DRO_delta_{radius}"] = value
+    if baseline == "None" and args.type == "nonlinear":
+        for depth, candidate in candidates.items():
+            for radius in RADII:
+                key = f"{args.robust_met}_Q_DRO_K_{depth}_delta_{radius}"
+                values[key] = robust_value(
+                    policy_data,
+                    candidate,
+                    depth,
+                    baseline,
+                    radius,
+                    torch.device(args.device),
+                )
+        for radius in RADII:
+            values[f"{args.robust_met}_Q_DRO_delta_{radius}"] = values[
+                f"{args.robust_met}_Q_DRO_K_{selected}_delta_{radius}"
+            ]
+    else:
+        for radius in RADII:
+            values[f"{args.robust_met}_Q_DRO_delta_{radius}"] = robust_value(
+                policy_data,
+                candidates[selected],
+                selected,
+                baseline,
+                radius,
+                torch.device(args.device),
+            )
 
-    label = "Shift_0.0"
     suffix = "" if baseline == "None" else f"-{baseline}"
-    path = result_directory(args) / f"{label}{suffix}-exp_id-{replication}-DRO.pkl"
+    path = result_directory(args) / (
+        f"Shift_0.0{suffix}-exp_id-{replication}-DRO.pkl"
+    )
     path.parent.mkdir(parents=True, exist_ok=True)
     joblib.dump(values, path)
     print(f"Completed replication {replication}: selected K={selected}; saved {path}")
@@ -200,16 +192,21 @@ def run_shifted(args, replication, data):
     policy_data, candidates, selected = fit_candidates(
         args, data["train"], data["test"], replication, name, (1, 2)
     )
-    actions = chosen_actions(
+    actions = policy_actions(
         policy_data, candidates[selected], selected, torch.device(args.device)
     )
     specification = data["specification"]
     if args.mode == "shift":
-        value = worst_covariate_value(data["test"], specification["indices"], actions)
+        value = worst_covariate_value(
+            data["test"], specification["indices"], actions
+        )
         prefix = "Shift"
     else:
         value = worst_concept_value(
-            data["test"], specification["probabilities"], actions
+            data["test"],
+            specification["probabilities"],
+            actions,
+            data["config"],
         )
         prefix = "Drift"
 
@@ -227,14 +224,18 @@ def build_parser():
     parser.add_argument("--type", default="nonlinear", choices=("linear", "nonlinear"))
     parser.add_argument("--mode", default="raw", choices=("raw", "shift", "drift"))
     parser.add_argument(
-        "--dist_shift", type=float, default=0.0,
+        "--dist_shift",
+        type=float,
+        default=0.0,
         choices=(0, 0.5, 1, 1.5, 2, 2.5, 3),
     )
     parser.add_argument("--start_rep", type=int, default=0)
     parser.add_argument("--num_reps", type=int, default=100)
     parser.add_argument("--data_dir", default="data")
     parser.add_argument("--output_root", type=Path, default=HERE)
-    parser.add_argument("--device", default="cuda:0" if torch.cuda.is_available() else "cpu")
+    parser.add_argument(
+        "--device", default="cuda:0" if torch.cuda.is_available() else "cpu"
+    )
 
     parser.add_argument("--batch_size", type=int, default=128)
     parser.add_argument("--epochs", type=int, default=50)
@@ -248,15 +249,23 @@ def build_parser():
     parser.add_argument("-Prob_act_list", default=["ReLU", "Sigmoid"])
     parser.add_argument("-Prob_neurons_list", default=[16, 8])
     parser.add_argument("-Prob_dropout_list", default=[0, 0])
-    parser.add_argument("-norm_met", default="normalized", choices=("normalized", "unnormalized"))
-    parser.add_argument("-robust_met", default="robust", choices=("robust", "non-robust"))
-    parser.add_argument("-propensity_met", default="known", choices=("unknown", "known"))
+    parser.add_argument(
+        "-norm_met", default="normalized", choices=("normalized", "unnormalized")
+    )
+    parser.add_argument(
+        "-robust_met", default="robust", choices=("robust", "non-robust")
+    )
+    parser.add_argument(
+        "-propensity_met", default="known", choices=("unknown", "known")
+    )
     parser.add_argument("-opt_procedure", default="data-driven")
     parser.add_argument("-alpha_lb", type=float, default=0.1)
     parser.add_argument("--test_size", type=int, default=2500)
     parser.add_argument("-optimization_epochs", type=int, default=1000)
     parser.add_argument("-estimator_choices", default="normalized_estimator")
-    parser.add_argument("-baseline", default="None", choices=("None", "SNLN", "KLLN"))
+    parser.add_argument(
+        "-baseline", default="None", choices=("None", "SNLN", "KLLN")
+    )
     parser.add_argument("-verbose", action="store_true")
     parser.add_argument("-plot_boundary", action="store_true")
     return parser
@@ -281,9 +290,8 @@ def main():
     if missing:
         parser.error("Missing simulation data file(s):\n" + "\n".join(map(str, missing)))
 
-    for replication, path in zip(
-        range(args.start_rep, args.start_rep + args.num_reps), files
-    ):
+    replications = range(args.start_rep, args.start_rep + args.num_reps)
+    for replication, path in zip(replications, files):
         print(f"Training for dataset {replication}")
         data = joblib.load(path)
         if args.mode == "raw":

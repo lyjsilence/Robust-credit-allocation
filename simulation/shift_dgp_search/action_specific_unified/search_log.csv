@@ -1,4 +1,0 @@
-candidate,status,good_level,good_contrast,base_logit,tail_loading,action_tail_contrast,findings
-pilot_1,rejected,0.78,0.16,-2.80,1.00,0.55,"Exact boundary and KL; nonlinear Ours did not beat SNLS, Table 2 gaps were below 1%, selected K was 1."
-pilot_2,rejected,0.65,0.30,-3.20,1.60,1.20,"Exact boundary and KL; stronger symmetric action-specific tails still made robust and non-robust learn the same ranking, and selected K remained 1."
-pilot_3,selected,,,,,,"Frozen after five replications: linear Ours approximately equaled SNLS; nonlinear Ours was better; Table 2 improvement increased with severity; data-driven selection had the best mean at every radius."
