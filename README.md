@@ -6,6 +6,25 @@ to Consumer Credit Allocation*. The repository contains the data-generating proc
 implementation, evaluation routines, and result aggregation script.
 
 
+## Requirements
+
+The simulation code was tested with the following versions:
+
+- Python 3.8.20
+- NumPy 1.24.1
+- Joblib 1.4.2
+- PyTorch 2.3.0+cu118
+- CUDA 11.8
+
+Install the required Python packages with:
+
+```bash
+python -m pip install -r requirements.txt
+```
+
+The CUDA build is only required for GPU execution. PyTorch automatically uses
+the CPU when CUDA is unavailable.
+
 ## Repository structure
 
 ```text
