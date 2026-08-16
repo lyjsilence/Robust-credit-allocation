@@ -6,18 +6,6 @@ to Consumer Credit Allocation*. The repository contains the data-generating proc
 implementation, evaluation routines, and result aggregation script.
 
 
-## Setup
-
-The experiments were run in the Conda environment `yijun_env`:
-
-```bash
-conda activate yijun_env
-```
-
-Run all commands below from the repository root. The main dependencies are
-Python, NumPy, PyTorch, and Joblib. CUDA is used automatically when available;
-otherwise, the experiment runner uses the CPU.
-
 ## Repository structure
 
 ```text
