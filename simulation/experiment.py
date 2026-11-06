@@ -1,7 +1,5 @@
 """Policy fitting, validation-only OOB selection and held-out evaluation."""
 
-import argparse
-import json
 import random
 from pathlib import Path
 
@@ -14,8 +12,6 @@ from policy_core.models import Policy
 from policy_core.evaluation import coefficient_grid, select_oob, validation_scores
 from policy_core.robust_values import robust_values
 from .dgp import (
-    CASES,
-    DESIGN,
     fitting_seed,
     held_out_data,
     oob_counts,
@@ -27,14 +23,6 @@ from . import shift
 
 WIDTHS = tuple(range(2, 257, 2))
 METHODS = ("robust", "non-robust")
-
-
-def save(path, value):
-    path = Path(path)
-    path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(
-        json.dumps(value, indent=2, allow_nan=False) + "\n", encoding="utf-8"
-    )
 
 
 def set_seed(seed):
@@ -57,27 +45,14 @@ def fit(study, case, rep, width, method, destination, device, data=None):
     candidate = fitting_seed(study, case, rep, width)
     set_seed(candidate)
     path = destination / "model.pt"
-    diagnostics = fit_candidate(
+    history = fit_candidate(
         data["train"],
-        data["validation"],
         width,
         method,
-        DESIGN["training_options"],
         path,
         torch.device(device),
     )
-    save(
-        destination / "complete.json",
-        dict(
-            study=study,
-            case=case,
-            rep=rep,
-            width=width,
-            method=method,
-            candidate_seed=candidate,
-            **diagnostics,
-        ),
-    )
+    pd.DataFrame(history).to_csv(destination / "training.csv", index=False)
     return path
 
 
@@ -97,13 +72,13 @@ def select(study, case, rep, method, validation, decisions):
     eta = 0.2 if method == "robust" else 0.0
     counts = oob_counts(study, case, rep)
     scores = validation_scores(validation, decisions, counts, eta=eta)
-    chosen, curve = select_oob(
+    chosen, _ = select_oob(
         **scores,
         widths=WIDTHS,
         coefficients=coefficient_grid(),
         cap=128 if study == "baseline" else 256,
     )
-    return chosen, dict(**scores, counts=counts, curve=curve)
+    return chosen
 
 
 def baseline_evaluation(test, decisions, selected):
@@ -194,10 +169,6 @@ def summarize_shift(frame):
 def run(study, cases, reps, output, device):
     output = Path(output)
     output.mkdir(parents=True, exist_ok=False)
-    save(
-        output / "plan.json",
-        dict(study=study, cases=cases, reps=reps, widths=WIDTHS, device=device),
-    )
     methods = ("robust",) if study == "baseline" else METHODS
     selections, selected_paths = [], {}
     for case in cases:
@@ -226,15 +197,12 @@ def run(study, cases, reps, output, device):
                     )
                     print(f"{case} rep={rep} {method} width={width} fitted", flush=True)
                 decisions = predict(paths, WIDTHS, validation["X"], device)
-                pick, scores = select(study, case, rep, method, validation, decisions)
-                np.savez_compressed(
-                    pool / "calibration.npz", decisions=decisions, **scores
-                )
+                pick = select(study, case, rep, method, validation, decisions)
                 row = dict(case=case, rep=rep, method=method, **pick)
                 selections.append(row)
                 selected_paths[case, rep, method] = paths
     # All choices are fixed on validation before held-out policy evaluation.
-    pd.DataFrame(selections).to_csv(output / "selections_frozen.csv", index=False)
+    pd.DataFrame(selections).to_csv(output / "selections.csv", index=False)
     if study == "baseline":
         rows = []
         for chosen in selections:
@@ -268,49 +236,4 @@ def run(study, cases, reps, output, device):
         summary = summarize_shift(frame)
     frame.to_csv(output / "replication_results.csv", index=False)
     summary.to_csv(output / "summary.csv", index=False)
-    save(
-        output / "complete.json", dict(study=study, replications=len(reps), cases=cases)
-    )
     print(summary.to_string(index=False))
-
-
-def main():
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("command", choices=["fit", "run"])
-    parser.add_argument("--study", choices=["baseline", "shift"], required=True)
-    parser.add_argument("--cases", nargs="+", choices=CASES)
-    group = parser.add_mutually_exclusive_group()
-    group.add_argument("--reps", nargs="+", type=int, default=[0])
-    group.add_argument("--all-reps", action="store_true")
-    parser.add_argument("--width", type=int, choices=WIDTHS, metavar="WIDTH")
-    parser.add_argument("--method", choices=METHODS, default="robust")
-    parser.add_argument("--device", default="cuda:0")
-    parser.add_argument("--output", type=Path, required=True)
-    args = parser.parse_args()
-    cases = args.cases or (["moderate"] if args.study == "shift" else list(CASES))
-    reps = list(range(100)) if args.all_reps else args.reps
-    if len(set(reps)) != len(reps) or not all(0 <= r < 100 for r in reps):
-        parser.error("Replication IDs must be distinct integers in 0,...,99")
-    if len(set(cases)) != len(cases):
-        parser.error("Cases must be distinct")
-    if args.study == "shift" and cases != ["moderate"]:
-        parser.error("The shift experiment uses --cases moderate")
-    if args.study == "baseline" and args.method != "robust":
-        parser.error("The baseline PDRP experiment uses robust candidate training")
-    torch.set_num_threads(1)
-    if args.command == "fit":
-        if len(reps) != 1 or len(cases) != 1 or args.width is None:
-            parser.error("fit requires one case, one replication and --width")
-        fit(
-            args.study,
-            cases[0],
-            reps[0],
-            args.width,
-            args.method,
-            args.output,
-            args.device,
-        )
-    else:
-        if args.width is not None:
-            parser.error("run uses the full fixed width grid")
-        run(args.study, cases, reps, args.output, args.device)

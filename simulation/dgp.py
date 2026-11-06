@@ -1,6 +1,5 @@
 """Generate observations for the complexity and perturbation experiments."""
 
-import json
 from pathlib import Path
 
 import numpy as np
@@ -10,27 +9,32 @@ from torch import nn
 
 from .shift import SEVERITIES, nominal_outcomes
 
-DESIGN = json.loads(Path(__file__).with_name("design.json").read_text(encoding="utf-8"))
-with np.load(Path(__file__).with_name("random_seeds.npz")) as archive:
-    SEEDS = {name: archive[name] for name in archive.files}
+NORMALIZATION = {
+    "low": (-0.0013596113120072362, 0.407926117841582),
+    "moderate": (7.575993833541794e-05, 0.4083798384729396),
+    "high": (-0.00016508049852892448, 0.40906725581128217),
+}
+SAMPLE_SIZES = {"train": 4500, "validation": 500, "test": 2500}
+with np.load(Path(__file__).with_name("random_inputs.npz")) as archive:
+    RANDOM_INPUTS = {name: archive[name] for name in archive.files}
 CASES = ("low", "moderate", "high")
 SPLITS = ("train", "validation", "test")
 
 
 def shift_direction_seeds(rep):
-    return SEEDS["shift_directions"][rep].tolist()
+    return RANDOM_INPUTS["shift_directions"][rep].tolist()
 
 
 def shift_resampling_seed(rep, severity, environment):
     index = SEVERITIES[1:].index(severity)
-    return int(SEEDS["shift_resampling"][rep, index, environment])
+    return int(RANDOM_INPUTS["shift_resampling"][rep, index, environment])
 
 
 def fitting_seed(study, case, rep, width):
     if study == "shift":
-        row = SEEDS["shift_fitting"][rep, width // 2 - 1]
+        row = RANDOM_INPUTS["shift_fitting"][rep, width // 2 - 1]
     else:
-        row = SEEDS["baseline_fitting"][rep, CASES.index(case), width // 2 - 1]
+        row = RANDOM_INPUTS["baseline_fitting"][rep, CASES.index(case), width // 2 - 1]
     return int(row)
 
 
@@ -57,12 +61,12 @@ def teacher(frequency):
 
 
 def smooth(case, n, seed):
-    norm = DESIGN["normalization"][case]
+    center, scale = NORMALIZATION[case]
     net = teacher(CASES.index(case) + 1)
     rng = np.random.default_rng(seed)
     x = rng.uniform(-1, 1, (n, 4))
     with torch.no_grad():
-        score = (net(torch.from_numpy(x)).numpy().ravel() - norm["median"]) / norm["sd"]
+        score = (net(torch.from_numpy(x)).numpy().ravel() - center) / scale
     delta = 1.5 * np.tanh(2 * score)
     outcomes = expit(np.column_stack((-delta, delta)) + rng.normal(0, 0.6, (n, 1)))
     nodes, weights = np.polynomial.hermite.hermgauss(40)
@@ -88,15 +92,15 @@ def smooth(case, n, seed):
 
 
 def training_data(study, case, rep):
-    seeds = SEEDS["baseline_data"][rep, CASES.index(case)]
+    seeds = RANDOM_INPUTS["baseline_data"][rep, CASES.index(case)]
     result = {
-        split: smooth(case, DESIGN["sample_sizes"][split], int(seeds[i]))
+        split: smooth(case, SAMPLE_SIZES[split], int(seeds[i]))
         for i, split in enumerate(SPLITS)
     }
     if study == "shift":
         for i, split in enumerate(SPLITS):
             part = result[split]
-            rng = np.random.default_rng(int(SEEDS["shift_outcomes"][rep, i]))
+            rng = np.random.default_rng(int(RANDOM_INPUTS["shift_outcomes"][rep, i]))
             n = len(part["X"])
             g = nominal_outcomes(
                 part["X"],
@@ -125,8 +129,8 @@ def training_data(study, case, rep):
 
 def held_out_data(case, rep, split):
     index = ("validation", "test").index(split)
-    seed = int(SEEDS["baseline_evaluation"][rep, CASES.index(case), index])
-    size = DESIGN["sample_sizes"][split]
+    seed = int(RANDOM_INPUTS["baseline_evaluation"][rep, CASES.index(case), index])
+    size = SAMPLE_SIZES[split]
     return smooth(case, size, seed)
 
 
@@ -134,11 +138,11 @@ def oob_counts(study, case, rep):
     from policy_core.evaluation import bootstrap_counts
 
     if study == "shift":
-        return bootstrap_counts(500, int(SEEDS["shift_oob"][rep]))
+        return bootstrap_counts(500, int(RANDOM_INPUTS["shift_oob"][rep]))
     if rep < 20:
-        # Original resampling draws are fixed design inputs, not observations.
-        with np.load(Path(__file__).with_name("bootstrap_counts.npz")) as z:
-            return z[f"{case}_{rep}"].astype(np.int64)
+        return RANDOM_INPUTS["bootstrap_counts"][rep, CASES.index(case)].astype(
+            np.int64
+        )
     return bootstrap_counts(
-        500, int(SEEDS["baseline_oob"][rep - 20, CASES.index(case)])
+        500, int(RANDOM_INPUTS["baseline_oob"][rep - 20, CASES.index(case)])
     )

@@ -1,48 +1,10 @@
 """Policy values and ordinary bootstrap out-of-bag width selection."""
 
 import numpy as np
-import torch
-from torch.nn import functional as F
 
 from .robust_values import robust_values
 
 TOLERANCE = 1e-10
-
-
-def hard_match(logits, action):
-    chosen = torch.max(torch.softmax(logits, dim=1), dim=1).indices.reshape(-1, 1)
-    return torch.where(chosen == action, 1, 0)
-
-
-def dro_value(
-    policy, x, action, outcome, propensity, log_alpha, radius, temperature=None
-):
-    """Normalized KL value at the fitted dual; temperature enables soft matching."""
-    logits = policy(x.float())
-    alpha = F.softplus(log_alpha)
-    if temperature is None:
-        match = hard_match(logits, action)
-    else:
-        probabilities = torch.softmax(logits / temperature, dim=1)
-        match = probabilities[
-            torch.arange(len(x), device=x.device), action.squeeze().long()
-        ]
-        match = match.reshape(-1, 1).clamp_min(1e-8)
-        propensity = propensity.clamp_min(1e-8)
-        alpha = alpha.clamp_min(1e-8)
-    normalizer = match / propensity
-    samples = match * torch.exp(-outcome / alpha) / propensity
-    ratio = samples.mean() / normalizer.mean()
-    if temperature is not None:
-        ratio = ratio.clamp_min(1e-8)
-    return -(alpha * torch.log(ratio) + alpha * radius)
-
-
-def ipw_value(policy, x, action, outcome, propensity):
-    match = hard_match(policy(x.float()), action).float()
-    propensity = propensity.clamp_min(1e-8)
-    normalizer = match / propensity
-    return (match * outcome / propensity).mean() / normalizer.mean().clamp_min(1e-8)
 
 
 def coefficient_grid():

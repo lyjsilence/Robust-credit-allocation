@@ -5,8 +5,22 @@ from torch import nn
 from torch.nn import functional as F
 from torch.optim import Adam
 
-from .evaluation import dro_value, ipw_value
 from .models import Policy
+
+TRAINING_OPTIONS = {
+    "learning_rate": 0.005,
+    "weight_decay": 0.0,
+    "max_epochs": 2000,
+    "min_policy_epochs": 200,
+    "policy_patience": 100,
+    "policy_tolerance": 1e-5,
+    "temperature": 0.05,
+    "min_dual_epochs": 25,
+    "dual_patience": 25,
+    "dual_tolerance": 1e-6,
+    "max_alternations": 5,
+    "radius": 0.2,
+}
 
 
 class PolicyObjective:
@@ -121,7 +135,8 @@ def optimize_alpha(log_alpha, loss_function, settings):
         log_alpha.copy_(best_alpha)
 
 
-def fit_candidate(train, validation, width, method, settings, path, device):
+def fit_candidate(train, width, method, path, device):
+    settings = TRAINING_OPTIONS
     objective = PolicyObjective(
         train, settings["temperature"], settings["radius"], device
     )
@@ -152,29 +167,4 @@ def fit_candidate(train, validation, width, method, settings, path, device):
             if abs(alphas[-1] - alphas[-2]) < 0.001:
                 break
 
-    policy.eval()
-    with torch.no_grad():
-        tensors = [
-            torch.tensor(validation[key]).to(device)
-            for key in ("X", "T", "Y", "prop_score")
-        ]
-        if robust:
-            value = dro_value(policy, *tensors, log_alpha, settings["radius"])
-        else:
-            value = ipw_value(policy, *tensors)
-        training_value = dro_value(
-            policy,
-            objective.x,
-            objective.action,
-            objective.y,
-            objective.propensity,
-            log_alpha,
-            settings["radius"],
-            temperature=settings["temperature"],
-        )
-    return {
-        "validation_value": value.item(),
-        "training_robust_value": training_value.item(),
-        "alphas": alphas,
-        "history": history,
-    }
+    return history
