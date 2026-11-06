@@ -176,7 +176,7 @@
       "rep": 0,
       "width": 10,
       "coefficient": 0.20833476384991764,
-      "old_c": 0.06588123695590493,
+      "validation_coefficient": 0.06588123695590493,
       "validation_value": 0.6203267477847643,
       "test_value": 0.6254549441302251,
       "oracle_value": 0.6345182654402395,
@@ -187,7 +187,7 @@
       "rep": 0,
       "width": 10,
       "coefficient": 3.546604758012318,
-      "old_c": 1.1215348995709233,
+      "validation_coefficient": 1.1215348995709233,
       "validation_value": 0.6361359750042288,
       "test_value": 0.6164184086760869,
       "oracle_value": 0.6164184086760869,
@@ -198,7 +198,7 @@
       "rep": 0,
       "width": 8,
       "coefficient": 0.6338376661055392,
-      "old_c": 0.20043706916988108,
+      "validation_coefficient": 0.20043706916988108,
       "validation_value": 0.584152192631302,
       "test_value": 0.6080242121280274,
       "oracle_value": 0.6080242121280274,
@@ -210,14 +210,14 @@
       "method": "robust",
       "width": 2,
       "coefficient": 6.024427633652624,
-      "old_c": 1.9050912921200744,
+      "validation_coefficient": 1.9050912921200744,
       "validation_value": 0.6886931460514445
     },
     {
       "method": "non-robust",
       "width": 238,
       "coefficient": 0.0,
-      "old_c": 0.0,
+      "validation_coefficient": 0.0,
       "validation_value": 0.8532060383690325
     }
   ],

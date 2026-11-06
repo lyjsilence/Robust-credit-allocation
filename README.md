@@ -2,9 +2,9 @@
 
 Core code for PDRP policy learning with ordinary bootstrap out-of-bag (OOB)
 calibration and for robust/non-robust comparisons under distribution shifts.
-The two experiments below reproduce the specified Known-propensity PDRP row
-and the covariate-shift/concept-drift table. They use different outcome models
-and different evaluation functionals.
+The repository contains the known-propensity PDRP complexity experiment and the
+covariate-shift/concept-drift experiment. They use different outcome models
+and evaluation functionals.
 
 ## Installation
 
@@ -35,9 +35,9 @@ python -m simulation fit --study shift --reps 0 --width 238 --method non-robust 
 python -m simulation.verify --fit results/check_low
 ```
 
-`model.pt` contains the fitted state and `complete.json` contains seeds and
-optimization diagnostics. The verification command compares the model tensors
-with a reference digest; it does not supply weights to the learner.
+`model.pt` contains the fitted state. `complete.json` records the initialization
+seed, epoch counts and fitting losses. The verification command compares model
+tensors with a reference digest; it does not supply weights to the learner.
 
 ## Complete candidate pools and tables
 
@@ -84,9 +84,9 @@ training, selection or evaluation.
   learning rate 0.005, weighted-classification pretraining and alternating
   policy/dual updates. The epoch ceilings, stopping rules and temperatures are
   in `simulation/design.json`; optimization checkpoints use fitting loss.
-- OOB calibration uses a new, independent 500-row validation sample, 200
-  size-500 bootstrap draws and a fixed 413-point coefficient grid. The training
-  container's original validation data are not substituted for this sample.
+- OOB calibration uses an independent 500-row validation sample, 200 size-500
+  bootstrap draws and a fixed 413-point coefficient grid. This sample is
+  separate from the validation data used to report each fit's diagnostic value.
 - Width selection maximizes validation value minus `C * sqrt(width / 5000)`.
   The reported validation-scale coefficient is `c = C / sqrt(10)`. Ties within
   1e-10 choose the smaller width or coefficient.
@@ -140,8 +140,10 @@ mean_nonrobust`, calculated before rounding.
 ## Files and fixed design inputs
 
 - `simulation/dgp.py`, `shift.py`: outcome generation and deployment shifts.
-- `simulation/experiment.py`: fitting, selection, scoring and aggregation.
-- `policy_core/`: numerical training, policy and KL/OOB routines.
+- `simulation/experiment.py`: experiment entry points and result aggregation.
+- `policy_core/models.py`, `learning.py`: the policy network and optimization.
+- `policy_core/evaluation.py`: policy values and OOB coefficient/width selection.
+- `policy_core/robust_values.py`: batched KL dual solver used for validation and testing.
 - `simulation/design.json`: one shared set of optimization settings, sample
   sizes and the normalization constants for Low, Middle and High complexity.
 - `simulation/random_seeds.npz`: integer random seeds indexed directly by
@@ -160,9 +162,9 @@ locations do not affect random draws. Its arrays have the following axes:
 |---|---|---|
 | `baseline_data` | 100 × 3 × 3 | replication, case, training/validation/test split |
 | `baseline_evaluation` | 100 × 3 × 2 | replication, case, validation/test split |
-| `baseline_fitting` | 100 × 3 × 128 × 2 | replication, case, width, preparation/initialization |
+| `baseline_fitting` | 100 × 3 × 128 | replication, case, width |
 | `baseline_oob` | 80 × 3 | replication 20–99, case |
-| `shift_fitting` | 100 × 128 × 2 | replication, width, preparation/initialization |
+| `shift_fitting` | 100 × 128 | replication, width |
 | `shift_outcomes` | 100 × 3 | replication, training/validation/test split |
 | `shift_directions` | 100 × 100 | replication, environment |
 | `shift_resampling` | 100 × 6 × 100 | replication, severity 2/4/6/8/10/12, environment |
@@ -181,16 +183,9 @@ generated data/models and operational logs are not included.
 
 ## Verification scope
 
-The release check regenerated 276 data arrays, retrained five candidate models,
-reconstructed three baseline OOB pools and two perturbation OOB pools, and
-recreated 1,400 paired perturbation environment rows. The trained model tensors
-matched the retained references exactly; all checked selections and numerical
-scores matched to 1e-12 or better. The stored 100-replication results were also
-reaggregated and match both displayed tables at their reported precision.
-
-This is a subset training check and a full saved-result aggregation check, not
-a fresh 100-replication training run. Verification used the installed software
-versions above in an isolated source directory, not a new operating-system or
-package installation. These are development-selected simulation settings;
-successful reproduction is not independent confirmation or proof of the
-manuscript's theoretical claims.
+The five diagnostic fits match the stored model tensors exactly in the stated
+environment. Replication-0 OOB selections and evaluation scores match their
+references within 1e-12. Reaggregation of the stored 100-replication results
+matches the displayed tables; a fresh 100-replication training run was not
+performed for this check. These are development-selected simulation settings;
+reproduction is not independent confirmation.

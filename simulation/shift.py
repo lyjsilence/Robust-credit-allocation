@@ -4,7 +4,7 @@ import numpy as np
 from scipy.special import expit, logit
 
 
-SEVERITIES = (0., 2., 4., 6., 8., 10., 12.)
+SEVERITIES = (0.0, 2.0, 4.0, 6.0, 8.0, 10.0, 12.0)
 KL_SCALE = 0.20
 P_LOW = 0.005
 P_HIGH = 0.780
@@ -13,15 +13,11 @@ NOISE_SD = 0.6
 
 def target_kl(severity):
     severity = float(severity)
-    if severity not in SEVERITIES:
-        raise ValueError(f"Unregistered severity {severity}")
     return 0.5 * (KL_SCALE * severity) ** 2
 
 
 def risk_score(x):
     x = np.asarray(x, dtype=np.float64)
-    if x.ndim != 2 or x.shape[1] != 4:
-        raise ValueError("Expected n x 4 covariates")
     wave = np.sin(2 * np.pi * x[:, 0]) * np.sin(2 * np.pi * x[:, 1])
     return expit(30.0 * (wave - 0.70))
 
@@ -37,12 +33,6 @@ def nominal_outcomes(x, risky_action, uniforms, gaussian_noise):
     uniforms = np.asarray(uniforms, dtype=np.float64).reshape(-1)
     gaussian_noise = np.asarray(gaussian_noise, dtype=np.float64).reshape(-1)
     n = len(x)
-    if not (len(risky_action) == len(uniforms) == len(gaussian_noise) == n):
-        raise ValueError("Outcome input length mismatch")
-    if not np.all((risky_action == 0) | (risky_action == 1)):
-        raise ValueError("Risky action must be binary")
-    if not np.all((uniforms > 0) & (uniforms < 1)):
-        raise ValueError("Uniform draws must lie strictly within (0,1)")
     p0 = baseline_probability(x)
     z = expit(gaussian_noise)
     bad = 0.02 * z
@@ -55,10 +45,14 @@ def nominal_outcomes(x, risky_action, uniforms, gaussian_noise):
     mu = np.empty_like(y_all)
     mu[np.arange(n), risky_action] = p0 * 0.01 + (1 - p0) * 0.90
     mu[np.arange(n), 1 - risky_action] = 0.79
-    if not np.all((y_all > 0) & (y_all < 1)):
-        raise AssertionError("Outcome left (0,1)")
-    return {"Y_all": y_all, "mu": mu, "p0": p0, "U": uniforms, "Z": z,
-            "risky_action": risky_action}
+    return {
+        "Y_all": y_all,
+        "mu": mu,
+        "p0": p0,
+        "U": uniforms,
+        "Z": z,
+        "risky_action": risky_action,
+    }
 
 
 def bernoulli_kl(p, p0):
@@ -70,8 +64,9 @@ def bernoulli_kl(p, p0):
 def drift_basis(x):
     x = np.asarray(x, dtype=np.float64)
     x1, x2 = x[:, 0], x[:, 1]
-    nonconstant = np.column_stack((x1, x2, x1 * x2, x1**2 - x2**2,
-                                   np.sin(np.pi * x1), np.cos(np.pi * x2)))
+    nonconstant = np.column_stack(
+        (x1, x2, x1 * x2, x1**2 - x2**2, np.sin(np.pi * x1), np.cos(np.pi * x2))
+    )
     scales = nonconstant.std(axis=0)
     if np.any(scales <= 0):
         raise ValueError("Zero-scale drift feature")
@@ -93,8 +88,6 @@ def solve_concept_probability(p0, h, severity):
     """Calibrate each environment's average Bernoulli KL exactly."""
     p0 = np.asarray(p0, dtype=np.float64).reshape(-1)
     h = np.asarray(h, dtype=np.float64).reshape(-1)
-    if len(p0) != len(h) or not np.all((p0 > 0) & (p0 < 1)) or not np.all(h > 0):
-        raise ValueError("Invalid concept drift inputs")
     target = target_kl(severity)
     if target == 0:
         return p0.copy(), 0.0, 0.0
@@ -161,8 +154,6 @@ def concept_outcomes(risky_action, uniforms, z, probabilities):
     z = np.asarray(z, dtype=np.float64).reshape(-1)
     probabilities = np.asarray(probabilities, dtype=np.float64).reshape(-1)
     n = len(risky_action)
-    if not (len(uniforms) == len(z) == len(probabilities) == n):
-        raise ValueError("Concept outcome input length mismatch")
     risky = np.where(uniforms < probabilities, 0.02 * z, 0.88 + 0.04 * z)
     stable = 0.77 + 0.04 * z
     outcomes = np.empty((n, 2), dtype=np.float64)

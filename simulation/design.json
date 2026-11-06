@@ -14,50 +14,22 @@
     }
   },
   "sample_sizes": {
-    "master_train": 4500,
-    "master_validation": 500,
+    "train": 4500,
+    "validation": 500,
     "test": 2500
   },
   "training_options": {
-    "lr": 0.005,
+    "learning_rate": 0.005,
     "weight_decay": 0.0,
-    "optimization_epochs": 2000,
-    "policy_initialization": "default",
-    "optimization_holdout_fraction": 0.0,
-    "policy_minimum_epochs": 200,
+    "max_epochs": 2000,
+    "min_policy_epochs": 200,
     "policy_patience": 100,
-    "policy_min_delta": 1e-05,
-    "policy_temperature_start": 1.0,
-    "policy_temperature_end": 0.05,
-    "policy_temperature_anneal_epochs": 200,
-    "policy_pretrain_epochs": 2000,
-    "policy_pretrain_minimum_epochs": 200,
-    "policy_pretrain_objective": "weighted_classification",
-    "policy_pretrain_checkpoint_split": "fit",
-    "policy_checkpoint_strategy": "stage_loss",
-    "audit_stage_training_q": true,
-    "alpha_minimum_epochs": 25,
-    "alpha_patience": 25,
-    "alpha_min_delta": 1e-06,
-    "max_iter": 5,
-    "num_treat": 2,
-    "alpha_lb": 0.1,
-    "propensity_met": "known",
-    "norm_met": "normalized",
-    "estimator_choices": "normalized_estimator",
-    "Prob_depth": 2,
-    "Prob_neurons_list": [
-      16,
-      8
-    ],
-    "Prob_dropout_list": [
-      0,
-      0
-    ],
-    "dist_shift": 0.0,
-    "baseline": "None",
-    "opt_procedure": "controlled-complexity",
-    "amb_radius": 0.2,
-    "training_only_checkpoint": true
+    "policy_tolerance": 1e-05,
+    "temperature": 0.05,
+    "min_dual_epochs": 25,
+    "dual_patience": 25,
+    "dual_tolerance": 1e-06,
+    "max_alternations": 5,
+    "radius": 0.2
   }
 }
