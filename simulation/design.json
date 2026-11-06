@@ -1,0 +1,7240 @@
+{
+  "normalization": {
+    "low": {
+      "median": -0.0013596113120072362,
+      "sd": 0.407926117841582
+    },
+    "moderate": {
+      "median": 7.575993833541794e-05,
+      "sd": 0.4083798384729396
+    },
+    "high": {
+      "median": -0.00016508049852892448,
+      "sd": 0.40906725581128217
+    }
+  },
+  "namespaces": {
+    "s78_independent_stability1": "s78/development/stability1",
+    "s79_independent_stability2": "s79/development/stability2",
+    "s80_independent_stability3": "s80/development/stability3",
+    "s96_add40_width128": "s96/development/add40v0"
+  },
+  "training_options": {
+    "s78_independent_stability1": {
+      "lr": 0.005,
+      "weight_decay": 0.0,
+      "optimization_epochs": 2000,
+      "policy_initialization": "default",
+      "optimization_holdout_fraction": 0.0,
+      "policy_minimum_epochs": 200,
+      "policy_patience": 100,
+      "policy_min_delta": 1e-05,
+      "policy_temperature_start": 1.0,
+      "policy_temperature_end": 0.05,
+      "policy_temperature_anneal_epochs": 200,
+      "policy_pretrain_epochs": 2000,
+      "policy_pretrain_minimum_epochs": 200,
+      "policy_pretrain_objective": "weighted_classification",
+      "policy_pretrain_checkpoint_split": "fit",
+      "policy_checkpoint_strategy": "stage_loss",
+      "joint_dro_min_delta": 1e-05,
+      "audit_stage_training_q": true,
+      "joint_dro_patience": 2,
+      "alpha_minimum_epochs": 25,
+      "alpha_patience": 25,
+      "alpha_min_delta": 1e-06,
+      "max_iter": 5,
+      "num_treat": 2,
+      "alpha_lb": 0.1,
+      "alpha_upper_bound": null,
+      "propensity_met": "known",
+      "norm_met": "normalized",
+      "estimator_choices": "normalized_estimator",
+      "Prob_depth": 2,
+      "Prob_neurons_list": [
+        16,
+        8
+      ],
+      "Prob_dropout_list": [
+        0,
+        0
+      ],
+      "dist_shift": 0.0,
+      "baseline": "None",
+      "robust_met": "robust",
+      "opt_procedure": "controlled-complexity",
+      "amb_radius": 0.2,
+      "training_only_checkpoint": true
+    },
+    "s79_independent_stability2": {
+      "lr": 0.005,
+      "weight_decay": 0.0,
+      "optimization_epochs": 2000,
+      "policy_initialization": "default",
+      "optimization_holdout_fraction": 0.0,
+      "policy_minimum_epochs": 200,
+      "policy_patience": 100,
+      "policy_min_delta": 1e-05,
+      "policy_temperature_start": 1.0,
+      "policy_temperature_end": 0.05,
+      "policy_temperature_anneal_epochs": 200,
+      "policy_pretrain_epochs": 2000,
+      "policy_pretrain_minimum_epochs": 200,
+      "policy_pretrain_objective": "weighted_classification",
+      "policy_pretrain_checkpoint_split": "fit",
+      "policy_checkpoint_strategy": "stage_loss",
+      "joint_dro_min_delta": 1e-05,
+      "audit_stage_training_q": true,
+      "joint_dro_patience": 2,
+      "alpha_minimum_epochs": 25,
+      "alpha_patience": 25,
+      "alpha_min_delta": 1e-06,
+      "max_iter": 5,
+      "num_treat": 2,
+      "alpha_lb": 0.1,
+      "alpha_upper_bound": null,
+      "propensity_met": "known",
+      "norm_met": "normalized",
+      "estimator_choices": "normalized_estimator",
+      "Prob_depth": 2,
+      "Prob_neurons_list": [
+        16,
+        8
+      ],
+      "Prob_dropout_list": [
+        0,
+        0
+      ],
+      "dist_shift": 0.0,
+      "baseline": "None",
+      "robust_met": "robust",
+      "opt_procedure": "controlled-complexity",
+      "amb_radius": 0.2,
+      "training_only_checkpoint": true
+    },
+    "s80_independent_stability3": {
+      "lr": 0.005,
+      "weight_decay": 0.0,
+      "optimization_epochs": 2000,
+      "policy_initialization": "default",
+      "optimization_holdout_fraction": 0.0,
+      "policy_minimum_epochs": 200,
+      "policy_patience": 100,
+      "policy_min_delta": 1e-05,
+      "policy_temperature_start": 1.0,
+      "policy_temperature_end": 0.05,
+      "policy_temperature_anneal_epochs": 200,
+      "policy_pretrain_epochs": 2000,
+      "policy_pretrain_minimum_epochs": 200,
+      "policy_pretrain_objective": "weighted_classification",
+      "policy_pretrain_checkpoint_split": "fit",
+      "policy_checkpoint_strategy": "stage_loss",
+      "joint_dro_min_delta": 1e-05,
+      "audit_stage_training_q": true,
+      "joint_dro_patience": 2,
+      "alpha_minimum_epochs": 25,
+      "alpha_patience": 25,
+      "alpha_min_delta": 1e-06,
+      "max_iter": 5,
+      "num_treat": 2,
+      "alpha_lb": 0.1,
+      "alpha_upper_bound": null,
+      "propensity_met": "known",
+      "norm_met": "normalized",
+      "estimator_choices": "normalized_estimator",
+      "Prob_depth": 2,
+      "Prob_neurons_list": [
+        16,
+        8
+      ],
+      "Prob_dropout_list": [
+        0,
+        0
+      ],
+      "dist_shift": 0.0,
+      "baseline": "None",
+      "robust_met": "robust",
+      "opt_procedure": "controlled-complexity",
+      "amb_radius": 0.2,
+      "training_only_checkpoint": true
+    },
+    "s96_add40_width128": {
+      "lr": 0.005,
+      "weight_decay": 0.0,
+      "optimization_epochs": 2000,
+      "policy_initialization": "default",
+      "optimization_holdout_fraction": 0.0,
+      "policy_minimum_epochs": 200,
+      "policy_patience": 100,
+      "policy_min_delta": 1e-05,
+      "policy_temperature_start": 1.0,
+      "policy_temperature_end": 0.05,
+      "policy_temperature_anneal_epochs": 200,
+      "policy_pretrain_epochs": 2000,
+      "policy_pretrain_minimum_epochs": 200,
+      "policy_pretrain_objective": "weighted_classification",
+      "policy_pretrain_checkpoint_split": "fit",
+      "policy_checkpoint_strategy": "stage_loss",
+      "joint_dro_min_delta": 1e-05,
+      "audit_stage_training_q": true,
+      "joint_dro_patience": 2,
+      "alpha_minimum_epochs": 25,
+      "alpha_patience": 25,
+      "alpha_min_delta": 1e-06,
+      "max_iter": 5,
+      "num_treat": 2,
+      "alpha_lb": 0.1,
+      "alpha_upper_bound": null,
+      "propensity_met": "known",
+      "norm_met": "normalized",
+      "estimator_choices": "normalized_estimator",
+      "Prob_depth": 2,
+      "Prob_neurons_list": [
+        16,
+        8
+      ],
+      "Prob_dropout_list": [
+        0,
+        0
+      ],
+      "dist_shift": 0.0,
+      "baseline": "None",
+      "robust_met": "robust",
+      "opt_procedure": "controlled-complexity",
+      "amb_radius": 0.2,
+      "training_only_checkpoint": true
+    }
+  },
+  "shift_seed_nonces": [
+    {
+      "batch": "s79_independent_stability2",
+      "rep": 15,
+      "role": "covariate_resample_l3_m47",
+      "width": 0,
+      "nonce": 1
+    },
+    {
+      "batch": "s80_independent_stability3",
+      "rep": 15,
+      "role": "covariate_resample_l1.5_m67",
+      "width": 0,
+      "nonce": 1
+    },
+    {
+      "batch": "s96_add40_width128",
+      "rep": 19,
+      "role": "covariate_resample_l2.5_m14",
+      "width": 0,
+      "nonce": 1
+    },
+    {
+      "batch": "s96_add40_width128",
+      "rep": 22,
+      "role": "candidate",
+      "width": 186,
+      "nonce": 1
+    }
+  ],
+  "replications": {
+    "0": {
+      "batch": "s78_independent_stability1",
+      "source_rep": 0,
+      "cases": {
+        "low": {
+          "training": {
+            "master_train": {
+              "seed": 2134460148,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 2765500842,
+              "n": 500
+            },
+            "test": {
+              "seed": 3327209839,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 549191535,
+            "test": 3231680042
+          },
+          "oob_seed": null
+        },
+        "moderate": {
+          "training": {
+            "master_train": {
+              "seed": 2385065672,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 2813790488,
+              "n": 500
+            },
+            "test": {
+              "seed": 4122325956,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 3904729406,
+            "test": 3201296238
+          },
+          "oob_seed": null
+        },
+        "high": {
+          "training": {
+            "master_train": {
+              "seed": 482411427,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 117929364,
+              "n": 500
+            },
+            "test": {
+              "seed": 1888553054,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 885443628,
+            "test": 2964046766
+          },
+          "oob_seed": null
+        }
+      },
+      "shift_oob_seed": 1509298892
+    },
+    "1": {
+      "batch": "s78_independent_stability1",
+      "source_rep": 1,
+      "cases": {
+        "low": {
+          "training": {
+            "master_train": {
+              "seed": 690192218,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 235850565,
+              "n": 500
+            },
+            "test": {
+              "seed": 1209421480,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 2494572231,
+            "test": 3284149908
+          },
+          "oob_seed": null
+        },
+        "moderate": {
+          "training": {
+            "master_train": {
+              "seed": 3589609818,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 3997409499,
+              "n": 500
+            },
+            "test": {
+              "seed": 300000705,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 3374431078,
+            "test": 321817243
+          },
+          "oob_seed": null
+        },
+        "high": {
+          "training": {
+            "master_train": {
+              "seed": 2154781275,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 281750555,
+              "n": 500
+            },
+            "test": {
+              "seed": 2503716176,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 3773927146,
+            "test": 657178839
+          },
+          "oob_seed": null
+        }
+      },
+      "shift_oob_seed": 2493278813
+    },
+    "2": {
+      "batch": "s78_independent_stability1",
+      "source_rep": 2,
+      "cases": {
+        "low": {
+          "training": {
+            "master_train": {
+              "seed": 837174364,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 1394032032,
+              "n": 500
+            },
+            "test": {
+              "seed": 2590855646,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 1023883056,
+            "test": 2641944934
+          },
+          "oob_seed": null
+        },
+        "moderate": {
+          "training": {
+            "master_train": {
+              "seed": 2448940763,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 2124246457,
+              "n": 500
+            },
+            "test": {
+              "seed": 3508654636,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 1908202859,
+            "test": 4204235038
+          },
+          "oob_seed": null
+        },
+        "high": {
+          "training": {
+            "master_train": {
+              "seed": 3866097755,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 4027521264,
+              "n": 500
+            },
+            "test": {
+              "seed": 975520041,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 4085126391,
+            "test": 1837643466
+          },
+          "oob_seed": null
+        }
+      },
+      "shift_oob_seed": 800932130
+    },
+    "3": {
+      "batch": "s78_independent_stability1",
+      "source_rep": 3,
+      "cases": {
+        "low": {
+          "training": {
+            "master_train": {
+              "seed": 4110242388,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 2823959444,
+              "n": 500
+            },
+            "test": {
+              "seed": 2112377281,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 2923906666,
+            "test": 830205156
+          },
+          "oob_seed": null
+        },
+        "moderate": {
+          "training": {
+            "master_train": {
+              "seed": 3513297559,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 3607465651,
+              "n": 500
+            },
+            "test": {
+              "seed": 3501808012,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 4249603748,
+            "test": 2920939819
+          },
+          "oob_seed": null
+        },
+        "high": {
+          "training": {
+            "master_train": {
+              "seed": 304495511,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 3430797184,
+              "n": 500
+            },
+            "test": {
+              "seed": 4290187026,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 561682204,
+            "test": 1005064114
+          },
+          "oob_seed": null
+        }
+      },
+      "shift_oob_seed": 2206751650
+    },
+    "4": {
+      "batch": "s78_independent_stability1",
+      "source_rep": 4,
+      "cases": {
+        "low": {
+          "training": {
+            "master_train": {
+              "seed": 1740153576,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 1279194686,
+              "n": 500
+            },
+            "test": {
+              "seed": 2132541747,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 2250221607,
+            "test": 1943443606
+          },
+          "oob_seed": null
+        },
+        "moderate": {
+          "training": {
+            "master_train": {
+              "seed": 2043517569,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 4082963684,
+              "n": 500
+            },
+            "test": {
+              "seed": 163986022,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 4136085271,
+            "test": 3907927840
+          },
+          "oob_seed": null
+        },
+        "high": {
+          "training": {
+            "master_train": {
+              "seed": 2033931727,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 4253911004,
+              "n": 500
+            },
+            "test": {
+              "seed": 3866474930,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 2545052268,
+            "test": 590549548
+          },
+          "oob_seed": null
+        }
+      },
+      "shift_oob_seed": 520112808
+    },
+    "5": {
+      "batch": "s78_independent_stability1",
+      "source_rep": 5,
+      "cases": {
+        "low": {
+          "training": {
+            "master_train": {
+              "seed": 3923247705,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 791674995,
+              "n": 500
+            },
+            "test": {
+              "seed": 2347172721,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 2579974207,
+            "test": 896944572
+          },
+          "oob_seed": null
+        },
+        "moderate": {
+          "training": {
+            "master_train": {
+              "seed": 2412452559,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 3753749895,
+              "n": 500
+            },
+            "test": {
+              "seed": 3064015051,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 3050673758,
+            "test": 125847392
+          },
+          "oob_seed": null
+        },
+        "high": {
+          "training": {
+            "master_train": {
+              "seed": 1176044102,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 3282442694,
+              "n": 500
+            },
+            "test": {
+              "seed": 1069352209,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 3831947325,
+            "test": 4160887544
+          },
+          "oob_seed": null
+        }
+      },
+      "shift_oob_seed": 4117649671
+    },
+    "6": {
+      "batch": "s78_independent_stability1",
+      "source_rep": 6,
+      "cases": {
+        "low": {
+          "training": {
+            "master_train": {
+              "seed": 2273111351,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 1117354251,
+              "n": 500
+            },
+            "test": {
+              "seed": 598906611,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 3557497765,
+            "test": 893174810
+          },
+          "oob_seed": null
+        },
+        "moderate": {
+          "training": {
+            "master_train": {
+              "seed": 230932716,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 157559858,
+              "n": 500
+            },
+            "test": {
+              "seed": 204858879,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 4163569365,
+            "test": 2444067204
+          },
+          "oob_seed": null
+        },
+        "high": {
+          "training": {
+            "master_train": {
+              "seed": 3084391673,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 1143336801,
+              "n": 500
+            },
+            "test": {
+              "seed": 142900930,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 1752442447,
+            "test": 1721612489
+          },
+          "oob_seed": null
+        }
+      },
+      "shift_oob_seed": 1302750463
+    },
+    "7": {
+      "batch": "s78_independent_stability1",
+      "source_rep": 7,
+      "cases": {
+        "low": {
+          "training": {
+            "master_train": {
+              "seed": 1113873987,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 1712165622,
+              "n": 500
+            },
+            "test": {
+              "seed": 1116775756,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 2343258692,
+            "test": 3792539790
+          },
+          "oob_seed": null
+        },
+        "moderate": {
+          "training": {
+            "master_train": {
+              "seed": 3882748265,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 2691058605,
+              "n": 500
+            },
+            "test": {
+              "seed": 3864394075,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 2274701151,
+            "test": 466399583
+          },
+          "oob_seed": null
+        },
+        "high": {
+          "training": {
+            "master_train": {
+              "seed": 2546973353,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 2461171205,
+              "n": 500
+            },
+            "test": {
+              "seed": 2545432949,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 4127325611,
+            "test": 1785381887
+          },
+          "oob_seed": null
+        }
+      },
+      "shift_oob_seed": 1403021997
+    },
+    "8": {
+      "batch": "s78_independent_stability1",
+      "source_rep": 8,
+      "cases": {
+        "low": {
+          "training": {
+            "master_train": {
+              "seed": 1982710028,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 284530319,
+              "n": 500
+            },
+            "test": {
+              "seed": 2073581681,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 206855267,
+            "test": 1022049330
+          },
+          "oob_seed": null
+        },
+        "moderate": {
+          "training": {
+            "master_train": {
+              "seed": 3512463393,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 598644436,
+              "n": 500
+            },
+            "test": {
+              "seed": 479392997,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 1205227106,
+            "test": 282890521
+          },
+          "oob_seed": null
+        },
+        "high": {
+          "training": {
+            "master_train": {
+              "seed": 985345304,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 2021433593,
+              "n": 500
+            },
+            "test": {
+              "seed": 281809533,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 2154864065,
+            "test": 2129914861
+          },
+          "oob_seed": null
+        }
+      },
+      "shift_oob_seed": 3370858952
+    },
+    "9": {
+      "batch": "s78_independent_stability1",
+      "source_rep": 9,
+      "cases": {
+        "low": {
+          "training": {
+            "master_train": {
+              "seed": 4137952389,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 1057931451,
+              "n": 500
+            },
+            "test": {
+              "seed": 1870399578,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 3805565558,
+            "test": 4189657113
+          },
+          "oob_seed": null
+        },
+        "moderate": {
+          "training": {
+            "master_train": {
+              "seed": 85273682,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 4087990210,
+              "n": 500
+            },
+            "test": {
+              "seed": 2530174550,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 927553646,
+            "test": 3393527868
+          },
+          "oob_seed": null
+        },
+        "high": {
+          "training": {
+            "master_train": {
+              "seed": 3834965658,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 1343346881,
+              "n": 500
+            },
+            "test": {
+              "seed": 3492483424,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 2528978429,
+            "test": 3854159217
+          },
+          "oob_seed": null
+        }
+      },
+      "shift_oob_seed": 1994374018
+    },
+    "10": {
+      "batch": "s78_independent_stability1",
+      "source_rep": 10,
+      "cases": {
+        "low": {
+          "training": {
+            "master_train": {
+              "seed": 1424204647,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 1536882234,
+              "n": 500
+            },
+            "test": {
+              "seed": 2942753855,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 3089532267,
+            "test": 2148407759
+          },
+          "oob_seed": null
+        },
+        "moderate": {
+          "training": {
+            "master_train": {
+              "seed": 2462823456,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 2579977610,
+              "n": 500
+            },
+            "test": {
+              "seed": 1605529121,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 1560779749,
+            "test": 459171530
+          },
+          "oob_seed": null
+        },
+        "high": {
+          "training": {
+            "master_train": {
+              "seed": 2484822731,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 3955952950,
+              "n": 500
+            },
+            "test": {
+              "seed": 1812649645,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 3397934164,
+            "test": 2893945216
+          },
+          "oob_seed": null
+        }
+      },
+      "shift_oob_seed": 3646659003
+    },
+    "11": {
+      "batch": "s78_independent_stability1",
+      "source_rep": 11,
+      "cases": {
+        "low": {
+          "training": {
+            "master_train": {
+              "seed": 375282297,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 4137235197,
+              "n": 500
+            },
+            "test": {
+              "seed": 3027597354,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 641187209,
+            "test": 3650585506
+          },
+          "oob_seed": null
+        },
+        "moderate": {
+          "training": {
+            "master_train": {
+              "seed": 4066686841,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 1641694691,
+              "n": 500
+            },
+            "test": {
+              "seed": 1211147623,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 4020907762,
+            "test": 2804518401
+          },
+          "oob_seed": null
+        },
+        "high": {
+          "training": {
+            "master_train": {
+              "seed": 3288784518,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 3512489043,
+              "n": 500
+            },
+            "test": {
+              "seed": 1531082797,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 3923534008,
+            "test": 1227712352
+          },
+          "oob_seed": null
+        }
+      },
+      "shift_oob_seed": 3065556608
+    },
+    "12": {
+      "batch": "s78_independent_stability1",
+      "source_rep": 12,
+      "cases": {
+        "low": {
+          "training": {
+            "master_train": {
+              "seed": 1907330879,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 69290164,
+              "n": 500
+            },
+            "test": {
+              "seed": 2998917560,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 3134711184,
+            "test": 687102169
+          },
+          "oob_seed": null
+        },
+        "moderate": {
+          "training": {
+            "master_train": {
+              "seed": 4126290099,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 569963770,
+              "n": 500
+            },
+            "test": {
+              "seed": 1686632944,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 1091653720,
+            "test": 364926666
+          },
+          "oob_seed": null
+        },
+        "high": {
+          "training": {
+            "master_train": {
+              "seed": 2376275188,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 1239964468,
+              "n": 500
+            },
+            "test": {
+              "seed": 2184737999,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 1419131341,
+            "test": 3301733399
+          },
+          "oob_seed": null
+        }
+      },
+      "shift_oob_seed": 758154627
+    },
+    "13": {
+      "batch": "s78_independent_stability1",
+      "source_rep": 13,
+      "cases": {
+        "low": {
+          "training": {
+            "master_train": {
+              "seed": 2507987615,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 3664614610,
+              "n": 500
+            },
+            "test": {
+              "seed": 2524114180,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 482284691,
+            "test": 1196683173
+          },
+          "oob_seed": null
+        },
+        "moderate": {
+          "training": {
+            "master_train": {
+              "seed": 354884120,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 2499270573,
+              "n": 500
+            },
+            "test": {
+              "seed": 241186865,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 2209644833,
+            "test": 3446743928
+          },
+          "oob_seed": null
+        },
+        "high": {
+          "training": {
+            "master_train": {
+              "seed": 1159498743,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 4070625653,
+              "n": 500
+            },
+            "test": {
+              "seed": 4259980109,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 686392968,
+            "test": 2790708137
+          },
+          "oob_seed": null
+        }
+      },
+      "shift_oob_seed": 1671779240
+    },
+    "14": {
+      "batch": "s78_independent_stability1",
+      "source_rep": 14,
+      "cases": {
+        "low": {
+          "training": {
+            "master_train": {
+              "seed": 1584783450,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 1724746866,
+              "n": 500
+            },
+            "test": {
+              "seed": 2772741571,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 743967829,
+            "test": 3601513480
+          },
+          "oob_seed": null
+        },
+        "moderate": {
+          "training": {
+            "master_train": {
+              "seed": 3825620573,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 642424284,
+              "n": 500
+            },
+            "test": {
+              "seed": 2158030260,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 2281647474,
+            "test": 3345922848
+          },
+          "oob_seed": null
+        },
+        "high": {
+          "training": {
+            "master_train": {
+              "seed": 1115800359,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 1807262695,
+              "n": 500
+            },
+            "test": {
+              "seed": 3402588410,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 2302651695,
+            "test": 2870122631
+          },
+          "oob_seed": null
+        }
+      },
+      "shift_oob_seed": 3417685046
+    },
+    "15": {
+      "batch": "s78_independent_stability1",
+      "source_rep": 15,
+      "cases": {
+        "low": {
+          "training": {
+            "master_train": {
+              "seed": 3987441364,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 3247949338,
+              "n": 500
+            },
+            "test": {
+              "seed": 3583435927,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 564409615,
+            "test": 1593344213
+          },
+          "oob_seed": null
+        },
+        "moderate": {
+          "training": {
+            "master_train": {
+              "seed": 2376482389,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 4035351395,
+              "n": 500
+            },
+            "test": {
+              "seed": 1526512607,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 3052208540,
+            "test": 2155368854
+          },
+          "oob_seed": null
+        },
+        "high": {
+          "training": {
+            "master_train": {
+              "seed": 3366285461,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 3310859412,
+              "n": 500
+            },
+            "test": {
+              "seed": 2929629457,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 4194049338,
+            "test": 3708337299
+          },
+          "oob_seed": null
+        }
+      },
+      "shift_oob_seed": 3670057891
+    },
+    "16": {
+      "batch": "s78_independent_stability1",
+      "source_rep": 16,
+      "cases": {
+        "low": {
+          "training": {
+            "master_train": {
+              "seed": 4225671247,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 3791797886,
+              "n": 500
+            },
+            "test": {
+              "seed": 3843487930,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 3748466230,
+            "test": 499403600
+          },
+          "oob_seed": null
+        },
+        "moderate": {
+          "training": {
+            "master_train": {
+              "seed": 658508163,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 3878294255,
+              "n": 500
+            },
+            "test": {
+              "seed": 3236134034,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 164625922,
+            "test": 1793717091
+          },
+          "oob_seed": null
+        },
+        "high": {
+          "training": {
+            "master_train": {
+              "seed": 1475693879,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 1123573820,
+              "n": 500
+            },
+            "test": {
+              "seed": 292994782,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 2140177575,
+            "test": 659329653
+          },
+          "oob_seed": null
+        }
+      },
+      "shift_oob_seed": 1285935367
+    },
+    "17": {
+      "batch": "s78_independent_stability1",
+      "source_rep": 17,
+      "cases": {
+        "low": {
+          "training": {
+            "master_train": {
+              "seed": 3849795178,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 536683722,
+              "n": 500
+            },
+            "test": {
+              "seed": 3591346650,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 4127842965,
+            "test": 350489625
+          },
+          "oob_seed": null
+        },
+        "moderate": {
+          "training": {
+            "master_train": {
+              "seed": 3793254050,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 1193496034,
+              "n": 500
+            },
+            "test": {
+              "seed": 2727179172,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 4077682147,
+            "test": 3363167532
+          },
+          "oob_seed": null
+        },
+        "high": {
+          "training": {
+            "master_train": {
+              "seed": 3204046252,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 4170534731,
+              "n": 500
+            },
+            "test": {
+              "seed": 268162819,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 53798039,
+            "test": 1120186345
+          },
+          "oob_seed": null
+        }
+      },
+      "shift_oob_seed": 3230699427
+    },
+    "18": {
+      "batch": "s78_independent_stability1",
+      "source_rep": 18,
+      "cases": {
+        "low": {
+          "training": {
+            "master_train": {
+              "seed": 2928603906,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 3111002647,
+              "n": 500
+            },
+            "test": {
+              "seed": 138955720,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 2235399666,
+            "test": 1686121622
+          },
+          "oob_seed": null
+        },
+        "moderate": {
+          "training": {
+            "master_train": {
+              "seed": 800771278,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 1194352600,
+              "n": 500
+            },
+            "test": {
+              "seed": 367513812,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 1487036401,
+            "test": 609919190
+          },
+          "oob_seed": null
+        },
+        "high": {
+          "training": {
+            "master_train": {
+              "seed": 3272041418,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 3325550369,
+              "n": 500
+            },
+            "test": {
+              "seed": 1341006824,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 1360381648,
+            "test": 3528596085
+          },
+          "oob_seed": null
+        }
+      },
+      "shift_oob_seed": 1389361626
+    },
+    "19": {
+      "batch": "s78_independent_stability1",
+      "source_rep": 19,
+      "cases": {
+        "low": {
+          "training": {
+            "master_train": {
+              "seed": 3087716243,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 3445543865,
+              "n": 500
+            },
+            "test": {
+              "seed": 3089234994,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 3789916762,
+            "test": 3655286897
+          },
+          "oob_seed": null
+        },
+        "moderate": {
+          "training": {
+            "master_train": {
+              "seed": 2804554557,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 3711825492,
+              "n": 500
+            },
+            "test": {
+              "seed": 2895405113,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 2026868900,
+            "test": 1735380559
+          },
+          "oob_seed": null
+        },
+        "high": {
+          "training": {
+            "master_train": {
+              "seed": 401222869,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 4233276640,
+              "n": 500
+            },
+            "test": {
+              "seed": 4287784389,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 1053203880,
+            "test": 753643419
+          },
+          "oob_seed": null
+        }
+      },
+      "shift_oob_seed": 2210256975
+    },
+    "20": {
+      "batch": "s79_independent_stability2",
+      "source_rep": 0,
+      "cases": {
+        "low": {
+          "training": {
+            "master_train": {
+              "seed": 747593104,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 3864844507,
+              "n": 500
+            },
+            "test": {
+              "seed": 242142414,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 1687163284,
+            "test": 1229981129
+          },
+          "oob_seed": 2037228349
+        },
+        "moderate": {
+          "training": {
+            "master_train": {
+              "seed": 1986518421,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 3225104231,
+              "n": 500
+            },
+            "test": {
+              "seed": 302952077,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 3629980300,
+            "test": 3334853238
+          },
+          "oob_seed": 1281554588
+        },
+        "high": {
+          "training": {
+            "master_train": {
+              "seed": 2797599931,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 2840706055,
+              "n": 500
+            },
+            "test": {
+              "seed": 3335857974,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 407680153,
+            "test": 1935232546
+          },
+          "oob_seed": 3083467200
+        }
+      },
+      "shift_oob_seed": 2192673397
+    },
+    "21": {
+      "batch": "s79_independent_stability2",
+      "source_rep": 1,
+      "cases": {
+        "low": {
+          "training": {
+            "master_train": {
+              "seed": 1634076482,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 1766497856,
+              "n": 500
+            },
+            "test": {
+              "seed": 130862182,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 743746397,
+            "test": 2534738879
+          },
+          "oob_seed": 656123220
+        },
+        "moderate": {
+          "training": {
+            "master_train": {
+              "seed": 672304789,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 4257731124,
+              "n": 500
+            },
+            "test": {
+              "seed": 1899729710,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 4016414395,
+            "test": 3890412189
+          },
+          "oob_seed": 1325240677
+        },
+        "high": {
+          "training": {
+            "master_train": {
+              "seed": 2224382233,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 1523097685,
+              "n": 500
+            },
+            "test": {
+              "seed": 1994202970,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 294116440,
+            "test": 3717332172
+          },
+          "oob_seed": 3776952696
+        }
+      },
+      "shift_oob_seed": 2100502556
+    },
+    "22": {
+      "batch": "s79_independent_stability2",
+      "source_rep": 2,
+      "cases": {
+        "low": {
+          "training": {
+            "master_train": {
+              "seed": 1329647105,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 4209131315,
+              "n": 500
+            },
+            "test": {
+              "seed": 3172921538,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 3767991375,
+            "test": 2276507791
+          },
+          "oob_seed": 993896348
+        },
+        "moderate": {
+          "training": {
+            "master_train": {
+              "seed": 3220886592,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 1774253073,
+              "n": 500
+            },
+            "test": {
+              "seed": 2483653651,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 1164396669,
+            "test": 1027614394
+          },
+          "oob_seed": 503686901
+        },
+        "high": {
+          "training": {
+            "master_train": {
+              "seed": 325847292,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 4072454354,
+              "n": 500
+            },
+            "test": {
+              "seed": 764812668,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 677763957,
+            "test": 1346092590
+          },
+          "oob_seed": 1927724790
+        }
+      },
+      "shift_oob_seed": 3924285967
+    },
+    "23": {
+      "batch": "s79_independent_stability2",
+      "source_rep": 3,
+      "cases": {
+        "low": {
+          "training": {
+            "master_train": {
+              "seed": 2164007688,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 3353793467,
+              "n": 500
+            },
+            "test": {
+              "seed": 1561902831,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 878962533,
+            "test": 3844040494
+          },
+          "oob_seed": 1099619354
+        },
+        "moderate": {
+          "training": {
+            "master_train": {
+              "seed": 3097403222,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 3418941312,
+              "n": 500
+            },
+            "test": {
+              "seed": 2606589353,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 860444766,
+            "test": 151714188
+          },
+          "oob_seed": 2455453012
+        },
+        "high": {
+          "training": {
+            "master_train": {
+              "seed": 973244199,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 2309177034,
+              "n": 500
+            },
+            "test": {
+              "seed": 3910853987,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 1105066498,
+            "test": 31456211
+          },
+          "oob_seed": 3624373606
+        }
+      },
+      "shift_oob_seed": 1415198396
+    },
+    "24": {
+      "batch": "s79_independent_stability2",
+      "source_rep": 4,
+      "cases": {
+        "low": {
+          "training": {
+            "master_train": {
+              "seed": 1204028886,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 675883943,
+              "n": 500
+            },
+            "test": {
+              "seed": 244137295,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 2432849790,
+            "test": 1976993820
+          },
+          "oob_seed": 1588694139
+        },
+        "moderate": {
+          "training": {
+            "master_train": {
+              "seed": 4017198204,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 3344518464,
+              "n": 500
+            },
+            "test": {
+              "seed": 1749728467,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 289726957,
+            "test": 36085836
+          },
+          "oob_seed": 3119496376
+        },
+        "high": {
+          "training": {
+            "master_train": {
+              "seed": 246936745,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 3096995340,
+              "n": 500
+            },
+            "test": {
+              "seed": 4116609527,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 1908555634,
+            "test": 2231643087
+          },
+          "oob_seed": 478643777
+        }
+      },
+      "shift_oob_seed": 941540264
+    },
+    "25": {
+      "batch": "s79_independent_stability2",
+      "source_rep": 5,
+      "cases": {
+        "low": {
+          "training": {
+            "master_train": {
+              "seed": 510812150,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 401184380,
+              "n": 500
+            },
+            "test": {
+              "seed": 2751739985,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 3484664517,
+            "test": 3744833978
+          },
+          "oob_seed": 2514921092
+        },
+        "moderate": {
+          "training": {
+            "master_train": {
+              "seed": 2708210250,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 1555282927,
+              "n": 500
+            },
+            "test": {
+              "seed": 1659148205,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 2276921020,
+            "test": 146231504
+          },
+          "oob_seed": 230689210
+        },
+        "high": {
+          "training": {
+            "master_train": {
+              "seed": 462254474,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 683426890,
+              "n": 500
+            },
+            "test": {
+              "seed": 3256284172,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 4000138740,
+            "test": 51528314
+          },
+          "oob_seed": 1846141967
+        }
+      },
+      "shift_oob_seed": 731284743
+    },
+    "26": {
+      "batch": "s79_independent_stability2",
+      "source_rep": 6,
+      "cases": {
+        "low": {
+          "training": {
+            "master_train": {
+              "seed": 3146360094,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 2837126731,
+              "n": 500
+            },
+            "test": {
+              "seed": 2257774618,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 2568519310,
+            "test": 1824126837
+          },
+          "oob_seed": 400680347
+        },
+        "moderate": {
+          "training": {
+            "master_train": {
+              "seed": 1641934714,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 543741725,
+              "n": 500
+            },
+            "test": {
+              "seed": 26940801,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 3358747370,
+            "test": 2682032208
+          },
+          "oob_seed": 2715197220
+        },
+        "high": {
+          "training": {
+            "master_train": {
+              "seed": 3741516436,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 2083325687,
+              "n": 500
+            },
+            "test": {
+              "seed": 407137909,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 1766336016,
+            "test": 593695559
+          },
+          "oob_seed": 3813147722
+        }
+      },
+      "shift_oob_seed": 1086763055
+    },
+    "27": {
+      "batch": "s79_independent_stability2",
+      "source_rep": 7,
+      "cases": {
+        "low": {
+          "training": {
+            "master_train": {
+              "seed": 1413193906,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 4073042874,
+              "n": 500
+            },
+            "test": {
+              "seed": 2727710845,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 3328116620,
+            "test": 1314037925
+          },
+          "oob_seed": 623558877
+        },
+        "moderate": {
+          "training": {
+            "master_train": {
+              "seed": 46964751,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 1779356629,
+              "n": 500
+            },
+            "test": {
+              "seed": 1447208103,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 1985524219,
+            "test": 53394434
+          },
+          "oob_seed": 2592688719
+        },
+        "high": {
+          "training": {
+            "master_train": {
+              "seed": 491784942,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 3562535218,
+              "n": 500
+            },
+            "test": {
+              "seed": 1439723566,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 1052788083,
+            "test": 3536891419
+          },
+          "oob_seed": 1731282529
+        }
+      },
+      "shift_oob_seed": 3892982716
+    },
+    "28": {
+      "batch": "s79_independent_stability2",
+      "source_rep": 8,
+      "cases": {
+        "low": {
+          "training": {
+            "master_train": {
+              "seed": 3614935158,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 1799012786,
+              "n": 500
+            },
+            "test": {
+              "seed": 2666959123,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 2689342190,
+            "test": 1161525970
+          },
+          "oob_seed": 2886419367
+        },
+        "moderate": {
+          "training": {
+            "master_train": {
+              "seed": 2245798874,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 4000380990,
+              "n": 500
+            },
+            "test": {
+              "seed": 2632823204,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 2097791690,
+            "test": 164897734
+          },
+          "oob_seed": 1646869434
+        },
+        "high": {
+          "training": {
+            "master_train": {
+              "seed": 2073402811,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 1369118656,
+              "n": 500
+            },
+            "test": {
+              "seed": 2420795939,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 2426351772,
+            "test": 3369791637
+          },
+          "oob_seed": 554750165
+        }
+      },
+      "shift_oob_seed": 2609073911
+    },
+    "29": {
+      "batch": "s79_independent_stability2",
+      "source_rep": 9,
+      "cases": {
+        "low": {
+          "training": {
+            "master_train": {
+              "seed": 281823803,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 561545314,
+              "n": 500
+            },
+            "test": {
+              "seed": 1733394323,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 1296337210,
+            "test": 1131872517
+          },
+          "oob_seed": 162996682
+        },
+        "moderate": {
+          "training": {
+            "master_train": {
+              "seed": 73326626,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 3068385881,
+              "n": 500
+            },
+            "test": {
+              "seed": 3892133042,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 1269034945,
+            "test": 541968005
+          },
+          "oob_seed": 2460668883
+        },
+        "high": {
+          "training": {
+            "master_train": {
+              "seed": 3222902822,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 2190779160,
+              "n": 500
+            },
+            "test": {
+              "seed": 3579731386,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 617503049,
+            "test": 243108534
+          },
+          "oob_seed": 499759991
+        }
+      },
+      "shift_oob_seed": 1937449194
+    },
+    "30": {
+      "batch": "s79_independent_stability2",
+      "source_rep": 10,
+      "cases": {
+        "low": {
+          "training": {
+            "master_train": {
+              "seed": 1766895001,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 2885014645,
+              "n": 500
+            },
+            "test": {
+              "seed": 3445793435,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 4120866330,
+            "test": 2123683385
+          },
+          "oob_seed": 1303348157
+        },
+        "moderate": {
+          "training": {
+            "master_train": {
+              "seed": 3318752949,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 243071301,
+              "n": 500
+            },
+            "test": {
+              "seed": 1353044733,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 2113277848,
+            "test": 3902618556
+          },
+          "oob_seed": 2781096319
+        },
+        "high": {
+          "training": {
+            "master_train": {
+              "seed": 3770185036,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 3975013058,
+              "n": 500
+            },
+            "test": {
+              "seed": 3460105871,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 3638780750,
+            "test": 2990416964
+          },
+          "oob_seed": 1151689564
+        }
+      },
+      "shift_oob_seed": 1105989795
+    },
+    "31": {
+      "batch": "s79_independent_stability2",
+      "source_rep": 11,
+      "cases": {
+        "low": {
+          "training": {
+            "master_train": {
+              "seed": 3453702605,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 3189783950,
+              "n": 500
+            },
+            "test": {
+              "seed": 3458665637,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 2007419165,
+            "test": 2942359513
+          },
+          "oob_seed": 2646802533
+        },
+        "moderate": {
+          "training": {
+            "master_train": {
+              "seed": 3924281833,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 2667669567,
+              "n": 500
+            },
+            "test": {
+              "seed": 3936275970,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 1754011104,
+            "test": 396520822
+          },
+          "oob_seed": 3997547367
+        },
+        "high": {
+          "training": {
+            "master_train": {
+              "seed": 297137285,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 1401309049,
+              "n": 500
+            },
+            "test": {
+              "seed": 580700969,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 796385163,
+            "test": 481512582
+          },
+          "oob_seed": 1906979243
+        }
+      },
+      "shift_oob_seed": 1491961219
+    },
+    "32": {
+      "batch": "s79_independent_stability2",
+      "source_rep": 12,
+      "cases": {
+        "low": {
+          "training": {
+            "master_train": {
+              "seed": 2514024576,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 2891377536,
+              "n": 500
+            },
+            "test": {
+              "seed": 3772948641,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 934695591,
+            "test": 2646856872
+          },
+          "oob_seed": 2702132570
+        },
+        "moderate": {
+          "training": {
+            "master_train": {
+              "seed": 1967130414,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 186896852,
+              "n": 500
+            },
+            "test": {
+              "seed": 3360797619,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 3434629347,
+            "test": 3242645309
+          },
+          "oob_seed": 1024327526
+        },
+        "high": {
+          "training": {
+            "master_train": {
+              "seed": 543961267,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 3262178103,
+              "n": 500
+            },
+            "test": {
+              "seed": 2878591109,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 2480542483,
+            "test": 4270436686
+          },
+          "oob_seed": 27104761
+        }
+      },
+      "shift_oob_seed": 1238571551
+    },
+    "33": {
+      "batch": "s79_independent_stability2",
+      "source_rep": 13,
+      "cases": {
+        "low": {
+          "training": {
+            "master_train": {
+              "seed": 2440192092,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 3337667897,
+              "n": 500
+            },
+            "test": {
+              "seed": 157547159,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 597584407,
+            "test": 2193193698
+          },
+          "oob_seed": 1876689047
+        },
+        "moderate": {
+          "training": {
+            "master_train": {
+              "seed": 3105616315,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 1471414612,
+              "n": 500
+            },
+            "test": {
+              "seed": 2534421893,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 4209617664,
+            "test": 1844090626
+          },
+          "oob_seed": 3852187005
+        },
+        "high": {
+          "training": {
+            "master_train": {
+              "seed": 59882130,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 948017539,
+              "n": 500
+            },
+            "test": {
+              "seed": 4099276303,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 207245625,
+            "test": 4088705486
+          },
+          "oob_seed": 3479672661
+        }
+      },
+      "shift_oob_seed": 1384165613
+    },
+    "34": {
+      "batch": "s79_independent_stability2",
+      "source_rep": 14,
+      "cases": {
+        "low": {
+          "training": {
+            "master_train": {
+              "seed": 3462824074,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 3285973110,
+              "n": 500
+            },
+            "test": {
+              "seed": 3151823460,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 4007110621,
+            "test": 1760875445
+          },
+          "oob_seed": 1644433676
+        },
+        "moderate": {
+          "training": {
+            "master_train": {
+              "seed": 3519530097,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 356670894,
+              "n": 500
+            },
+            "test": {
+              "seed": 237367125,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 3470768087,
+            "test": 4244965216
+          },
+          "oob_seed": 3614727919
+        },
+        "high": {
+          "training": {
+            "master_train": {
+              "seed": 4039911316,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 1850943794,
+              "n": 500
+            },
+            "test": {
+              "seed": 3158109866,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 2667820503,
+            "test": 1570937276
+          },
+          "oob_seed": 2707800736
+        }
+      },
+      "shift_oob_seed": 4195235166
+    },
+    "35": {
+      "batch": "s79_independent_stability2",
+      "source_rep": 15,
+      "cases": {
+        "low": {
+          "training": {
+            "master_train": {
+              "seed": 2024351547,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 3039393124,
+              "n": 500
+            },
+            "test": {
+              "seed": 896322037,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 334126776,
+            "test": 1165058977
+          },
+          "oob_seed": 2653223940
+        },
+        "moderate": {
+          "training": {
+            "master_train": {
+              "seed": 1015678264,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 3845037836,
+              "n": 500
+            },
+            "test": {
+              "seed": 2271384263,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 3093542158,
+            "test": 2087593404
+          },
+          "oob_seed": 3774008088
+        },
+        "high": {
+          "training": {
+            "master_train": {
+              "seed": 3745371302,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 3057236670,
+              "n": 500
+            },
+            "test": {
+              "seed": 818533105,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 2110603344,
+            "test": 1151951350
+          },
+          "oob_seed": 1871050406
+        }
+      },
+      "shift_oob_seed": 1409151253
+    },
+    "36": {
+      "batch": "s79_independent_stability2",
+      "source_rep": 16,
+      "cases": {
+        "low": {
+          "training": {
+            "master_train": {
+              "seed": 3979355838,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 188666043,
+              "n": 500
+            },
+            "test": {
+              "seed": 1365066548,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 3284044949,
+            "test": 142250599
+          },
+          "oob_seed": 2728621534
+        },
+        "moderate": {
+          "training": {
+            "master_train": {
+              "seed": 397022690,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 4011957997,
+              "n": 500
+            },
+            "test": {
+              "seed": 1172357483,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 633262129,
+            "test": 1217919923
+          },
+          "oob_seed": 580485823
+        },
+        "high": {
+          "training": {
+            "master_train": {
+              "seed": 690349608,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 220531465,
+              "n": 500
+            },
+            "test": {
+              "seed": 1202928991,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 1440678642,
+            "test": 3621767661
+          },
+          "oob_seed": 1037339170
+        }
+      },
+      "shift_oob_seed": 2364860877
+    },
+    "37": {
+      "batch": "s79_independent_stability2",
+      "source_rep": 17,
+      "cases": {
+        "low": {
+          "training": {
+            "master_train": {
+              "seed": 3202356070,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 2284207286,
+              "n": 500
+            },
+            "test": {
+              "seed": 4016865155,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 2568043960,
+            "test": 1850245058
+          },
+          "oob_seed": 1866145688
+        },
+        "moderate": {
+          "training": {
+            "master_train": {
+              "seed": 2124902205,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 3381795895,
+              "n": 500
+            },
+            "test": {
+              "seed": 2020941461,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 272485351,
+            "test": 2369367325
+          },
+          "oob_seed": 3671018689
+        },
+        "high": {
+          "training": {
+            "master_train": {
+              "seed": 846497125,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 344782489,
+              "n": 500
+            },
+            "test": {
+              "seed": 1646863076,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 3404571828,
+            "test": 2985628608
+          },
+          "oob_seed": 2866567720
+        }
+      },
+      "shift_oob_seed": 4248673038
+    },
+    "38": {
+      "batch": "s79_independent_stability2",
+      "source_rep": 18,
+      "cases": {
+        "low": {
+          "training": {
+            "master_train": {
+              "seed": 4200188391,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 543732659,
+              "n": 500
+            },
+            "test": {
+              "seed": 3954116061,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 2769022869,
+            "test": 3892304412
+          },
+          "oob_seed": 101132725
+        },
+        "moderate": {
+          "training": {
+            "master_train": {
+              "seed": 2712733512,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 1966832862,
+              "n": 500
+            },
+            "test": {
+              "seed": 2024754433,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 2696066456,
+            "test": 3893898649
+          },
+          "oob_seed": 3845171785
+        },
+        "high": {
+          "training": {
+            "master_train": {
+              "seed": 1738961804,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 3845027557,
+              "n": 500
+            },
+            "test": {
+              "seed": 636948709,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 1317971575,
+            "test": 2707702854
+          },
+          "oob_seed": 1164005058
+        }
+      },
+      "shift_oob_seed": 2006782702
+    },
+    "39": {
+      "batch": "s79_independent_stability2",
+      "source_rep": 19,
+      "cases": {
+        "low": {
+          "training": {
+            "master_train": {
+              "seed": 477143382,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 2696540924,
+              "n": 500
+            },
+            "test": {
+              "seed": 2392849547,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 2771167815,
+            "test": 3685292999
+          },
+          "oob_seed": 3846838063
+        },
+        "moderate": {
+          "training": {
+            "master_train": {
+              "seed": 3800569144,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 1800786927,
+              "n": 500
+            },
+            "test": {
+              "seed": 3337068231,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 4000205279,
+            "test": 3099747096
+          },
+          "oob_seed": 2293350499
+        },
+        "high": {
+          "training": {
+            "master_train": {
+              "seed": 240764541,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 790631946,
+              "n": 500
+            },
+            "test": {
+              "seed": 3674391574,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 2785803191,
+            "test": 2281999880
+          },
+          "oob_seed": 2888406809
+        }
+      },
+      "shift_oob_seed": 179917669
+    },
+    "40": {
+      "batch": "s80_independent_stability3",
+      "source_rep": 0,
+      "cases": {
+        "low": {
+          "training": {
+            "master_train": {
+              "seed": 746095401,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 973310887,
+              "n": 500
+            },
+            "test": {
+              "seed": 1999371130,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 4173110358,
+            "test": 3380461248
+          },
+          "oob_seed": 2977014666
+        },
+        "moderate": {
+          "training": {
+            "master_train": {
+              "seed": 3700424809,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 3339292222,
+              "n": 500
+            },
+            "test": {
+              "seed": 1050341286,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 3648041119,
+            "test": 838235377
+          },
+          "oob_seed": 589788220
+        },
+        "high": {
+          "training": {
+            "master_train": {
+              "seed": 177836278,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 1455274597,
+              "n": 500
+            },
+            "test": {
+              "seed": 2424944369,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 2745540630,
+            "test": 895516798
+          },
+          "oob_seed": 2401563246
+        }
+      },
+      "shift_oob_seed": 3626473011
+    },
+    "41": {
+      "batch": "s80_independent_stability3",
+      "source_rep": 1,
+      "cases": {
+        "low": {
+          "training": {
+            "master_train": {
+              "seed": 3803734537,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 2913891766,
+              "n": 500
+            },
+            "test": {
+              "seed": 2266914893,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 771714634,
+            "test": 1824790895
+          },
+          "oob_seed": 460905335
+        },
+        "moderate": {
+          "training": {
+            "master_train": {
+              "seed": 357300321,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 3265934699,
+              "n": 500
+            },
+            "test": {
+              "seed": 1413677873,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 3207095032,
+            "test": 3195143295
+          },
+          "oob_seed": 2226749180
+        },
+        "high": {
+          "training": {
+            "master_train": {
+              "seed": 3009486367,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 886747422,
+              "n": 500
+            },
+            "test": {
+              "seed": 31151358,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 1881775304,
+            "test": 560908878
+          },
+          "oob_seed": 663308227
+        }
+      },
+      "shift_oob_seed": 1841925063
+    },
+    "42": {
+      "batch": "s80_independent_stability3",
+      "source_rep": 2,
+      "cases": {
+        "low": {
+          "training": {
+            "master_train": {
+              "seed": 4135441502,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 1091136991,
+              "n": 500
+            },
+            "test": {
+              "seed": 2222678221,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 2441620751,
+            "test": 182763542
+          },
+          "oob_seed": 4098029514
+        },
+        "moderate": {
+          "training": {
+            "master_train": {
+              "seed": 1738119738,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 2443362228,
+              "n": 500
+            },
+            "test": {
+              "seed": 2629213451,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 377663929,
+            "test": 2379477945
+          },
+          "oob_seed": 3575311593
+        },
+        "high": {
+          "training": {
+            "master_train": {
+              "seed": 2838289464,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 3103094983,
+              "n": 500
+            },
+            "test": {
+              "seed": 3329137715,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 1605114452,
+            "test": 2528857127
+          },
+          "oob_seed": 2757099566
+        }
+      },
+      "shift_oob_seed": 64603004
+    },
+    "43": {
+      "batch": "s80_independent_stability3",
+      "source_rep": 3,
+      "cases": {
+        "low": {
+          "training": {
+            "master_train": {
+              "seed": 778141712,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 4226168235,
+              "n": 500
+            },
+            "test": {
+              "seed": 1874195980,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 2839058641,
+            "test": 2612792722
+          },
+          "oob_seed": 1102786334
+        },
+        "moderate": {
+          "training": {
+            "master_train": {
+              "seed": 4226554107,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 2371960819,
+              "n": 500
+            },
+            "test": {
+              "seed": 4085909934,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 793612449,
+            "test": 4049301125
+          },
+          "oob_seed": 26393945
+        },
+        "high": {
+          "training": {
+            "master_train": {
+              "seed": 3629352326,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 3504204437,
+              "n": 500
+            },
+            "test": {
+              "seed": 3978113761,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 2334586971,
+            "test": 2184062413
+          },
+          "oob_seed": 1010468085
+        }
+      },
+      "shift_oob_seed": 4147907819
+    },
+    "44": {
+      "batch": "s80_independent_stability3",
+      "source_rep": 4,
+      "cases": {
+        "low": {
+          "training": {
+            "master_train": {
+              "seed": 1038414282,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 667147707,
+              "n": 500
+            },
+            "test": {
+              "seed": 2407603070,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 2281052274,
+            "test": 2963766276
+          },
+          "oob_seed": 1336098545
+        },
+        "moderate": {
+          "training": {
+            "master_train": {
+              "seed": 4248628531,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 3430635910,
+              "n": 500
+            },
+            "test": {
+              "seed": 2504395563,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 714283082,
+            "test": 3699654118
+          },
+          "oob_seed": 2061239808
+        },
+        "high": {
+          "training": {
+            "master_train": {
+              "seed": 370190693,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 1094172808,
+              "n": 500
+            },
+            "test": {
+              "seed": 472746748,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 4139152373,
+            "test": 1921470562
+          },
+          "oob_seed": 1823353271
+        }
+      },
+      "shift_oob_seed": 2423532147
+    },
+    "45": {
+      "batch": "s80_independent_stability3",
+      "source_rep": 5,
+      "cases": {
+        "low": {
+          "training": {
+            "master_train": {
+              "seed": 1809321453,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 1289413141,
+              "n": 500
+            },
+            "test": {
+              "seed": 3927714086,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 3034734599,
+            "test": 4077532107
+          },
+          "oob_seed": 467213813
+        },
+        "moderate": {
+          "training": {
+            "master_train": {
+              "seed": 4141319151,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 2129753052,
+              "n": 500
+            },
+            "test": {
+              "seed": 1849607904,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 26042632,
+            "test": 1635633598
+          },
+          "oob_seed": 588537546
+        },
+        "high": {
+          "training": {
+            "master_train": {
+              "seed": 3245867900,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 2236892550,
+              "n": 500
+            },
+            "test": {
+              "seed": 2154658405,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 4025478725,
+            "test": 1637345291
+          },
+          "oob_seed": 4036404246
+        }
+      },
+      "shift_oob_seed": 1613452331
+    },
+    "46": {
+      "batch": "s80_independent_stability3",
+      "source_rep": 6,
+      "cases": {
+        "low": {
+          "training": {
+            "master_train": {
+              "seed": 1701472817,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 812717175,
+              "n": 500
+            },
+            "test": {
+              "seed": 110389626,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 3086533784,
+            "test": 4249937217
+          },
+          "oob_seed": 1813849607
+        },
+        "moderate": {
+          "training": {
+            "master_train": {
+              "seed": 1695841,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 798467958,
+              "n": 500
+            },
+            "test": {
+              "seed": 500885,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 4283275862,
+            "test": 4138976650
+          },
+          "oob_seed": 1768108138
+        },
+        "high": {
+          "training": {
+            "master_train": {
+              "seed": 2772556561,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 2986097589,
+              "n": 500
+            },
+            "test": {
+              "seed": 3807374743,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 4031407999,
+            "test": 3459515885
+          },
+          "oob_seed": 1938021587
+        }
+      },
+      "shift_oob_seed": 2096116099
+    },
+    "47": {
+      "batch": "s80_independent_stability3",
+      "source_rep": 7,
+      "cases": {
+        "low": {
+          "training": {
+            "master_train": {
+              "seed": 1679073278,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 1170150254,
+              "n": 500
+            },
+            "test": {
+              "seed": 1463725615,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 3396833239,
+            "test": 2533982277
+          },
+          "oob_seed": 2986834495
+        },
+        "moderate": {
+          "training": {
+            "master_train": {
+              "seed": 3503266070,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 3563236255,
+              "n": 500
+            },
+            "test": {
+              "seed": 3356983047,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 2620935029,
+            "test": 3284611912
+          },
+          "oob_seed": 1133458332
+        },
+        "high": {
+          "training": {
+            "master_train": {
+              "seed": 1381722058,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 1698231417,
+              "n": 500
+            },
+            "test": {
+              "seed": 1996187848,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 219286529,
+            "test": 2086134588
+          },
+          "oob_seed": 3899225121
+        }
+      },
+      "shift_oob_seed": 1774090928
+    },
+    "48": {
+      "batch": "s80_independent_stability3",
+      "source_rep": 8,
+      "cases": {
+        "low": {
+          "training": {
+            "master_train": {
+              "seed": 1579424846,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 716900462,
+              "n": 500
+            },
+            "test": {
+              "seed": 3600903310,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 766392325,
+            "test": 339532304
+          },
+          "oob_seed": 3652376095
+        },
+        "moderate": {
+          "training": {
+            "master_train": {
+              "seed": 84630930,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 3218684827,
+              "n": 500
+            },
+            "test": {
+              "seed": 1908187728,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 2047409966,
+            "test": 3144761767
+          },
+          "oob_seed": 1813358958
+        },
+        "high": {
+          "training": {
+            "master_train": {
+              "seed": 1761361690,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 1670489355,
+              "n": 500
+            },
+            "test": {
+              "seed": 1159976679,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 2894189473,
+            "test": 3645547653
+          },
+          "oob_seed": 3581495324
+        }
+      },
+      "shift_oob_seed": 3470812429
+    },
+    "49": {
+      "batch": "s80_independent_stability3",
+      "source_rep": 9,
+      "cases": {
+        "low": {
+          "training": {
+            "master_train": {
+              "seed": 3592859597,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 1514825583,
+              "n": 500
+            },
+            "test": {
+              "seed": 3700813131,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 2399579681,
+            "test": 2856692145
+          },
+          "oob_seed": 3573753878
+        },
+        "moderate": {
+          "training": {
+            "master_train": {
+              "seed": 4135153729,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 3935287276,
+              "n": 500
+            },
+            "test": {
+              "seed": 1164724925,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 3316401680,
+            "test": 2911382532
+          },
+          "oob_seed": 1132636457
+        },
+        "high": {
+          "training": {
+            "master_train": {
+              "seed": 3809126085,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 3009394239,
+              "n": 500
+            },
+            "test": {
+              "seed": 3565452740,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 3147721182,
+            "test": 3546813142
+          },
+          "oob_seed": 2274801067
+        }
+      },
+      "shift_oob_seed": 3737846238
+    },
+    "50": {
+      "batch": "s80_independent_stability3",
+      "source_rep": 10,
+      "cases": {
+        "low": {
+          "training": {
+            "master_train": {
+              "seed": 3229806385,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 57433167,
+              "n": 500
+            },
+            "test": {
+              "seed": 993415602,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 2253039742,
+            "test": 2012032627
+          },
+          "oob_seed": 847720063
+        },
+        "moderate": {
+          "training": {
+            "master_train": {
+              "seed": 2117446088,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 2588867278,
+              "n": 500
+            },
+            "test": {
+              "seed": 3100067731,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 2146314205,
+            "test": 3370466594
+          },
+          "oob_seed": 54665699
+        },
+        "high": {
+          "training": {
+            "master_train": {
+              "seed": 330793340,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 2841572463,
+              "n": 500
+            },
+            "test": {
+              "seed": 2490047726,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 2927318411,
+            "test": 2992854275
+          },
+          "oob_seed": 4110021591
+        }
+      },
+      "shift_oob_seed": 3345473411
+    },
+    "51": {
+      "batch": "s80_independent_stability3",
+      "source_rep": 11,
+      "cases": {
+        "low": {
+          "training": {
+            "master_train": {
+              "seed": 2137280990,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 1004928158,
+              "n": 500
+            },
+            "test": {
+              "seed": 3569101631,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 1431396347,
+            "test": 1471688399
+          },
+          "oob_seed": 3970793871
+        },
+        "moderate": {
+          "training": {
+            "master_train": {
+              "seed": 156056062,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 3315398906,
+              "n": 500
+            },
+            "test": {
+              "seed": 1180572282,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 1032094201,
+            "test": 3287199306
+          },
+          "oob_seed": 259039153
+        },
+        "high": {
+          "training": {
+            "master_train": {
+              "seed": 4257413884,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 2835410318,
+              "n": 500
+            },
+            "test": {
+              "seed": 1346251059,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 643940244,
+            "test": 3616385783
+          },
+          "oob_seed": 2066692227
+        }
+      },
+      "shift_oob_seed": 2134778523
+    },
+    "52": {
+      "batch": "s80_independent_stability3",
+      "source_rep": 12,
+      "cases": {
+        "low": {
+          "training": {
+            "master_train": {
+              "seed": 3911631836,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 3635813420,
+              "n": 500
+            },
+            "test": {
+              "seed": 3810126318,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 543741827,
+            "test": 1274459768
+          },
+          "oob_seed": 275270640
+        },
+        "moderate": {
+          "training": {
+            "master_train": {
+              "seed": 2155359660,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 3763508693,
+              "n": 500
+            },
+            "test": {
+              "seed": 4169289947,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 462167262,
+            "test": 1804541965
+          },
+          "oob_seed": 4216928828
+        },
+        "high": {
+          "training": {
+            "master_train": {
+              "seed": 4007235824,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 232630736,
+              "n": 500
+            },
+            "test": {
+              "seed": 2045344272,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 2760983915,
+            "test": 3350084702
+          },
+          "oob_seed": 1030796690
+        }
+      },
+      "shift_oob_seed": 3632067170
+    },
+    "53": {
+      "batch": "s80_independent_stability3",
+      "source_rep": 13,
+      "cases": {
+        "low": {
+          "training": {
+            "master_train": {
+              "seed": 4175554467,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 2242641939,
+              "n": 500
+            },
+            "test": {
+              "seed": 2409098538,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 193670175,
+            "test": 1512418408
+          },
+          "oob_seed": 3343567491
+        },
+        "moderate": {
+          "training": {
+            "master_train": {
+              "seed": 867667147,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 862528234,
+              "n": 500
+            },
+            "test": {
+              "seed": 546619100,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 2492011693,
+            "test": 65996543
+          },
+          "oob_seed": 1284432634
+        },
+        "high": {
+          "training": {
+            "master_train": {
+              "seed": 682850049,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 3419178634,
+              "n": 500
+            },
+            "test": {
+              "seed": 4013598297,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 1892607070,
+            "test": 3246723183
+          },
+          "oob_seed": 3969644710
+        }
+      },
+      "shift_oob_seed": 3671642846
+    },
+    "54": {
+      "batch": "s80_independent_stability3",
+      "source_rep": 14,
+      "cases": {
+        "low": {
+          "training": {
+            "master_train": {
+              "seed": 1714037918,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 1067076044,
+              "n": 500
+            },
+            "test": {
+              "seed": 1279676333,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 3841112449,
+            "test": 4001927869
+          },
+          "oob_seed": 1890693091
+        },
+        "moderate": {
+          "training": {
+            "master_train": {
+              "seed": 2847152366,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 1575177506,
+              "n": 500
+            },
+            "test": {
+              "seed": 3225292173,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 3720225145,
+            "test": 1578822789
+          },
+          "oob_seed": 1101938653
+        },
+        "high": {
+          "training": {
+            "master_train": {
+              "seed": 2217720843,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 158348672,
+              "n": 500
+            },
+            "test": {
+              "seed": 3068442204,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 2887534703,
+            "test": 1102376465
+          },
+          "oob_seed": 2513256352
+        }
+      },
+      "shift_oob_seed": 4093420328
+    },
+    "55": {
+      "batch": "s80_independent_stability3",
+      "source_rep": 15,
+      "cases": {
+        "low": {
+          "training": {
+            "master_train": {
+              "seed": 1608502696,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 2990288169,
+              "n": 500
+            },
+            "test": {
+              "seed": 502060945,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 1257857847,
+            "test": 1227724914
+          },
+          "oob_seed": 3936487240
+        },
+        "moderate": {
+          "training": {
+            "master_train": {
+              "seed": 1081014226,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 2031866062,
+              "n": 500
+            },
+            "test": {
+              "seed": 2313437302,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 2769691807,
+            "test": 4002300028
+          },
+          "oob_seed": 3908536512
+        },
+        "high": {
+          "training": {
+            "master_train": {
+              "seed": 2866310682,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 680596384,
+              "n": 500
+            },
+            "test": {
+              "seed": 2528759774,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 2127253224,
+            "test": 554039976
+          },
+          "oob_seed": 774643765
+        }
+      },
+      "shift_oob_seed": 3288852094
+    },
+    "56": {
+      "batch": "s80_independent_stability3",
+      "source_rep": 16,
+      "cases": {
+        "low": {
+          "training": {
+            "master_train": {
+              "seed": 438292291,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 3247465720,
+              "n": 500
+            },
+            "test": {
+              "seed": 2480853027,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 3813118393,
+            "test": 3016183543
+          },
+          "oob_seed": 970097708
+        },
+        "moderate": {
+          "training": {
+            "master_train": {
+              "seed": 4003990223,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 21265467,
+              "n": 500
+            },
+            "test": {
+              "seed": 1814434075,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 122612063,
+            "test": 757374996
+          },
+          "oob_seed": 678088166
+        },
+        "high": {
+          "training": {
+            "master_train": {
+              "seed": 3746903400,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 2344310784,
+              "n": 500
+            },
+            "test": {
+              "seed": 1380299654,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 97994421,
+            "test": 3629595836
+          },
+          "oob_seed": 1525402716
+        }
+      },
+      "shift_oob_seed": 2050430246
+    },
+    "57": {
+      "batch": "s80_independent_stability3",
+      "source_rep": 17,
+      "cases": {
+        "low": {
+          "training": {
+            "master_train": {
+              "seed": 361333593,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 4069017870,
+              "n": 500
+            },
+            "test": {
+              "seed": 2519658303,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 781453317,
+            "test": 225410250
+          },
+          "oob_seed": 2112247557
+        },
+        "moderate": {
+          "training": {
+            "master_train": {
+              "seed": 3689509181,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 2350040960,
+              "n": 500
+            },
+            "test": {
+              "seed": 2112911245,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 3041461475,
+            "test": 2700620790
+          },
+          "oob_seed": 4157210399
+        },
+        "high": {
+          "training": {
+            "master_train": {
+              "seed": 1499840774,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 2158160009,
+              "n": 500
+            },
+            "test": {
+              "seed": 2757274180,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 3250315851,
+            "test": 1096492747
+          },
+          "oob_seed": 3121019173
+        }
+      },
+      "shift_oob_seed": 862625458
+    },
+    "58": {
+      "batch": "s80_independent_stability3",
+      "source_rep": 18,
+      "cases": {
+        "low": {
+          "training": {
+            "master_train": {
+              "seed": 4244775666,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 1966670739,
+              "n": 500
+            },
+            "test": {
+              "seed": 2735929202,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 696808577,
+            "test": 2693477214
+          },
+          "oob_seed": 2257653224
+        },
+        "moderate": {
+          "training": {
+            "master_train": {
+              "seed": 2825201006,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 1819931273,
+              "n": 500
+            },
+            "test": {
+              "seed": 1930143874,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 57157128,
+            "test": 4154054295
+          },
+          "oob_seed": 1692426283
+        },
+        "high": {
+          "training": {
+            "master_train": {
+              "seed": 616573188,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 613403682,
+              "n": 500
+            },
+            "test": {
+              "seed": 4060920354,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 1156783822,
+            "test": 3225191293
+          },
+          "oob_seed": 2270976527
+        }
+      },
+      "shift_oob_seed": 871021416
+    },
+    "59": {
+      "batch": "s80_independent_stability3",
+      "source_rep": 19,
+      "cases": {
+        "low": {
+          "training": {
+            "master_train": {
+              "seed": 2153077061,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 3137268136,
+              "n": 500
+            },
+            "test": {
+              "seed": 3014326684,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 387174900,
+            "test": 2437097806
+          },
+          "oob_seed": 3166964909
+        },
+        "moderate": {
+          "training": {
+            "master_train": {
+              "seed": 2560195835,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 3665060881,
+              "n": 500
+            },
+            "test": {
+              "seed": 2127112642,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 3961323998,
+            "test": 1665051111
+          },
+          "oob_seed": 1221188749
+        },
+        "high": {
+          "training": {
+            "master_train": {
+              "seed": 2815339121,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 1936200237,
+              "n": 500
+            },
+            "test": {
+              "seed": 2202838965,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 1978909351,
+            "test": 8964910
+          },
+          "oob_seed": 711406442
+        }
+      },
+      "shift_oob_seed": 747302005
+    },
+    "60": {
+      "batch": "s96_add40_width128",
+      "source_rep": 0,
+      "cases": {
+        "low": {
+          "training": {
+            "master_train": {
+              "seed": 3356395107,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 3979473578,
+              "n": 500
+            },
+            "test": {
+              "seed": 3000372885,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 4173875161,
+            "test": 996703582
+          },
+          "oob_seed": 2461900901
+        },
+        "moderate": {
+          "training": {
+            "master_train": {
+              "seed": 3034604956,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 3996420306,
+              "n": 500
+            },
+            "test": {
+              "seed": 163175377,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 4053516504,
+            "test": 2774244666
+          },
+          "oob_seed": 2481157506
+        },
+        "high": {
+          "training": {
+            "master_train": {
+              "seed": 4052087725,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 3089230018,
+              "n": 500
+            },
+            "test": {
+              "seed": 1983155132,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 3536884397,
+            "test": 2639815588
+          },
+          "oob_seed": 276341088
+        }
+      },
+      "shift_oob_seed": 2114056294
+    },
+    "61": {
+      "batch": "s96_add40_width128",
+      "source_rep": 1,
+      "cases": {
+        "low": {
+          "training": {
+            "master_train": {
+              "seed": 1302296056,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 3763943498,
+              "n": 500
+            },
+            "test": {
+              "seed": 3500817337,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 610981435,
+            "test": 1533585615
+          },
+          "oob_seed": 2040203883
+        },
+        "moderate": {
+          "training": {
+            "master_train": {
+              "seed": 926849194,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 1581737371,
+              "n": 500
+            },
+            "test": {
+              "seed": 1832805241,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 318104400,
+            "test": 2566892573
+          },
+          "oob_seed": 4001526148
+        },
+        "high": {
+          "training": {
+            "master_train": {
+              "seed": 2738268581,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 3931257597,
+              "n": 500
+            },
+            "test": {
+              "seed": 1923773576,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 2178748858,
+            "test": 4195889170
+          },
+          "oob_seed": 2433643120
+        }
+      },
+      "shift_oob_seed": 2565573581
+    },
+    "62": {
+      "batch": "s96_add40_width128",
+      "source_rep": 2,
+      "cases": {
+        "low": {
+          "training": {
+            "master_train": {
+              "seed": 542897800,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 378806672,
+              "n": 500
+            },
+            "test": {
+              "seed": 922809361,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 3505865660,
+            "test": 382272638
+          },
+          "oob_seed": 2059766274
+        },
+        "moderate": {
+          "training": {
+            "master_train": {
+              "seed": 2056033282,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 3095582660,
+              "n": 500
+            },
+            "test": {
+              "seed": 318139282,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 2981892824,
+            "test": 609943915
+          },
+          "oob_seed": 2389806531
+        },
+        "high": {
+          "training": {
+            "master_train": {
+              "seed": 980940646,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 495204419,
+              "n": 500
+            },
+            "test": {
+              "seed": 2453609819,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 2941056474,
+            "test": 316118011
+          },
+          "oob_seed": 2643861424
+        }
+      },
+      "shift_oob_seed": 1201884658
+    },
+    "63": {
+      "batch": "s96_add40_width128",
+      "source_rep": 3,
+      "cases": {
+        "low": {
+          "training": {
+            "master_train": {
+              "seed": 2647696820,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 2944299718,
+              "n": 500
+            },
+            "test": {
+              "seed": 3748056744,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 356681485,
+            "test": 3772230190
+          },
+          "oob_seed": 3826865224
+        },
+        "moderate": {
+          "training": {
+            "master_train": {
+              "seed": 1700477625,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 1012273337,
+              "n": 500
+            },
+            "test": {
+              "seed": 4112072482,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 12300455,
+            "test": 404145442
+          },
+          "oob_seed": 4091822768
+        },
+        "high": {
+          "training": {
+            "master_train": {
+              "seed": 3714979187,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 4051966304,
+              "n": 500
+            },
+            "test": {
+              "seed": 3665897186,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 2426247298,
+            "test": 2838815971
+          },
+          "oob_seed": 2744112542
+        }
+      },
+      "shift_oob_seed": 2485979472
+    },
+    "64": {
+      "batch": "s96_add40_width128",
+      "source_rep": 4,
+      "cases": {
+        "low": {
+          "training": {
+            "master_train": {
+              "seed": 1422282448,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 1189101930,
+              "n": 500
+            },
+            "test": {
+              "seed": 541092512,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 1056166222,
+            "test": 1982549820
+          },
+          "oob_seed": 424438694
+        },
+        "moderate": {
+          "training": {
+            "master_train": {
+              "seed": 2146738065,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 2192830062,
+              "n": 500
+            },
+            "test": {
+              "seed": 2852380808,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 3413427514,
+            "test": 1329961014
+          },
+          "oob_seed": 331787029
+        },
+        "high": {
+          "training": {
+            "master_train": {
+              "seed": 32588764,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 2235251452,
+              "n": 500
+            },
+            "test": {
+              "seed": 2333912612,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 38296656,
+            "test": 2965037433
+          },
+          "oob_seed": 2505798008
+        }
+      },
+      "shift_oob_seed": 1641391709
+    },
+    "65": {
+      "batch": "s96_add40_width128",
+      "source_rep": 5,
+      "cases": {
+        "low": {
+          "training": {
+            "master_train": {
+              "seed": 363541811,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 1607905149,
+              "n": 500
+            },
+            "test": {
+              "seed": 324949517,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 3557690876,
+            "test": 1552799323
+          },
+          "oob_seed": 2947529747
+        },
+        "moderate": {
+          "training": {
+            "master_train": {
+              "seed": 1936123192,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 903767788,
+              "n": 500
+            },
+            "test": {
+              "seed": 1313838507,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 471922761,
+            "test": 3625193689
+          },
+          "oob_seed": 4026823504
+        },
+        "high": {
+          "training": {
+            "master_train": {
+              "seed": 2302729331,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 3981142373,
+              "n": 500
+            },
+            "test": {
+              "seed": 809924112,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 239286953,
+            "test": 2035089705
+          },
+          "oob_seed": 3163612871
+        }
+      },
+      "shift_oob_seed": 1085109509
+    },
+    "66": {
+      "batch": "s96_add40_width128",
+      "source_rep": 6,
+      "cases": {
+        "low": {
+          "training": {
+            "master_train": {
+              "seed": 3007394194,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 2686833413,
+              "n": 500
+            },
+            "test": {
+              "seed": 2596578776,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 1197769376,
+            "test": 4219302795
+          },
+          "oob_seed": 1184872135
+        },
+        "moderate": {
+          "training": {
+            "master_train": {
+              "seed": 1561323779,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 369249751,
+              "n": 500
+            },
+            "test": {
+              "seed": 519521349,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 328728295,
+            "test": 310353901
+          },
+          "oob_seed": 3866619090
+        },
+        "high": {
+          "training": {
+            "master_train": {
+              "seed": 3777765159,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 2109166628,
+              "n": 500
+            },
+            "test": {
+              "seed": 684003440,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 1464763284,
+            "test": 1386039583
+          },
+          "oob_seed": 2584104562
+        }
+      },
+      "shift_oob_seed": 1454035946
+    },
+    "67": {
+      "batch": "s96_add40_width128",
+      "source_rep": 7,
+      "cases": {
+        "low": {
+          "training": {
+            "master_train": {
+              "seed": 3559063972,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 2561027692,
+              "n": 500
+            },
+            "test": {
+              "seed": 2241287221,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 2254720170,
+            "test": 1192226481
+          },
+          "oob_seed": 1468828798
+        },
+        "moderate": {
+          "training": {
+            "master_train": {
+              "seed": 3552449247,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 2244851165,
+              "n": 500
+            },
+            "test": {
+              "seed": 2508757444,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 2145820660,
+            "test": 1344306283
+          },
+          "oob_seed": 850856887
+        },
+        "high": {
+          "training": {
+            "master_train": {
+              "seed": 382833699,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 714685482,
+              "n": 500
+            },
+            "test": {
+              "seed": 3949215445,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 2994965376,
+            "test": 1654811622
+          },
+          "oob_seed": 2939936236
+        }
+      },
+      "shift_oob_seed": 2520234806
+    },
+    "68": {
+      "batch": "s96_add40_width128",
+      "source_rep": 8,
+      "cases": {
+        "low": {
+          "training": {
+            "master_train": {
+              "seed": 2473007132,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 892816234,
+              "n": 500
+            },
+            "test": {
+              "seed": 3950680351,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 4198621845,
+            "test": 3067996001
+          },
+          "oob_seed": 58849729
+        },
+        "moderate": {
+          "training": {
+            "master_train": {
+              "seed": 358670634,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 424759187,
+              "n": 500
+            },
+            "test": {
+              "seed": 4203445662,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 1572096444,
+            "test": 139034702
+          },
+          "oob_seed": 1602115879
+        },
+        "high": {
+          "training": {
+            "master_train": {
+              "seed": 3205201769,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 2807458774,
+              "n": 500
+            },
+            "test": {
+              "seed": 506028282,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 2112990407,
+            "test": 3865323140
+          },
+          "oob_seed": 2904061919
+        }
+      },
+      "shift_oob_seed": 1675538294
+    },
+    "69": {
+      "batch": "s96_add40_width128",
+      "source_rep": 9,
+      "cases": {
+        "low": {
+          "training": {
+            "master_train": {
+              "seed": 4163413476,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 3712247304,
+              "n": 500
+            },
+            "test": {
+              "seed": 947958922,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 1755185067,
+            "test": 2746205424
+          },
+          "oob_seed": 2637887141
+        },
+        "moderate": {
+          "training": {
+            "master_train": {
+              "seed": 1331070964,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 3081823030,
+              "n": 500
+            },
+            "test": {
+              "seed": 1447707595,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 3542956095,
+            "test": 3432969749
+          },
+          "oob_seed": 1153328709
+        },
+        "high": {
+          "training": {
+            "master_train": {
+              "seed": 3723497421,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 210536245,
+              "n": 500
+            },
+            "test": {
+              "seed": 127633002,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 3701191917,
+            "test": 3003050857
+          },
+          "oob_seed": 346846254
+        }
+      },
+      "shift_oob_seed": 949593063
+    },
+    "70": {
+      "batch": "s96_add40_width128",
+      "source_rep": 10,
+      "cases": {
+        "low": {
+          "training": {
+            "master_train": {
+              "seed": 2901154861,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 794648267,
+              "n": 500
+            },
+            "test": {
+              "seed": 1837545543,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 2939980353,
+            "test": 3435170438
+          },
+          "oob_seed": 4221678260
+        },
+        "moderate": {
+          "training": {
+            "master_train": {
+              "seed": 1411151784,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 1965626849,
+              "n": 500
+            },
+            "test": {
+              "seed": 339315898,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 3086495415,
+            "test": 2887528258
+          },
+          "oob_seed": 2752186436
+        },
+        "high": {
+          "training": {
+            "master_train": {
+              "seed": 3177008787,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 4201136385,
+              "n": 500
+            },
+            "test": {
+              "seed": 859813861,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 3599188758,
+            "test": 2551693673
+          },
+          "oob_seed": 3509685394
+        }
+      },
+      "shift_oob_seed": 1785888240
+    },
+    "71": {
+      "batch": "s96_add40_width128",
+      "source_rep": 11,
+      "cases": {
+        "low": {
+          "training": {
+            "master_train": {
+              "seed": 326731557,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 1602921917,
+              "n": 500
+            },
+            "test": {
+              "seed": 372155520,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 828698567,
+            "test": 322638857
+          },
+          "oob_seed": 3436193741
+        },
+        "moderate": {
+          "training": {
+            "master_train": {
+              "seed": 2718657276,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 3959680521,
+              "n": 500
+            },
+            "test": {
+              "seed": 799264363,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 1615810998,
+            "test": 1836985063
+          },
+          "oob_seed": 3733054110
+        },
+        "high": {
+          "training": {
+            "master_train": {
+              "seed": 718659700,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 284448385,
+              "n": 500
+            },
+            "test": {
+              "seed": 3811038219,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 3600408575,
+            "test": 3703814328
+          },
+          "oob_seed": 1662399825
+        }
+      },
+      "shift_oob_seed": 1020558327
+    },
+    "72": {
+      "batch": "s96_add40_width128",
+      "source_rep": 12,
+      "cases": {
+        "low": {
+          "training": {
+            "master_train": {
+              "seed": 2213806509,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 1518444215,
+              "n": 500
+            },
+            "test": {
+              "seed": 1296509955,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 212789176,
+            "test": 551747982
+          },
+          "oob_seed": 96153474
+        },
+        "moderate": {
+          "training": {
+            "master_train": {
+              "seed": 3392919332,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 3009456805,
+              "n": 500
+            },
+            "test": {
+              "seed": 3440044901,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 4072312081,
+            "test": 2009404413
+          },
+          "oob_seed": 2752077156
+        },
+        "high": {
+          "training": {
+            "master_train": {
+              "seed": 3088176916,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 3497204002,
+              "n": 500
+            },
+            "test": {
+              "seed": 3163471218,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 81603397,
+            "test": 2017595500
+          },
+          "oob_seed": 843135007
+        }
+      },
+      "shift_oob_seed": 866136510
+    },
+    "73": {
+      "batch": "s96_add40_width128",
+      "source_rep": 13,
+      "cases": {
+        "low": {
+          "training": {
+            "master_train": {
+              "seed": 2169457599,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 2338355247,
+              "n": 500
+            },
+            "test": {
+              "seed": 2814388063,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 2743892140,
+            "test": 3832879362
+          },
+          "oob_seed": 3266880806
+        },
+        "moderate": {
+          "training": {
+            "master_train": {
+              "seed": 709775068,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 3036384334,
+              "n": 500
+            },
+            "test": {
+              "seed": 872260833,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 2311183118,
+            "test": 3881498730
+          },
+          "oob_seed": 747791781
+        },
+        "high": {
+          "training": {
+            "master_train": {
+              "seed": 858317849,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 4120437058,
+              "n": 500
+            },
+            "test": {
+              "seed": 675160115,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 3782388494,
+            "test": 2250746558
+          },
+          "oob_seed": 3661746567
+        }
+      },
+      "shift_oob_seed": 3322781820
+    },
+    "74": {
+      "batch": "s96_add40_width128",
+      "source_rep": 14,
+      "cases": {
+        "low": {
+          "training": {
+            "master_train": {
+              "seed": 3664138046,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 3438218822,
+              "n": 500
+            },
+            "test": {
+              "seed": 1617758913,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 1630006028,
+            "test": 928610527
+          },
+          "oob_seed": 4109104824
+        },
+        "moderate": {
+          "training": {
+            "master_train": {
+              "seed": 440225045,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 494922942,
+              "n": 500
+            },
+            "test": {
+              "seed": 779450367,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 3442225643,
+            "test": 2927387885
+          },
+          "oob_seed": 3830543961
+        },
+        "high": {
+          "training": {
+            "master_train": {
+              "seed": 1162574885,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 351023183,
+              "n": 500
+            },
+            "test": {
+              "seed": 3289104316,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 848863608,
+            "test": 2463809151
+          },
+          "oob_seed": 3957648967
+        }
+      },
+      "shift_oob_seed": 158940461
+    },
+    "75": {
+      "batch": "s96_add40_width128",
+      "source_rep": 15,
+      "cases": {
+        "low": {
+          "training": {
+            "master_train": {
+              "seed": 3375666187,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 3781179939,
+              "n": 500
+            },
+            "test": {
+              "seed": 1707664513,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 894771736,
+            "test": 2304042568
+          },
+          "oob_seed": 2006353706
+        },
+        "moderate": {
+          "training": {
+            "master_train": {
+              "seed": 3815629695,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 1714326535,
+              "n": 500
+            },
+            "test": {
+              "seed": 310148395,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 1061379689,
+            "test": 4146637795
+          },
+          "oob_seed": 1911286712
+        },
+        "high": {
+          "training": {
+            "master_train": {
+              "seed": 3601021465,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 2674778360,
+              "n": 500
+            },
+            "test": {
+              "seed": 382667590,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 3921744028,
+            "test": 1625841667
+          },
+          "oob_seed": 2904136049
+        }
+      },
+      "shift_oob_seed": 116472658
+    },
+    "76": {
+      "batch": "s96_add40_width128",
+      "source_rep": 16,
+      "cases": {
+        "low": {
+          "training": {
+            "master_train": {
+              "seed": 982038121,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 2742700380,
+              "n": 500
+            },
+            "test": {
+              "seed": 3817771362,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 2554524692,
+            "test": 3792424527
+          },
+          "oob_seed": 3645366576
+        },
+        "moderate": {
+          "training": {
+            "master_train": {
+              "seed": 3937015762,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 4191273997,
+              "n": 500
+            },
+            "test": {
+              "seed": 1258234967,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 4291982412,
+            "test": 792272958
+          },
+          "oob_seed": 957300673
+        },
+        "high": {
+          "training": {
+            "master_train": {
+              "seed": 3597165622,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 3958099013,
+              "n": 500
+            },
+            "test": {
+              "seed": 3578648135,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 1059461096,
+            "test": 1944559939
+          },
+          "oob_seed": 1704112668
+        }
+      },
+      "shift_oob_seed": 3456651028
+    },
+    "77": {
+      "batch": "s96_add40_width128",
+      "source_rep": 17,
+      "cases": {
+        "low": {
+          "training": {
+            "master_train": {
+              "seed": 671997592,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 4003368016,
+              "n": 500
+            },
+            "test": {
+              "seed": 2903694277,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 2225512315,
+            "test": 3238926239
+          },
+          "oob_seed": 4165793245
+        },
+        "moderate": {
+          "training": {
+            "master_train": {
+              "seed": 316518428,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 3189095370,
+              "n": 500
+            },
+            "test": {
+              "seed": 3655427166,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 164799803,
+            "test": 3403558260
+          },
+          "oob_seed": 2893445153
+        },
+        "high": {
+          "training": {
+            "master_train": {
+              "seed": 2130808778,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 3219355386,
+              "n": 500
+            },
+            "test": {
+              "seed": 1907914131,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 3225611525,
+            "test": 2492753408
+          },
+          "oob_seed": 1719060239
+        }
+      },
+      "shift_oob_seed": 1882536207
+    },
+    "78": {
+      "batch": "s96_add40_width128",
+      "source_rep": 18,
+      "cases": {
+        "low": {
+          "training": {
+            "master_train": {
+              "seed": 91428252,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 328769706,
+              "n": 500
+            },
+            "test": {
+              "seed": 1812719319,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 1471916915,
+            "test": 3360243654
+          },
+          "oob_seed": 3307738257
+        },
+        "moderate": {
+          "training": {
+            "master_train": {
+              "seed": 2098069191,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 3123743761,
+              "n": 500
+            },
+            "test": {
+              "seed": 148959325,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 3222254361,
+            "test": 915162944
+          },
+          "oob_seed": 4065071462
+        },
+        "high": {
+          "training": {
+            "master_train": {
+              "seed": 341378649,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 2565711318,
+              "n": 500
+            },
+            "test": {
+              "seed": 249680957,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 1036355841,
+            "test": 830200109
+          },
+          "oob_seed": 1079149921
+        }
+      },
+      "shift_oob_seed": 4023044039
+    },
+    "79": {
+      "batch": "s96_add40_width128",
+      "source_rep": 19,
+      "cases": {
+        "low": {
+          "training": {
+            "master_train": {
+              "seed": 1035702476,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 1998396183,
+              "n": 500
+            },
+            "test": {
+              "seed": 741296005,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 3196261328,
+            "test": 1798017448
+          },
+          "oob_seed": 785501459
+        },
+        "moderate": {
+          "training": {
+            "master_train": {
+              "seed": 2244208719,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 2189170933,
+              "n": 500
+            },
+            "test": {
+              "seed": 4014008351,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 906518966,
+            "test": 2820178743
+          },
+          "oob_seed": 1150578917
+        },
+        "high": {
+          "training": {
+            "master_train": {
+              "seed": 3717105266,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 1576082124,
+              "n": 500
+            },
+            "test": {
+              "seed": 497522624,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 3011708183,
+            "test": 4263310364
+          },
+          "oob_seed": 1997075282
+        }
+      },
+      "shift_oob_seed": 1442580323
+    },
+    "80": {
+      "batch": "s96_add40_width128",
+      "source_rep": 20,
+      "cases": {
+        "low": {
+          "training": {
+            "master_train": {
+              "seed": 2830614928,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 64672758,
+              "n": 500
+            },
+            "test": {
+              "seed": 2011557937,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 1177313813,
+            "test": 2261413623
+          },
+          "oob_seed": 1903534983
+        },
+        "moderate": {
+          "training": {
+            "master_train": {
+              "seed": 4230998295,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 1597518960,
+              "n": 500
+            },
+            "test": {
+              "seed": 3792504224,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 2383614523,
+            "test": 3334702309
+          },
+          "oob_seed": 4038563016
+        },
+        "high": {
+          "training": {
+            "master_train": {
+              "seed": 3944141534,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 3726743259,
+              "n": 500
+            },
+            "test": {
+              "seed": 3483863686,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 929698147,
+            "test": 2881560904
+          },
+          "oob_seed": 31586921
+        }
+      },
+      "shift_oob_seed": 2360586995
+    },
+    "81": {
+      "batch": "s96_add40_width128",
+      "source_rep": 21,
+      "cases": {
+        "low": {
+          "training": {
+            "master_train": {
+              "seed": 992575420,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 2855705057,
+              "n": 500
+            },
+            "test": {
+              "seed": 244283125,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 1747729619,
+            "test": 2727680341
+          },
+          "oob_seed": 2280991325
+        },
+        "moderate": {
+          "training": {
+            "master_train": {
+              "seed": 3249672794,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 1843450208,
+              "n": 500
+            },
+            "test": {
+              "seed": 104781434,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 3639456356,
+            "test": 1879687587
+          },
+          "oob_seed": 2468598220
+        },
+        "high": {
+          "training": {
+            "master_train": {
+              "seed": 479302912,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 3327874102,
+              "n": 500
+            },
+            "test": {
+              "seed": 3268831417,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 759594699,
+            "test": 1503723878
+          },
+          "oob_seed": 2048039437
+        }
+      },
+      "shift_oob_seed": 1824657312
+    },
+    "82": {
+      "batch": "s96_add40_width128",
+      "source_rep": 22,
+      "cases": {
+        "low": {
+          "training": {
+            "master_train": {
+              "seed": 1333588450,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 3458617782,
+              "n": 500
+            },
+            "test": {
+              "seed": 3169536117,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 406020431,
+            "test": 997227161
+          },
+          "oob_seed": 1380405042
+        },
+        "moderate": {
+          "training": {
+            "master_train": {
+              "seed": 2461197804,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 2429568297,
+              "n": 500
+            },
+            "test": {
+              "seed": 868575893,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 3641786098,
+            "test": 2526324131
+          },
+          "oob_seed": 2560434741
+        },
+        "high": {
+          "training": {
+            "master_train": {
+              "seed": 1356518416,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 3627139494,
+              "n": 500
+            },
+            "test": {
+              "seed": 2764543962,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 1911770588,
+            "test": 2649974839
+          },
+          "oob_seed": 3468179285
+        }
+      },
+      "shift_oob_seed": 2243351235
+    },
+    "83": {
+      "batch": "s96_add40_width128",
+      "source_rep": 23,
+      "cases": {
+        "low": {
+          "training": {
+            "master_train": {
+              "seed": 400564676,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 1171503468,
+              "n": 500
+            },
+            "test": {
+              "seed": 2779847725,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 1265378419,
+            "test": 801935185
+          },
+          "oob_seed": 1035416958
+        },
+        "moderate": {
+          "training": {
+            "master_train": {
+              "seed": 4258328185,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 2314453604,
+              "n": 500
+            },
+            "test": {
+              "seed": 3041116106,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 1363896242,
+            "test": 1400581982
+          },
+          "oob_seed": 791967076
+        },
+        "high": {
+          "training": {
+            "master_train": {
+              "seed": 426662772,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 332950770,
+              "n": 500
+            },
+            "test": {
+              "seed": 2298750637,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 325077511,
+            "test": 1309748721
+          },
+          "oob_seed": 683709886
+        }
+      },
+      "shift_oob_seed": 3251912793
+    },
+    "84": {
+      "batch": "s96_add40_width128",
+      "source_rep": 24,
+      "cases": {
+        "low": {
+          "training": {
+            "master_train": {
+              "seed": 3411469940,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 945816824,
+              "n": 500
+            },
+            "test": {
+              "seed": 2097749849,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 1428840083,
+            "test": 3434928465
+          },
+          "oob_seed": 1290711735
+        },
+        "moderate": {
+          "training": {
+            "master_train": {
+              "seed": 2704833116,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 56195008,
+              "n": 500
+            },
+            "test": {
+              "seed": 1843024232,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 3036286689,
+            "test": 2112964007
+          },
+          "oob_seed": 1666348999
+        },
+        "high": {
+          "training": {
+            "master_train": {
+              "seed": 3163825224,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 1656568473,
+              "n": 500
+            },
+            "test": {
+              "seed": 2053031440,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 3180744325,
+            "test": 2515332082
+          },
+          "oob_seed": 1072645160
+        }
+      },
+      "shift_oob_seed": 917868553
+    },
+    "85": {
+      "batch": "s96_add40_width128",
+      "source_rep": 25,
+      "cases": {
+        "low": {
+          "training": {
+            "master_train": {
+              "seed": 2714612084,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 4051588288,
+              "n": 500
+            },
+            "test": {
+              "seed": 733186627,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 1152165664,
+            "test": 2546085631
+          },
+          "oob_seed": 2891376092
+        },
+        "moderate": {
+          "training": {
+            "master_train": {
+              "seed": 4223503057,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 711082175,
+              "n": 500
+            },
+            "test": {
+              "seed": 3799507898,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 14973087,
+            "test": 3697794002
+          },
+          "oob_seed": 4084191027
+        },
+        "high": {
+          "training": {
+            "master_train": {
+              "seed": 1041062386,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 2908874402,
+              "n": 500
+            },
+            "test": {
+              "seed": 376031544,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 2540393374,
+            "test": 137895839
+          },
+          "oob_seed": 524001598
+        }
+      },
+      "shift_oob_seed": 3301378626
+    },
+    "86": {
+      "batch": "s96_add40_width128",
+      "source_rep": 26,
+      "cases": {
+        "low": {
+          "training": {
+            "master_train": {
+              "seed": 3515500925,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 3430272305,
+              "n": 500
+            },
+            "test": {
+              "seed": 849038865,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 1856854388,
+            "test": 4136209177
+          },
+          "oob_seed": 3948395562
+        },
+        "moderate": {
+          "training": {
+            "master_train": {
+              "seed": 1168713981,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 4069537395,
+              "n": 500
+            },
+            "test": {
+              "seed": 1564185121,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 297327564,
+            "test": 748890345
+          },
+          "oob_seed": 3856331201
+        },
+        "high": {
+          "training": {
+            "master_train": {
+              "seed": 1513716812,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 3793698045,
+              "n": 500
+            },
+            "test": {
+              "seed": 3641202366,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 4073311075,
+            "test": 2782365834
+          },
+          "oob_seed": 2849963619
+        }
+      },
+      "shift_oob_seed": 1888811357
+    },
+    "87": {
+      "batch": "s96_add40_width128",
+      "source_rep": 27,
+      "cases": {
+        "low": {
+          "training": {
+            "master_train": {
+              "seed": 670904308,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 534675609,
+              "n": 500
+            },
+            "test": {
+              "seed": 1889946082,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 1115305419,
+            "test": 4106594982
+          },
+          "oob_seed": 2232022498
+        },
+        "moderate": {
+          "training": {
+            "master_train": {
+              "seed": 3582385335,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 714999559,
+              "n": 500
+            },
+            "test": {
+              "seed": 3137823857,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 3273378334,
+            "test": 1359198255
+          },
+          "oob_seed": 3858848066
+        },
+        "high": {
+          "training": {
+            "master_train": {
+              "seed": 1224481574,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 3778927163,
+              "n": 500
+            },
+            "test": {
+              "seed": 3187489358,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 1851082778,
+            "test": 3759495455
+          },
+          "oob_seed": 3856857498
+        }
+      },
+      "shift_oob_seed": 1490822453
+    },
+    "88": {
+      "batch": "s96_add40_width128",
+      "source_rep": 28,
+      "cases": {
+        "low": {
+          "training": {
+            "master_train": {
+              "seed": 3416654939,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 976141937,
+              "n": 500
+            },
+            "test": {
+              "seed": 1440834695,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 700095207,
+            "test": 2068933988
+          },
+          "oob_seed": 3879264922
+        },
+        "moderate": {
+          "training": {
+            "master_train": {
+              "seed": 3634605513,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 2071215323,
+              "n": 500
+            },
+            "test": {
+              "seed": 2623460015,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 3886779386,
+            "test": 2627039345
+          },
+          "oob_seed": 3815374239
+        },
+        "high": {
+          "training": {
+            "master_train": {
+              "seed": 2472664799,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 146651704,
+              "n": 500
+            },
+            "test": {
+              "seed": 2415591403,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 2094281851,
+            "test": 971534428
+          },
+          "oob_seed": 3628646033
+        }
+      },
+      "shift_oob_seed": 1245972320
+    },
+    "89": {
+      "batch": "s96_add40_width128",
+      "source_rep": 29,
+      "cases": {
+        "low": {
+          "training": {
+            "master_train": {
+              "seed": 1661837253,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 1389002676,
+              "n": 500
+            },
+            "test": {
+              "seed": 2086768456,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 276543344,
+            "test": 2561928311
+          },
+          "oob_seed": 2327921551
+        },
+        "moderate": {
+          "training": {
+            "master_train": {
+              "seed": 3760530612,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 2683340689,
+              "n": 500
+            },
+            "test": {
+              "seed": 1194915831,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 3823299499,
+            "test": 2389129025
+          },
+          "oob_seed": 315957303
+        },
+        "high": {
+          "training": {
+            "master_train": {
+              "seed": 2322084278,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 751006408,
+              "n": 500
+            },
+            "test": {
+              "seed": 2289757826,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 1582725365,
+            "test": 4219969328
+          },
+          "oob_seed": 4109956098
+        }
+      },
+      "shift_oob_seed": 3651851775
+    },
+    "90": {
+      "batch": "s96_add40_width128",
+      "source_rep": 30,
+      "cases": {
+        "low": {
+          "training": {
+            "master_train": {
+              "seed": 299864471,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 1323280535,
+              "n": 500
+            },
+            "test": {
+              "seed": 2988603546,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 4114210436,
+            "test": 2053946585
+          },
+          "oob_seed": 2324624415
+        },
+        "moderate": {
+          "training": {
+            "master_train": {
+              "seed": 4252614629,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 3094632647,
+              "n": 500
+            },
+            "test": {
+              "seed": 2228071395,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 2240162648,
+            "test": 3612872195
+          },
+          "oob_seed": 2874786458
+        },
+        "high": {
+          "training": {
+            "master_train": {
+              "seed": 2059963211,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 1860751642,
+              "n": 500
+            },
+            "test": {
+              "seed": 3970188008,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 2107996149,
+            "test": 2206987600
+          },
+          "oob_seed": 284035272
+        }
+      },
+      "shift_oob_seed": 3741411264
+    },
+    "91": {
+      "batch": "s96_add40_width128",
+      "source_rep": 31,
+      "cases": {
+        "low": {
+          "training": {
+            "master_train": {
+              "seed": 3393447182,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 1734288782,
+              "n": 500
+            },
+            "test": {
+              "seed": 2878780521,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 3776068700,
+            "test": 308032687
+          },
+          "oob_seed": 1524693766
+        },
+        "moderate": {
+          "training": {
+            "master_train": {
+              "seed": 221206361,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 2823218439,
+              "n": 500
+            },
+            "test": {
+              "seed": 649931676,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 1252569693,
+            "test": 2486047969
+          },
+          "oob_seed": 2340139985
+        },
+        "high": {
+          "training": {
+            "master_train": {
+              "seed": 1304609517,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 1068011972,
+              "n": 500
+            },
+            "test": {
+              "seed": 2260261269,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 1970417265,
+            "test": 95074336
+          },
+          "oob_seed": 4092856859
+        }
+      },
+      "shift_oob_seed": 204928981
+    },
+    "92": {
+      "batch": "s96_add40_width128",
+      "source_rep": 32,
+      "cases": {
+        "low": {
+          "training": {
+            "master_train": {
+              "seed": 3571702696,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 2608803521,
+              "n": 500
+            },
+            "test": {
+              "seed": 3564294205,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 2639849297,
+            "test": 48243338
+          },
+          "oob_seed": 1352635130
+        },
+        "moderate": {
+          "training": {
+            "master_train": {
+              "seed": 818181389,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 3896595992,
+              "n": 500
+            },
+            "test": {
+              "seed": 788690028,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 2921531145,
+            "test": 78018342
+          },
+          "oob_seed": 185579593
+        },
+        "high": {
+          "training": {
+            "master_train": {
+              "seed": 4276919695,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 764831282,
+              "n": 500
+            },
+            "test": {
+              "seed": 4198675846,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 2366407662,
+            "test": 1957485445
+          },
+          "oob_seed": 613085531
+        }
+      },
+      "shift_oob_seed": 3539558040
+    },
+    "93": {
+      "batch": "s96_add40_width128",
+      "source_rep": 33,
+      "cases": {
+        "low": {
+          "training": {
+            "master_train": {
+              "seed": 621005382,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 1909480707,
+              "n": 500
+            },
+            "test": {
+              "seed": 2054297401,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 959450842,
+            "test": 2327493382
+          },
+          "oob_seed": 2252937615
+        },
+        "moderate": {
+          "training": {
+            "master_train": {
+              "seed": 1542349911,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 2628445111,
+              "n": 500
+            },
+            "test": {
+              "seed": 88753672,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 3753256363,
+            "test": 547986952
+          },
+          "oob_seed": 1715689758
+        },
+        "high": {
+          "training": {
+            "master_train": {
+              "seed": 1593350681,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 2082546446,
+              "n": 500
+            },
+            "test": {
+              "seed": 4024067067,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 881051000,
+            "test": 452159563
+          },
+          "oob_seed": 3396701011
+        }
+      },
+      "shift_oob_seed": 3203890150
+    },
+    "94": {
+      "batch": "s96_add40_width128",
+      "source_rep": 34,
+      "cases": {
+        "low": {
+          "training": {
+            "master_train": {
+              "seed": 816795423,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 4123359093,
+              "n": 500
+            },
+            "test": {
+              "seed": 2299362390,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 2951937114,
+            "test": 1762174869
+          },
+          "oob_seed": 4114463425
+        },
+        "moderate": {
+          "training": {
+            "master_train": {
+              "seed": 3841272936,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 1322326339,
+              "n": 500
+            },
+            "test": {
+              "seed": 559326561,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 4146088501,
+            "test": 673274655
+          },
+          "oob_seed": 3103375024
+        },
+        "high": {
+          "training": {
+            "master_train": {
+              "seed": 1977494975,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 1135836100,
+              "n": 500
+            },
+            "test": {
+              "seed": 775835381,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 1690202014,
+            "test": 2148441305
+          },
+          "oob_seed": 2970195896
+        }
+      },
+      "shift_oob_seed": 2716831687
+    },
+    "95": {
+      "batch": "s96_add40_width128",
+      "source_rep": 35,
+      "cases": {
+        "low": {
+          "training": {
+            "master_train": {
+              "seed": 3003850271,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 888352937,
+              "n": 500
+            },
+            "test": {
+              "seed": 3118420431,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 4248328782,
+            "test": 2341526842
+          },
+          "oob_seed": 146512940
+        },
+        "moderate": {
+          "training": {
+            "master_train": {
+              "seed": 2865046143,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 2385837024,
+              "n": 500
+            },
+            "test": {
+              "seed": 2156357134,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 859862090,
+            "test": 3614316530
+          },
+          "oob_seed": 3382729912
+        },
+        "high": {
+          "training": {
+            "master_train": {
+              "seed": 4205129003,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 2248570062,
+              "n": 500
+            },
+            "test": {
+              "seed": 3337440839,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 20230523,
+            "test": 96522495
+          },
+          "oob_seed": 1001821752
+        }
+      },
+      "shift_oob_seed": 1299438901
+    },
+    "96": {
+      "batch": "s96_add40_width128",
+      "source_rep": 36,
+      "cases": {
+        "low": {
+          "training": {
+            "master_train": {
+              "seed": 1999165563,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 1688278845,
+              "n": 500
+            },
+            "test": {
+              "seed": 498141925,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 1429087705,
+            "test": 2881162372
+          },
+          "oob_seed": 1991665847
+        },
+        "moderate": {
+          "training": {
+            "master_train": {
+              "seed": 1580621390,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 2478193576,
+              "n": 500
+            },
+            "test": {
+              "seed": 2592590106,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 3956441977,
+            "test": 2538183957
+          },
+          "oob_seed": 3376157706
+        },
+        "high": {
+          "training": {
+            "master_train": {
+              "seed": 437083938,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 402596839,
+              "n": 500
+            },
+            "test": {
+              "seed": 3326858276,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 4273961789,
+            "test": 534711666
+          },
+          "oob_seed": 2806424113
+        }
+      },
+      "shift_oob_seed": 2756737826
+    },
+    "97": {
+      "batch": "s96_add40_width128",
+      "source_rep": 37,
+      "cases": {
+        "low": {
+          "training": {
+            "master_train": {
+              "seed": 3353242929,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 2848640268,
+              "n": 500
+            },
+            "test": {
+              "seed": 2966951556,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 2105066514,
+            "test": 1058917828
+          },
+          "oob_seed": 42630297
+        },
+        "moderate": {
+          "training": {
+            "master_train": {
+              "seed": 2989641378,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 3755699773,
+              "n": 500
+            },
+            "test": {
+              "seed": 2419559877,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 3927938071,
+            "test": 3437178058
+          },
+          "oob_seed": 4064105844
+        },
+        "high": {
+          "training": {
+            "master_train": {
+              "seed": 1257134317,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 2584105646,
+              "n": 500
+            },
+            "test": {
+              "seed": 762536993,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 612195652,
+            "test": 2036667711
+          },
+          "oob_seed": 2562849807
+        }
+      },
+      "shift_oob_seed": 2957602724
+    },
+    "98": {
+      "batch": "s96_add40_width128",
+      "source_rep": 38,
+      "cases": {
+        "low": {
+          "training": {
+            "master_train": {
+              "seed": 3752802969,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 882787005,
+              "n": 500
+            },
+            "test": {
+              "seed": 2825485376,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 1554354297,
+            "test": 2222172692
+          },
+          "oob_seed": 4198629000
+        },
+        "moderate": {
+          "training": {
+            "master_train": {
+              "seed": 1307882156,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 3142338688,
+              "n": 500
+            },
+            "test": {
+              "seed": 2755384061,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 2394927955,
+            "test": 2015258266
+          },
+          "oob_seed": 477648647
+        },
+        "high": {
+          "training": {
+            "master_train": {
+              "seed": 956467596,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 2399555980,
+              "n": 500
+            },
+            "test": {
+              "seed": 3046355874,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 3375635070,
+            "test": 1073534825
+          },
+          "oob_seed": 2610975803
+        }
+      },
+      "shift_oob_seed": 1729897133
+    },
+    "99": {
+      "batch": "s96_add40_width128",
+      "source_rep": 39,
+      "cases": {
+        "low": {
+          "training": {
+            "master_train": {
+              "seed": 564190862,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 1395201281,
+              "n": 500
+            },
+            "test": {
+              "seed": 2442962802,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 3839878457,
+            "test": 22318487
+          },
+          "oob_seed": 2814887730
+        },
+        "moderate": {
+          "training": {
+            "master_train": {
+              "seed": 1388031073,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 1118170855,
+              "n": 500
+            },
+            "test": {
+              "seed": 4244282218,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 677167590,
+            "test": 2423964915
+          },
+          "oob_seed": 2462199178
+        },
+        "high": {
+          "training": {
+            "master_train": {
+              "seed": 1171445132,
+              "n": 4500
+            },
+            "master_validation": {
+              "seed": 1636867403,
+              "n": 500
+            },
+            "test": {
+              "seed": 3767343333,
+              "n": 2500
+            }
+          },
+          "evaluation": {
+            "validation": 1052094972,
+            "test": 1823663460
+          },
+          "oob_seed": 2170998772
+        }
+      },
+      "shift_oob_seed": 2579205727
+    }
+  }
+}

@@ -1,16 +1,46 @@
-"""Policy models used by the simulation experiments."""
-
+"""Two-hidden-layer policies and the training propensity network."""
 import torch
 from torch import nn
 
+POLICY_INITIALIZATIONS = ("default", "kaiming_relu")
 
-class SievePolicy(nn.Module):
-    """A fixed-width ReLU network whose depth indexes policy complexity."""
+def initialize_sieve_layers(layers, depth, initialization):
+    """Initialize a plain ReLU sieve without using data or teacher parameters."""
+    if initialization == "default":
+        return
+    if initialization != "kaiming_relu":
+        raise ValueError(
+            f"Unknown policy initialization {initialization!r}; "
+            f"expected one of {POLICY_INITIALIZATIONS}"
+        )
+    for layer in layers[:depth]:
+        nn.init.kaiming_normal_(
+            layer.weight,
+            mode="fan_in",
+            nonlinearity="relu",
+        )
+        if layer.bias is not None:
+            nn.init.zeros_(layer.bias)
+    output_layer = layers[depth]
+    nn.init.xavier_normal_(output_layer.weight)
+    if output_layer.bias is not None:
+        nn.init.zeros_(output_layer.bias)
 
-    def __init__(self, input_dim, depth, num_actions, device):
+
+class CategoricalSievePolicy(nn.Module):
+    def __init__(
+        self,
+        input_dim,
+        depth,
+        num_actions,
+        device,
+        width=None,
+        initialization="default",
+    ):
         super().__init__()
         self.depth = depth
-        width = 2 * input_dim
+        width = input_dim + 1 if width is None else int(width)
+        self.width = width
         self.activations = nn.ModuleList(
             [nn.ReLU() for _ in range(depth)] + [nn.Identity()]
         )
@@ -23,6 +53,8 @@ class SievePolicy(nn.Module):
             else:
                 layers.append(nn.Linear(width, width, bias=True))
         self.layers = nn.ModuleList(layers)
+        self.initialization = initialization
+        initialize_sieve_layers(self.layers, depth, initialization)
         self.to(device)
 
     def forward(self, x):
@@ -31,21 +63,7 @@ class SievePolicy(nn.Module):
         return x
 
 
-class LinearPolicy(nn.Module):
-    """Linear policy used by the SNLS benchmark."""
-
-    def __init__(self, input_dim, num_actions, device):
-        super().__init__()
-        self.layer = nn.Linear(input_dim, num_actions, bias=False)
-        self.to(device)
-
-    def forward(self, x):
-        return self.layer(x)
-
-
-class PropensityModel(nn.Module):
-    """Propensity network retained to preserve the original RNG sequence."""
-
+class SimulationPropensityModel(nn.Module):
     def __init__(self, args, input_dim, num_actions, device):
         super().__init__()
         self.depth = args.Prob_depth
@@ -77,14 +95,16 @@ class PropensityModel(nn.Module):
         return self.activations[0](x)
 
 
-def build_policy(policy_data, depth, baseline, device):
-    if baseline == "None":
-        return SievePolicy(
-            policy_data["dim_X"], depth, policy_data["num_treat"], device
-        )
-    return LinearPolicy(policy_data["dim_X"], policy_data["num_treat"], device)
-
-
 def set_trainable(module, trainable):
     for parameter in module.parameters():
         parameter.requires_grad_(trainable)
+
+
+def build_policy(policy_data, depth, baseline, profile, device):
+    return CategoricalSievePolicy(policy_data["dim_X"], depth, policy_data["num_treat"],
+        device, width=policy_data["args"].policy_hidden_width,
+        initialization=policy_data["args"].policy_initialization)
+
+
+def build_propensity_model(args, policy_data, profile, device):
+    return SimulationPropensityModel(args, policy_data["dim_X"], policy_data["num_treat"], device)

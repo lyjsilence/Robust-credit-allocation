@@ -1,0 +1,376 @@
+{
+  "baseline_100": [
+    {
+      "case": "high",
+      "n": 100,
+      "median_width": 27.0,
+      "mean_q": 0.5720554316671169,
+      "sd_q": 0.018166696273286792,
+      "mean_regret": 0.007841810480378299,
+      "sd_regret": 0.009822967209328362
+    },
+    {
+      "case": "low",
+      "n": 100,
+      "median_width": 4.0,
+      "mean_q": 0.6308512200138019,
+      "sd_q": 0.0068636434544202774,
+      "mean_regret": 0.0033208841518092315,
+      "sd_regret": 0.0036854630703367156
+    },
+    {
+      "case": "moderate",
+      "n": 100,
+      "median_width": 8.0,
+      "mean_q": 0.6213948701473668,
+      "sd_q": 0.009240895062757878,
+      "mean_regret": 0.003922988391824059,
+      "sd_regret": 0.00554622800655415
+    }
+  ],
+  "shift_100": [
+    {
+      "mode": "Concept drift",
+      "severity": 0.0,
+      "n": 100,
+      "robust_mean": 0.8093857142863417,
+      "robust_se": 0.000568523567024896,
+      "nonrobust_mean": 0.8285225179444277,
+      "nonrobust_se": 0.000514330608173257,
+      "improvement_percent": -2.309750579328184
+    },
+    {
+      "mode": "Concept drift",
+      "severity": 2.0,
+      "n": 100,
+      "robust_mean": 0.7738915239795022,
+      "robust_se": 0.00041422981325356086,
+      "nonrobust_mean": 0.7759796010275923,
+      "nonrobust_se": 0.0004572049032338381,
+      "improvement_percent": -0.26908916746331313
+    },
+    {
+      "mode": "Concept drift",
+      "severity": 4.0,
+      "n": 100,
+      "robust_mean": 0.7318381718358552,
+      "robust_se": 0.0006096571006958317,
+      "nonrobust_mean": 0.7111181460799375,
+      "nonrobust_se": 0.0007249166753570691,
+      "improvement_percent": 2.913724796665291
+    },
+    {
+      "mode": "Concept drift",
+      "severity": 6.0,
+      "n": 100,
+      "robust_mean": 0.6805161510657249,
+      "robust_se": 0.0010344655301839515,
+      "nonrobust_mean": 0.6311367848068051,
+      "nonrobust_se": 0.0011632177397380775,
+      "improvement_percent": 7.823877081421428
+    },
+    {
+      "mode": "Concept drift",
+      "severity": 8.0,
+      "n": 100,
+      "robust_mean": 0.6209333445786932,
+      "robust_se": 0.0015778431250873487,
+      "nonrobust_mean": 0.5364690874531014,
+      "nonrobust_se": 0.0017716686452745518,
+      "improvement_percent": 15.744477939369766
+    },
+    {
+      "mode": "Concept drift",
+      "severity": 10.0,
+      "n": 100,
+      "robust_mean": 0.5539925397850997,
+      "robust_se": 0.0022668302040679844,
+      "nonrobust_mean": 0.4298901972278562,
+      "nonrobust_se": 0.002519742057054582,
+      "improvement_percent": 28.868381590814725
+    },
+    {
+      "mode": "Concept drift",
+      "severity": 12.0,
+      "n": 100,
+      "robust_mean": 0.48075071420547166,
+      "robust_se": 0.002988526659601053,
+      "nonrobust_mean": 0.3130559279943323,
+      "nonrobust_se": 0.003484652245310861,
+      "improvement_percent": 53.56703745733751
+    },
+    {
+      "mode": "Covariate shift",
+      "severity": 0.0,
+      "n": 100,
+      "robust_mean": 0.8093857142863417,
+      "robust_se": 0.000568523567024896,
+      "nonrobust_mean": 0.8285225179444277,
+      "nonrobust_se": 0.000514330608173257,
+      "improvement_percent": -2.309750579328184
+    },
+    {
+      "mode": "Covariate shift",
+      "severity": 2.0,
+      "n": 100,
+      "robust_mean": 0.7499185772842949,
+      "robust_se": 0.0007228910526124481,
+      "nonrobust_mean": 0.7490721135336971,
+      "nonrobust_se": 0.0007549332504028477,
+      "improvement_percent": 0.11300163699925735
+    },
+    {
+      "mode": "Covariate shift",
+      "severity": 4.0,
+      "n": 100,
+      "robust_mean": 0.6910150488024783,
+      "robust_se": 0.0012056900195166055,
+      "nonrobust_mean": 0.6698717294750288,
+      "nonrobust_se": 0.0012687469996637,
+      "improvement_percent": 3.1563235761597546
+    },
+    {
+      "mode": "Covariate shift",
+      "severity": 6.0,
+      "n": 100,
+      "robust_mean": 0.6276375347247878,
+      "robust_se": 0.0016914169267395966,
+      "nonrobust_mean": 0.5843355528845591,
+      "nonrobust_se": 0.0019089559008121332,
+      "improvement_percent": 7.410465036137099
+    },
+    {
+      "mode": "Covariate shift",
+      "severity": 8.0,
+      "n": 100,
+      "robust_mean": 0.5628323156424603,
+      "robust_se": 0.0023502990055156566,
+      "nonrobust_mean": 0.4973482899053386,
+      "nonrobust_se": 0.002658007881896824,
+      "improvement_percent": 13.166633336486473
+    },
+    {
+      "mode": "Covariate shift",
+      "severity": 10.0,
+      "n": 100,
+      "robust_mean": 0.5017394359674947,
+      "robust_se": 0.0029144011872448937,
+      "nonrobust_mean": 0.4177569280291396,
+      "nonrobust_se": 0.003302606523763589,
+      "improvement_percent": 20.103199325636847
+    },
+    {
+      "mode": "Covariate shift",
+      "severity": 12.0,
+      "n": 100,
+      "robust_mean": 0.4719702335999068,
+      "robust_se": 0.003918417022264535,
+      "nonrobust_mean": 0.39976944970038447,
+      "nonrobust_se": 0.003943042222355196,
+      "improvement_percent": 18.060605670001742
+    }
+  ],
+  "baseline_rep0": [
+    {
+      "case": "low",
+      "rep": 0,
+      "width": 10,
+      "coefficient": 0.20833476384991764,
+      "old_c": 0.06588123695590493,
+      "validation_value": 0.6203267477847643,
+      "test_value": 0.6254549441302251,
+      "oracle_value": 0.6345182654402395,
+      "test_regret": 0.009063321310014416
+    },
+    {
+      "case": "moderate",
+      "rep": 0,
+      "width": 10,
+      "coefficient": 3.546604758012318,
+      "old_c": 1.1215348995709233,
+      "validation_value": 0.6361359750042288,
+      "test_value": 0.6164184086760869,
+      "oracle_value": 0.6164184086760869,
+      "test_regret": 0.0
+    },
+    {
+      "case": "high",
+      "rep": 0,
+      "width": 8,
+      "coefficient": 0.6338376661055392,
+      "old_c": 0.20043706916988108,
+      "validation_value": 0.584152192631302,
+      "test_value": 0.6080242121280274,
+      "oracle_value": 0.6080242121280274,
+      "test_regret": 0.0
+    }
+  ],
+  "shift_rep0_picks": [
+    {
+      "method": "robust",
+      "width": 2,
+      "coefficient": 6.024427633652624,
+      "old_c": 1.9050912921200744,
+      "validation_value": 0.6886931460514445
+    },
+    {
+      "method": "non-robust",
+      "width": 238,
+      "coefficient": 0.0,
+      "old_c": 0.0,
+      "validation_value": 0.8532060383690325
+    }
+  ],
+  "shift_rep0": [
+    {
+      "rep": 0,
+      "mode": "Concept drift",
+      "severity": 0.0,
+      "robust": 0.8083242110878229,
+      "non-robust": 0.8322731253260747
+    },
+    {
+      "rep": 0,
+      "mode": "Concept drift",
+      "severity": 2.0,
+      "robust": 0.7745248485745863,
+      "non-robust": 0.7767488660467788
+    },
+    {
+      "rep": 0,
+      "mode": "Concept drift",
+      "severity": 4.0,
+      "robust": 0.7318156504496932,
+      "non-robust": 0.7073243133891374
+    },
+    {
+      "rep": 0,
+      "mode": "Concept drift",
+      "severity": 6.0,
+      "robust": 0.6808758282907307,
+      "non-robust": 0.6254794056469575
+    },
+    {
+      "rep": 0,
+      "mode": "Concept drift",
+      "severity": 8.0,
+      "robust": 0.6231815376419574,
+      "non-robust": 0.5243543274484574
+    },
+    {
+      "rep": 0,
+      "mode": "Concept drift",
+      "severity": 10.0,
+      "robust": 0.5598524358245545,
+      "non-robust": 0.409378317319788
+    },
+    {
+      "rep": 0,
+      "mode": "Concept drift",
+      "severity": 12.0,
+      "robust": 0.49258202853379773,
+      "non-robust": 0.2851233234112151
+    },
+    {
+      "rep": 0,
+      "mode": "Covariate shift",
+      "severity": 0.0,
+      "robust": 0.8083242110878229,
+      "non-robust": 0.8322731253260747
+    },
+    {
+      "rep": 0,
+      "mode": "Covariate shift",
+      "severity": 2.0,
+      "robust": 0.7535301832886413,
+      "non-robust": 0.7522739038787782
+    },
+    {
+      "rep": 0,
+      "mode": "Covariate shift",
+      "severity": 4.0,
+      "robust": 0.693103130591102,
+      "non-robust": 0.6693069827649742
+    },
+    {
+      "rep": 0,
+      "mode": "Covariate shift",
+      "severity": 6.0,
+      "robust": 0.6343948486948385,
+      "non-robust": 0.5793754070717841
+    },
+    {
+      "rep": 0,
+      "mode": "Covariate shift",
+      "severity": 8.0,
+      "robust": 0.5677497677771375,
+      "non-robust": 0.49178025598023084
+    },
+    {
+      "rep": 0,
+      "mode": "Covariate shift",
+      "severity": 10.0,
+      "robust": 0.513803349244222,
+      "non-robust": 0.4175511884516105
+    },
+    {
+      "rep": 0,
+      "mode": "Covariate shift",
+      "severity": 12.0,
+      "robust": 0.4818131618887186,
+      "non-robust": 0.40574312062561513
+    }
+  ],
+  "fit_checks": [
+    {
+      "study": "baseline",
+      "case": "low",
+      "rep": 0,
+      "width": 10,
+      "method": "robust",
+      "exact": true,
+      "max_parameter_error": 0.0,
+      "state_sha256": "801a86900a28bb70c5ad0543a682cc9646a3a6a03a089e4e0c774790503e0a16"
+    },
+    {
+      "study": "baseline",
+      "case": "moderate",
+      "rep": 0,
+      "width": 10,
+      "method": "robust",
+      "exact": true,
+      "max_parameter_error": 0.0,
+      "state_sha256": "e98ca4c749adbd07329302a62c4797f38e939eef99279ffc58eabcc0c713c755"
+    },
+    {
+      "study": "baseline",
+      "case": "high",
+      "rep": 0,
+      "width": 8,
+      "method": "robust",
+      "exact": true,
+      "max_parameter_error": 0.0,
+      "state_sha256": "a9225f9a2af3549ac7630eccae099839ecc9d9073c282862409b52a212fa0add"
+    },
+    {
+      "study": "shift",
+      "case": "moderate",
+      "rep": 0,
+      "width": 2,
+      "method": "robust",
+      "exact": true,
+      "max_parameter_error": 0.0,
+      "state_sha256": "a9a09541875c93ed88beb4b1f42b133f8df13838b080596038abc8bc09f05c24"
+    },
+    {
+      "study": "shift",
+      "case": "moderate",
+      "rep": 0,
+      "width": 238,
+      "method": "non-robust",
+      "exact": true,
+      "max_parameter_error": 0.0,
+      "state_sha256": "566cb9e9961fb0a373206d48fd2fa08d39ead80501c9f6eb52a9586404fe9ad2"
+    }
+  ]
+}

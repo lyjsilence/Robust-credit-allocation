@@ -1,48 +1,11 @@
-# Generated simulation artifacts
-data/
-**/data/
-results/
-**/results/
-models/
-**/models/
-reproduction_runs/
-**/reproduction_runs/
-
-# Local archives and development sandboxes
-simulation/raw code/
-simulation/shift_dgp_search/
-simulation/*sandbox*/
-
-# Serialized datasets and fitted models
-*.pkl
-*.joblib
-*.npy
-*.npz
-*.pt
-*.pth
-*.ckpt
-
-# Generated tables, figures, and logs
-*.csv
-*.xlsx
-*.png
-*.jpg
-*.jpeg
-*.pdf
-*.log
-
-# Python caches and local environments
 __pycache__/
 *.py[cod]
-.pytest_cache/
-.mypy_cache/
-.ruff_cache/
-.ipynb_checkpoints/
 .venv/
-venv/
-
-# Editors and operating systems
-.idea/
-.vscode/
+results/
+outputs/
+*.pt
+*.pth
+*.pkl
+*.joblib
+*.log
 .DS_Store
-Thumbs.db
