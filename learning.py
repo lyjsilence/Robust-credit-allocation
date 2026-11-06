@@ -5,7 +5,6 @@ from torch import nn
 from torch.nn import functional as F
 from torch.optim import Adam
 
-from .models import Policy
 
 TRAINING_OPTIONS = {
     "learning_rate": 0.005,
@@ -21,6 +20,23 @@ TRAINING_OPTIONS = {
     "max_alternations": 5,
     "radius": 0.2,
 }
+
+
+class Policy(nn.Module):
+    def __init__(self, width, input_dim=4):
+        super().__init__()
+        self.layers = nn.ModuleList(
+            [
+                nn.Linear(input_dim, width),
+                nn.Linear(width, width),
+                nn.Linear(width, 2),
+            ]
+        )
+
+    def forward(self, x):
+        x = self.layers[0](x).relu()
+        x = self.layers[1](x).relu()
+        return self.layers[2](x)
 
 
 class PolicyObjective:
