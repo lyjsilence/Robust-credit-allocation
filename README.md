@@ -142,16 +142,40 @@ mean_nonrobust`, calculated before rounding.
 - `simulation/dgp.py`, `shift.py`: outcome generation and deployment shifts.
 - `simulation/experiment.py`: fitting, selection, scoring and aggregation.
 - `policy_core/`: numerical training, policy and KL/OOB routines.
-- `simulation/design.json`: optimization settings, normalization and seeds.
+- `simulation/design.json`: one shared set of optimization settings, sample
+  sizes and the normalization constants for Low, Middle and High complexity.
+- `simulation/random_seeds.npz`: integer random seeds indexed directly by
+  replication 0,...,99, case, width and draw purpose. They contain no outcomes
+  or fitted models. The same fitting seeds pair robust and non-robust policies.
 - `simulation/bootstrap_counts.npz`: the fixed integer bootstrap multiplicities
   for the first 20 baseline replications. They contain no outcomes or model
   predictions. Later replications regenerate multiplicities from saved seeds.
 - `reference_results.json`: table and replication-0 expectations plus five
   model-state digests, used only for verification.
 
-Opaque stream identifiers and four recorded hash-collision nonces are retained
-because changing them changes the random draws. No original filesystem layout,
-private environment name, downloaded dataset or fitted checkpoint is required.
+The seed archive specifies all random streams numerically, so names and file
+locations do not affect random draws. Its arrays have the following axes:
+
+| Array | Shape | Axes |
+|---|---|---|
+| `baseline_data` | 100 × 3 × 3 | replication, case, training/validation/test split |
+| `baseline_evaluation` | 100 × 3 × 2 | replication, case, validation/test split |
+| `baseline_fitting` | 100 × 3 × 128 × 2 | replication, case, width, preparation/initialization |
+| `baseline_oob` | 80 × 3 | replication 20–99, case |
+| `shift_fitting` | 100 × 128 × 2 | replication, width, preparation/initialization |
+| `shift_outcomes` | 100 × 3 | replication, training/validation/test split |
+| `shift_directions` | 100 × 100 | replication, environment |
+| `shift_resampling` | 100 × 6 × 100 | replication, severity 2/4/6/8/10/12, environment |
+| `shift_oob` | 100 | replication |
+
+Cases are ordered Low, Middle, High; widths are 2,4,...,256. Replications 0–19
+read their fixed bootstrap multiplicities from `bootstrap_counts.npz`.
+All 100 replications use the same DGP parameters and optimization settings
+within each reported case/experiment. The complexity and perturbation
+experiments use the distinct outcome mechanisms described above.
+
+No original filesystem layout, private environment name, downloaded dataset or
+fitted checkpoint is required.
 Empirical experiments, unrelated simulation variants, plots, manuscripts,
 generated data/models and operational logs are not included.
 

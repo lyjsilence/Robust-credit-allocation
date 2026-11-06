@@ -16,7 +16,7 @@ from policy_core.models import CategoricalSievePolicy
 from policy_core.oob import coefficient_grid, select_oob, validation_scores
 from policy_core.robust_values import robust_values
 from .dgp import (CASES, DESIGN, fitting_seeds, held_out_data, oob_counts,
-                  shift_seed, training_data)
+                  shift_direction_seeds, shift_resampling_seed, training_data)
 from . import shift
 
 WIDTHS = tuple(range(2, 257, 2))
@@ -46,8 +46,7 @@ def fit(study, case, rep, width, method, destination, device, data=None):
     destination.mkdir(parents=True, exist_ok=False)
     if data is None:
         data = training_data(study, case, rep)
-    batch = DESIGN['replications'][str(rep)]['batch']
-    args = SimpleNamespace(**DESIGN['training_options'][batch])
+    args = SimpleNamespace(**DESIGN['training_options'])
     args.policy_hidden_width = width
     args.robust_met = method
     args.model_dir = destination
@@ -62,7 +61,7 @@ def fit(study, case, rep, width, method, destination, device, data=None):
     set_seed(candidate)
     path = destination/'model.pt'
     _, validation, alphas, value, history = fit_candidate(policy_data, 2,
-        DESIGN['replications'][str(rep)]['source_rep'], path, SIMULATION_PROFILE,
+        rep, path, SIMULATION_PROFILE,
         torch.device(device), return_diagnostics=True)
     save(destination/'complete.json', dict(study=study, case=case, rep=rep, width=width,
         method=method, preparation_seed=preparation, candidate_seed=candidate,
@@ -106,15 +105,15 @@ def shift_evaluation(rep, test, predictions):
     p0, u, z, risky = (test[k].ravel() for k in
                        ('tail_p0', 'tail_u', 'tail_z', 'tail_risky_action'))
     baseline = {method:y[np.arange(n), pred] for method, pred in predictions.items()}
-    h = shift.susceptibility(test['X'], [shift_seed(rep, f'concept_direction_m{m}') for m in range(100)])
+    h = shift.susceptibility(test['X'], shift_direction_seeds(rep))
     rows = []
-    for severity, seed_label in zip(shift.SEVERITIES, (0., .5, 1., 1.5, 2., 2.5, 3.)):
+    for severity in shift.SEVERITIES:
         weights, _, _ = shift.tilt_weights(test['X'], severity)
         for m in range(100):
             if severity == 0:
                 cov = con = {method:float(values.mean()) for method, values in baseline.items()}
             else:
-                rng = np.random.default_rng(shift_seed(rep, f'covariate_resample_l{seed_label:g}_m{m}'))
+                rng = np.random.default_rng(shift_resampling_seed(rep, severity, m))
                 indices = rng.choice(n, n, replace=True, p=weights)
                 cov = {method:float(values[indices].mean()) for method, values in baseline.items()}
                 p, _, _ = shift.solve_concept_probability(p0, h[m], severity)

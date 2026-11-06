@@ -1,5 +1,4 @@
-"""Generate the two simulation designs from their fixed random streams."""
-import hashlib
+"""Generate observations for the complexity and perturbation experiments."""
 import json
 from pathlib import Path
 
@@ -8,36 +7,32 @@ import torch
 from scipy.special import expit
 from torch import nn
 
-from .shift import nominal_outcomes
+from .shift import SEVERITIES, nominal_outcomes
 
 DESIGN = json.loads(Path(__file__).with_name('design.json').read_text(encoding='utf-8'))
+with np.load(Path(__file__).with_name('random_seeds.npz')) as archive:
+    SEEDS = {name:archive[name] for name in archive.files}
 CASES = ('low', 'moderate', 'high')
 SPLITS = ('master_train', 'master_validation', 'test')
 
 
-def stream_seed(cycle, phase, batch, scenario, replication, role, width=0, attempt=0):
-    identity = [str(cycle), str(phase), str(batch), str(scenario),
-                int(replication), str(role), int(width), int(attempt)]
-    encoded = json.dumps(identity, separators=(',', ':'), ensure_ascii=True).encode()
-    return int.from_bytes(hashlib.sha256(encoded).digest()[:4], 'big')
+def shift_direction_seeds(rep):
+    return SEEDS['shift_directions'][rep].tolist()
 
 
-def shift_seed(rep, role, width=0):
-    record = DESIGN['replications'][str(rep)]
-    batch, source_rep = record['batch'], record['source_rep']
-    nonce = next((r['nonce'] for r in DESIGN['shift_seed_nonces']
-                  if (r['batch'], r['rep'], r['role'], r['width']) ==
-                  (batch, source_rep, role, width)), 0)
-    return stream_seed('s102', 'development', batch, 'moderate', source_rep, role, width, nonce)
+def shift_resampling_seed(rep, severity, environment):
+    index = SEVERITIES[1:].index(severity)
+    return int(SEEDS['shift_resampling'][rep, index, environment])
 
 
 def fitting_seeds(study, case, rep, width):
+    if width not in range(2, 257, 2):
+        raise ValueError('Width must be an even integer from 2 through 256')
     if study == 'shift':
-        return shift_seed(rep, 'preparation', width), shift_seed(rep, 'candidate', width)
-    r = DESIGN['replications'][str(rep)]
-    namespace = DESIGN['namespaces'][r['batch']]
-    return tuple(stream_seed(namespace, 'fitting', 5000, case, r['source_rep'], role, width)
-                 for role in ('preparation:depth0', 'candidate:depth2'))
+        row = SEEDS['shift_fitting'][rep, width//2-1]
+    else:
+        row = SEEDS['baseline_fitting'][rep, CASES.index(case), width//2-1]
+    return tuple(int(value) for value in row)
 
 
 def teacher(frequency):
@@ -84,11 +79,13 @@ def smooth(case, n, seed):
 def training_data(study, case, rep):
     if study == 'shift' and case != 'moderate':
         raise ValueError('The perturbation experiment uses the Middle case only')
-    seeds = DESIGN['replications'][str(rep)]['cases'][case]['training']
-    result = {split:smooth(case, **seeds[split]) for split in SPLITS}
+    seeds = SEEDS['baseline_data'][rep, CASES.index(case)]
+    result = {split:smooth(case, DESIGN['sample_sizes'][split], int(seeds[i]))
+              for i, split in enumerate(SPLITS)}
     if study == 'shift':
-        for split, part in result.items():
-            rng = np.random.default_rng(shift_seed(rep, 'outcome_'+split))
+        for i, split in enumerate(SPLITS):
+            part = result[split]
+            rng = np.random.default_rng(int(SEEDS['shift_outcomes'][rep, i]))
             n = len(part['X'])
             g = nominal_outcomes(part['X'], part['mu'].argmax(1),
                                  rng.uniform(size=n), rng.normal(0, .6, size=n))
@@ -103,17 +100,18 @@ def training_data(study, case, rep):
 
 
 def held_out_data(case, rep, split):
-    seed = DESIGN['replications'][str(rep)]['cases'][case]['evaluation'][split]
-    return smooth(case, 500 if split == 'validation' else 2500, seed)
+    index = ('validation', 'test').index(split)
+    seed = int(SEEDS['baseline_evaluation'][rep, CASES.index(case), index])
+    size = DESIGN['sample_sizes']['master_validation' if split == 'validation' else 'test']
+    return smooth(case, size, seed)
 
 
 def oob_counts(study, case, rep):
     from policy_core.oob import bootstrap_counts
-    r = DESIGN['replications'][str(rep)]
     if study == 'shift':
-        return bootstrap_counts(500, r['shift_oob_seed'])
+        return bootstrap_counts(500, int(SEEDS['shift_oob'][rep]))
     if rep < 20:
         # Original resampling draws are fixed design inputs, not observations.
         with np.load(Path(__file__).with_name('bootstrap_counts.npz')) as z:
             return z[f'{case}_{rep}'].astype(np.int64)
-    return bootstrap_counts(500, r['cases'][case]['oob_seed'])
+    return bootstrap_counts(500, int(SEEDS['baseline_oob'][rep-20, CASES.index(case)]))
