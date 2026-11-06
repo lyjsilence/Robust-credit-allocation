@@ -73,13 +73,13 @@ Shift environments are saved in `covariate_level_LEVEL.npz` and `concept_level_L
 Training reads the files generated above. Each command evaluates the fitted
 policies and writes replication-level results and a summary.
 
-### Policy complexity: Low, Middle and High
+### Policy complexity: Low, Middle and High (Table 1)
 
 ```bash
 python run_simulation.py --mode run --study baseline --cases low moderate high --num-reps 100 --data-dir data --output results/baseline
 ```
 
-### Robustness under distribution shift
+### Robustness under distribution shift (Table 2)
 
 ```bash
 python run_simulation.py --mode run --study shift --shift-mode both --level 0 2 4 6 8 10 --num-reps 100 --data-dir data --output results/shift
