@@ -103,10 +103,10 @@ python run_simulation.py --mode summarize --study shift --output results/shift
 
 Output files are `selections.csv`, `replication_results.csv` and `summary.csv`.
 
-## 4. Proofs
-
-Due to page limitation, we upload the complete proofs (2026_Causal_Allocation_proofs.pdf) here for reference. 
-
 The shift experiment also saves `environments.csv`. 
 
 Each candidate directory contains `model.pt` and `training.csv`.
+
+## 4. Proofs of Propositions, Theorem, and Corollary
+
+Due to page limitation, we upload the complete proofs (2026_Causal_Allocation_proofs.pdf) here for reference. 
